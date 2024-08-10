@@ -25,48 +25,43 @@ on `n` number of threads:
 // benchmarked code
 import { run } from '@nicholaswmin/dyno'
 
-let counter = 0
-
 run(async function task(parameters) {
-  function fibonacci_1(n) {
+  function fibonacci(n) {
     return n < 1 ? 0
       : n <= 2 ? 1
       : fibonacci_1(n - 1) + fibonacci_1(n - 2)
   }
-
-  function fibonacci_2(n) {
-    return n < 1 ? 0
-    : n <= 2 ? 1
-    : fibonacci_2(n - 1) + fibonacci_2(n - 2)
+  
+  function sleep(ms) {
+    return new Promise(res => setTimeout(res, ms))
   }
-
-  performance.timerify(fibonacci_1)(parameters.FOO * Math.sin(++counter))
-  performance.timerify(fibonacci_2)(parameters.BAR * Math.sin(++counter))  
+  
+  performance.timerify(fibonacci)(parameters.FOO)
+  performance.timerify(sleep)(parameters.BAR)
 })
 ```
 
-while rendering live output:
+while logging measurements timings:
 
 ```js
-
 general stats 
 
-┌─────────┬──────┬──────┬─────────┬────────┐
-│ (index) │ sent │ done │ backlog │ uptime │
-├─────────┼──────┼──────┼─────────┼────────┤
-│ 0       │ 179  │ 178  │ 1       │ 6      │
-└─────────┴──────┴──────┴─────────┴────────┘
+┌─────────┬──────┬──────┬─────────┬──────────────┐
+│ (index) │ sent │ done │ backlog │ uptime (sec) │
+├─────────┼──────┼──────┼─────────┼──────────────┤
+│ 0       │ 132  │ 130  │ 2       │ 5            │
+└─────────┴──────┴──────┴─────────┴──────────────┘
 
-cycle timings (mean/ms) 
+cycle timings 
 
-┌─────────┬──────┬─────────────┬─────────────┬──────────┐
-│ (index) │ task │ fibonacci_1 │ fibonacci_2 │ eloop    │
-├─────────┼──────┼─────────────┼─────────────┼──────────┤
-│ 0       │ 14   │ 2           │ 13          │ 12797591 │
-│ 1       │ 15   │ 2           │ 13          │ 12780725 │
-│ 2       │ 16   │ 2           │ 14          │ 12793736 │
-│ 3       │ 15   │ 2           │ 14          │ 12919025 │
-└─────────┴──────┴─────────────┴─────────────┴──────────┘
+┌─────────┬─────────┬──────┬───────────┬───────┬──────────┐
+│ (index) │ thread  │ task │ fibonacci │ sleep │ eloop    │
+├─────────┼─────────┼──────┼───────────┼───────┼──────────┤
+│ 0       │ '19517' │ 73   │ 73        │ 98    │ 30370723 │
+│ 1       │ '19518' │ 70   │ 70        │ 103   │ 28461987 │
+│ 2       │ '19519' │ 69   │ 69        │ 104   │ 28810519 │
+│ 3       │ '19520' │ 71   │ 71        │ 102   │ 26976256 │
+└─────────┴─────────┴──────┴───────────┴───────┴──────────┘
 ```
 
 > note: requires additional configuration, see below
@@ -126,20 +121,20 @@ import { join } from 'node:path'
 import { dyno } from '@nicholaswmin/dyno'
 
 await dyno({
-  // location of the task file
+  // task file path
   task: join(import.meta.dirname, 'task.js'),
 
-  // test parameters
+  // parameters
   parameters: {
     // required
     CYCLES_PER_SECOND: 40, 
     CONCURRENCY: 4, 
     DURATION_MS: 10 * 1000,
     
-    // custom, optional
+    // optional,
     // passed-on to 'task.js'
-    FOO: 30,
-    BAR: 35
+    FOO: 35,
+    BAR: 50
   },
   
   // Render output using `console.table`
@@ -154,7 +149,7 @@ await dyno({
 
       threads: Object.keys(threads).reduce((acc, pid) => {
         return [ ...acc, Object.keys(threads[pid]).reduce((acc, task) => ({
-            ...acc, thread: pid, [task]: Math.round(threads[pid][task].mean)
+          ...acc, thread: pid, [task]: Math.round(threads[pid][task].mean)
         }), {})]
       }, [])
     }
