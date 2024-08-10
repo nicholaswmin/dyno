@@ -2,20 +2,20 @@ import { join } from 'node:path'
 import { dyno } from '{{entrypath}}'
 
 await dyno({
-  // location of the task file
+  // task file path
   task: join(import.meta.dirname, 'task.js'),
 
-  // test parameters
+  // parameters
   parameters: {
     // required
     CYCLES_PER_SECOND: 40, 
     CONCURRENCY: 4, 
     DURATION_MS: 10 * 1000,
     
-    // custom, optional
+    // optional,
     // passed-on to 'task.js'
-    FOO: 30,
-    BAR: 35
+    FOO: 35,
+    BAR: 50
   },
   
   // Render output using `console.table`
@@ -30,14 +30,16 @@ await dyno({
 
       threads: Object.keys(threads).reduce((acc, pid) => {
         return [ ...acc, Object.keys(threads[pid]).reduce((acc, task) => ({
-            ...acc, thread: pid, [task]: Math.round(threads[pid][task].mean)
+          ...acc, thread: pid, [task]: Math.round(threads[pid][task].mean)
         }), {})]
       }, [])
     }
     
     console.clear()
+
     console.log('\n', 'general stats', '\n')
     console.table(tables.main)
+
     console.log('\n', 'cycle timings', '\n')
     console.table(tables.threads)
   }
