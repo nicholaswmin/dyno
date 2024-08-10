@@ -1,7 +1,7 @@
 {
   "name": "@nicholaswmin/dyno",
   "type": "module",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "benchmarking in multiple threads",
   "main": "index.js",
   "bin": {
