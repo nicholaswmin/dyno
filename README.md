@@ -155,7 +155,6 @@ await dyno({
       // 
       // - 'sent', number of issued cycles 
       // - 'done', number of completed cycles 
-      // - 'backlog', backlog of issued yet uncompleted cycles
       // - 'uptime', current test duration
       // 
       new view.Table('Cycles', [{
