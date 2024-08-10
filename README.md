@@ -19,7 +19,7 @@ run multithreaded benchmarks
 
 ## Overview
 
-Run the following piece of code `n` number of times 
+Run the following piece of code `n` number of cycles, 
 on `n` number of threads:
 
 ```js
@@ -46,7 +46,7 @@ run(async function task(parameters) {
 })
 ```
 
-rendering live output:
+while rendering live output:
 
 ```js
 +--------------------------------+
