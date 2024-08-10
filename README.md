@@ -76,6 +76,8 @@ cycle timings
 └─────────┴─────────┴──────┴───────────┴───────┴──────────┘
 ```
 
+> an example `main` file is [documented below](#main-file):
+
 ## Quickstart
 
 ### Install
