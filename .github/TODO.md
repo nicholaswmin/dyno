@@ -42,6 +42,7 @@
 
 ## build
 
+- [ ] actually publish a semvered `v1`
 - [x] "pull" this into its own project/repository
 - [x] publish to `npm`
 
