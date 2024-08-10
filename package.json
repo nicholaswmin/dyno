@@ -2,7 +2,7 @@
   "name": "@nicholaswmin/dyno",
   "type": "module",
   "version": "0.1.1",
-  "description": "runs code on separate threads and logs runtime measurements",
+  "description": "benchmarking in multiple threads",
   "main": "index.js",
   "bin": {
     "init": "bin/create-example.js"

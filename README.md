@@ -2,7 +2,7 @@
 
 # :stopwatch: dyno
 
-run multithreaded benchmarks
+benchmarking in multiple threads
 
 * [Install](#install)
 * [Quickstart](#quickstart)
