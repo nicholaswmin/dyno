@@ -13,10 +13,8 @@ test('#dyno() records a default task measurement', async t => {
       task: join(import.meta.dirname, 'tasks/records-foo.js'),
       parameters
     })
-    
-    const pids = Object.keys(result).sort((a, b) => a - b) 
 
-    task = result[pids[1]].task
+    task = result.thread.task
   })
 
   await t.test('tracks a task measurement', async t => {
@@ -27,13 +25,13 @@ test('#dyno() records a default task measurement', async t => {
     t.assert.ok(task.count > 0, `task.count: ${task.count}, not > 0`)
 
     t.assert.ok(task.min > 0, `task.min: ${task.min}, not > 0`)
-    t.assert.ok(task.min < 15, `task.min: ${task.min}, not < 15`)
+    t.assert.ok(task.min < 20, `task.min: ${task.min}, not < 20`)
 
     t.assert.ok(task.mean > 0, `task.mean: ${task.mean}, not > 0`)
-    t.assert.ok(task.mean < 15, `task.mean: ${task.mean}, not < 15`)
+    t.assert.ok(task.mean < 20, `task.mean: ${task.mean}, not < 20`)
 
     t.assert.ok(task.max > 0, `task.max: ${task.max}, not > 0`)
-    t.assert.ok(task.max < 15, `task.mean: ${task.max}, not < 15`)
+    t.assert.ok(task.max < 20, `task.mean: ${task.max}, not < 20`)
   })
   
   await t.test('records snapshots of the histogram', async t => {

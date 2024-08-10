@@ -1,8 +1,8 @@
-[![test-workflow][test-badge]][test-workflow] [![codeql-workflow][codeql-badge]][codeql-workflow]
+[![test-workflow][test-badge]][test-workflow] [![coverage-workflow][coverage-badge]][coverage-report] [![codeql-workflow][codeql-badge]][codeql-workflow]
 
 # :stopwatch: dyno
 
-run multithreaded benchmarks
+benchmarking in multiple threads
 
 * [Install](#install)
 * [Quickstart](#quickstart)
@@ -11,7 +11,6 @@ run multithreaded benchmarks
 * [Example](#example)
   + [Run file](#run-file)
   + [Task file](#task-file)
-  + [Output](#output)
 * [Tests](#tests)
 * [Misc.](#misc)
 * [Authors](#authors)
@@ -19,50 +18,74 @@ run multithreaded benchmarks
 
 ## Overview
 
+Run the following piece of code `n` number of cycles, 
+on `n` number of threads:
+
 ```js
 // benchmarked code
 import { run } from '@nicholaswmin/dyno'
 
+let counter = 0
+
 run(async function task(parameters) {
-  // function under test
-  function fibonacci(n) {
+  function fibonacci_1(n) {
     return n < 1 ? 0
-          : n <= 2 ? 1
-          : fibonacci(n - 1) + fibonacci(n - 2)
+      : n <= 2 ? 1
+      : fibonacci_1(n - 1) + fibonacci_1(n - 2)
   }
-  
-  // record measurements using `performance.timerify`
-  const timed_fibonacci = performance.timerify(fibonacci)
-  
-  for (let i = 0; i < parameters.ITERATIONS; i++)
-    timed_fibonacci(parameters.FIB_NUMBER)
+
+  function fibonacci_2(n) {
+    return n < 1 ? 0
+    : n <= 2 ? 1
+    : fibonacci_2(n - 1) + fibonacci_2(n - 2)
+  }
+
+  performance.timerify(fibonacci_1)(parameters.FOO * Math.sin(++counter))
+  performance.timerify(fibonacci_2)(parameters.BAR * Math.sin(++counter))  
 })
 ```
 
-> requires test configuration in another file, `run.js`, see below
-
-renders:
+while rendering live output:
 
 ```js
 +--------------------------------+
-|             Tasks              |
+|             Cycles             |
 +------+------+---------+--------+
 | sent | done | backlog | uptime |
 +------+------+---------+--------+
-|   49 |   48 |       1 |      5 |
+|  284 |  276 |       8 |      7 |
 +------+------+---------+--------+
 
-+--------------------------------------------------+
-|                  Task durations                  |
-+-----------+----------------+---------------------+
-| thread id | task (mean/ms) | fibonacci (mean/ms) |
-+-----------+----------------+---------------------+
-|     63511 |            157 |                  53 |
-|     63512 |            159 |                  53 |
-|     63513 |            174 |                  53 |
-|     63514 |            160 |                  54 |
-+-----------+----------------+---------------------+
++-----------------------------------------------------------------------------+
+|                                   Timings                                   |
++-----------+-----------------+-----------------------+-----------------------+
+| thread id | cycle (mean/ms) | fibonacci_1 (mean/ms) | fibonacci_2 (mean/ms) |
++-----------+-----------------+-----------------------+-----------------------+
+|     97339 |              77 |                     1 |                    39 |
+|     97340 |              65 |                     1 |                    35 |
+|     97341 |              89 |                     1 |                    41 |
+|     97342 |              65 |                     1 |                    35 |
++-----------+-----------------+-----------------------+-----------------------+
+
+  Task timings
+
+  -- task  -- fibonacci_1  -- fibonacci_2
+
+ 148.86 ┼╮                                                                    
+ 134.08 ┤╰──╮                                                                 
+ 119.30 ┤   ╰─╮                                                               
+ 104.52 ┤     ╰──╮                                                            
+  89.74 ┤        ╰───────────────────╮                                        
+  74.96 ┼──╮                         ╰───────────────────╮                    
+  60.18 ┤  ╰─────╮                                       ╰─────────────────╮  
+  45.40 ┤        ╰───────────────────────────────────────╮                 │  
+  30.62 ┤                                                ╰──────────────────╮ 
+  15.84 ┤                                                                   ╰ 
+   1.06 ┼──────────────────────────────────────────────────────────────────── 
 ```
+
+> note: requires additional configuration, see below
+
 ## Install
 
 ```bash
@@ -101,7 +124,6 @@ then:
 
 ```bash
 npm run benchmark
-# or just: node run.js
 ``` 
 
 ## Example
@@ -119,77 +141,66 @@ import { join } from 'node:path'
 import { dyno, view } from '@nicholaswmin/dyno'
 
 await dyno({
-  // location of task file
+  // location of the task file
   task: join(import.meta.dirname, 'task.js'),
+
+  // test parameters
   parameters: {
-    // required test parameters
-    CYCLES_PER_SECOND: 10, 
+    // required
+    CYCLES_PER_SECOND: 40, 
     CONCURRENCY: 4, 
-    DURATION_MS: 5 * 1000,
+    DURATION_MS: 10 * 1000,
     
-    // custom parameters,
-    // passed on to 'task.js'
-    FIB_NUMBER: 35,
-    ITERATIONS: 3
+    // custom, optional
+    // passed-on to 'task.js'
+    FOO: 30,
+    BAR: 35
   },
   
-  // render live test logs
-  render: function(threads) {
-    // `threads` contains: 
-    //
-    // - histograms & histogram snapshots,
-    //   per task, per thread
-    //
-    // - 1 of the threads is the 
-    //   primary/main process which 
-    //   contains general test stats
+  // Render output using `view.Table` & `view.Plot`
+  render: function({ main, threads, thread }) {
+    // - `main` contains general test stats
+    //    - `sent`   : number of issued cycles 
+    //    - `done`   : number of completed cycles 
+    //    - `uptime` : test duration in seconds
     // 
-    const pid  = process.pid.toString()
-    const main = threads[pid]
+    // - `threads` contains task/threads measures
+    //    - `task`  : duration of a cycle
+    //    - `eloop` : duration of event loop
+    //    - any user-defined measures from `task.js`
+    // 
+    // - `thread` is just the 1st of `threads`
     const views = [
-      // Log main output: 
-      // general test stats, 
-      // cycles sent/finished, backlog etc..
-      // 
-      // Available measures:
-      // 
-      // - 'sent', number of issued cycles 
-      // - 'done', number of completed cycles 
-      // - 'backlog', backlog of issued yet uncompleted cycles
-      // - 'uptime', current test duration
-      // 
-      new view.Table('Cycles', [{
+
+      // Build main output as ASCII Table
+      new view.Table('General', [{
         'sent':    main?.sent?.count,
         'done':    main?.done?.count,
         'backlog': main?.sent?.count - main?.done?.count,
         'uptime':  main?.uptime?.count
       }]),
-      // Log task output:
-      //
-      // - Per thread measurements from 'task.js'
-      // - Custom measurements can be recorded here
-      // - e.g the 'fibonacci' measurement is a 
-      //   custom measurement recorded using 
-      //   `performance.timerify`
-      // 
-      // Available measures:
-      // - 'task', duration of a cycle/task
-      // 
-      // Custom measurements can also be 
-      // recorded in `task.js`
-      //
-      new view.Table('Task durations', Object.keys(threads)
-      .filter(_pid => _pid !== pid)
-      .map(pid => ({
-        'thread id': pid,
-        'cycle (mean/ms)': Math.round(threads[pid].task?.mean),
-        'fibonacci (mean/ms)': Math.round(threads[pid].fibonacci?.mean)
-      })))
+
+      // Build per-thread output as ASCII Table
+      new view.Table(
+        'Cycles', 
+        Object.keys(threads)
+        .map(pid => ({
+          'thread id': pid,
+          'cycle (mean/ms)': Math.round(threads[pid].task?.mean),
+          'fibonacci_1 (mean/ms)': Math.round(threads[pid].fibonacci_1?.mean),
+          'fibonacci_2 (mean/ms)': Math.round(threads[pid].fibonacci_2?.mean)
+          // show top 5 threads, sorted by cycle time
+        })).sort((a, b) => b[1] - a[1]).slice(0, 5)
+      ),
+
+      // Build an ASCII chart of per-task timings,
+      // excluding event-loop timings
+      new view.Plot('mean/ms timings', thread, { 
+        exclude: ['eloop']
+      })
     ]
-    // display only the top 5 threads, 
-    // sorted by mean cycle duration
-    .sort((a, b) => b[1] - a[1]).slice(0, 5)
-    // render the tables
+    
+    // Render the views in the terminal
     console.clear()
     views.forEach(view => view.render())  
   }
@@ -213,43 +224,24 @@ Custom measurements can be taken using the following
  // task.js
 import { run } from '@nicholaswmin/dyno'
 
+let counter = 0
+
 run(async function task(parameters) {
-  // function under test
-  function fibonacci(n) {
+  function fibonacci_1(n) {
     return n < 1 ? 0
-          : n <= 2 ? 1
-          : fibonacci(n - 1) + fibonacci(n - 2)
+      : n <= 2 ? 1
+      : fibonacci_1(n - 1) + fibonacci_1(n - 2)
   }
-  
-  // record measurements using `performance.timerify`
-  const timed_fibonacci = performance.timerify(fibonacci)
-  
-  for (let i = 0; i < parameters.ITERATIONS; i++)
-    timed_fibonacci(parameters.FIB_NUMBER)
+
+  function fibonacci_2(n) {
+    return n < 1 ? 0
+    : n <= 2 ? 1
+    : fibonacci_2(n - 1) + fibonacci_2(n - 2)
+  }
+
+  performance.timerify(fibonacci_1)(parameters.FOO * Math.sin(++counter))
+  performance.timerify(fibonacci_2)(parameters.BAR * Math.sin(++counter))  
 })
-```
-
-### Output
-
-```js
-+--------------------------------+
-|             Tasks              |
-+------+------+---------+--------+
-| sent | done | backlog | uptime |
-+------+------+---------+--------+
-|   49 |   48 |       1 |      5 |
-+------+------+---------+--------+
-
-+--------------------------------------------------+
-|                  Task durations                  |
-+-----------+----------------+---------------------+
-| thread id | task (mean/ms) | fibonacci (mean/ms) |
-+-----------+----------------+---------------------+
-|     63511 |            157 |                  53 |
-|     63512 |            159 |                  53 |
-|     63513 |            174 |                  53 |
-|     63514 |            160 |                  54 |
-+-----------+----------------+---------------------+
 ```
 
 ## Tests
@@ -272,7 +264,22 @@ test coverage:
 npm run test:coverage
 ```
 
+style checks/eslint:
+
+```bash
+npm run checks
+```
+
 ## Misc
+
+> for users 
+
+```bash
+npx init
+```
+
+> create a runnable sample benchmark, 
+> like the one listed above
 
 > for contributors
 
@@ -296,6 +303,9 @@ Nicholas Kyriakides, [@nicholaswmin][nicholaswmin]
 
 [test-badge]: https://github.com/nicholaswmin/dyno/actions/workflows/test.yml/badge.svg
 [test-workflow]: https://github.com/nicholaswmin/dyno/actions/workflows/test:unit.yml
+
+[coverage-badge]: https://coveralls.io/repos/github/nicholaswmin/dyno/badge.svg?branch=main
+[coverage-report]: https://coveralls.io/github/nicholaswmin/dyno?branch=main
 
 [codeql-badge]: https://github.com/nicholaswmin/dyno/actions/workflows/codeql.yml/badge.svg
 [codeql-workflow]: https://github.com/nicholaswmin/dyno/actions/workflows/codeql.yml

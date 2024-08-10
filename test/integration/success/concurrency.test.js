@@ -14,22 +14,22 @@ test('#dyno() cycles in x amount of threads', async t => {
   })
 
   await t.test('returns an object', async t => {
-    const pids = Object.keys(result).sort((a, b) => a - b) 
-    const t1 = result[pids[1]], t2 = result[pids[2]]
+    const pids = Object.keys(result.threads).sort((a, b) => a - b) 
+    const t1 = result.threads[pids[0]], t2 = result.threads[pids[1]]
+  
+    await t.test('with a threads property', async t => {
+      t.assert.ok(Object.hasOwn(result, 'threads'))
+    })
   
     await t.test('with 1 property per-thread', async t => {
       await t.test('spawns at least 1 thread', async t => {
         t.assert.ok(pids.length > 0, 'result has 0 threads')
       })
-
-      await t.test('1st property is the main process', async t => {
-        t.assert.strictEqual(pids[0], process.pid.toString())
-      })
     })
     
     await t.test('with child thread measurements', async t => {
       await t.test('spawns specified number of threads', async t => {
-        t.assert.strictEqual(pids.length, 2 + 1)
+        t.assert.strictEqual(pids.length, 2)
       })
 
       await t.test('each thread runs at least 1 cycle', t => {
