@@ -61,7 +61,7 @@ await dyno({
       // Custom measurements can also be 
       // recorded in `task.js`
       //
-      new view.Table('Task durations', Object.keys(threads)
+      new view.Table('Timings', Object.keys(threads)
       .filter(_pid => _pid !== pid)
       .map(pid => ({
         'thread id': pid,
