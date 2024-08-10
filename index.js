@@ -1,12 +1,12 @@
 import timer from 'timers/promises'
-import run from './src/task/index.js'
+import task from './src/task/index.js'
 import prompt from './src/prompt/index.js'
 import Uptimer from './src/uptimer/index.js'
 import threader from './src/threader/index.js'
 import Collector from './src/collector/index.js'
 import Scheduler from './src/scheduler/index.js'
 
-const dyno = async ({ task, parameters, onMeasureUpdate = () => {} }) => {
+const main = async ({ task, parameters, onMeasureUpdate = () => {} }) => {
   parameters = await prompt(parameters, {
     skipUserInput: ['test'].includes(process.env.NODE_ENV)
   })
@@ -44,4 +44,4 @@ const dyno = async ({ task, parameters, onMeasureUpdate = () => {} }) => {
   return collector.stats
 }
 
-export { dyno, run }
+export { main, task }

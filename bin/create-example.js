@@ -9,7 +9,7 @@ await createExample({
   targetfolder: './benchmark',
   entrypath: path.relative(process.cwd(), '../index.js'),
   fragments: [
-    { target: 'run.js'         },
+    { target: 'main.js'        },
     { target: 'task.js'        },
     { target: 'bind.js'        },
     { target: 'package.json'   },

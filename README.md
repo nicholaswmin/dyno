@@ -8,15 +8,13 @@ benchmarking in multiple threads
 * [Quickstart](#quickstart)
   + [Overview](#overview)
   + [Generate benchmark](#generate-sample-benchmark)
-* [Example](#example)
-  + [Run file](#run-file)
+* [Configuration](#configuration)
+  + [Main file](#main-file)
   + [Task file](#task-file)
 * [Tests](#tests)
 * [Misc.](#misc)
 * [Authors](#authors)
 * [License](#license)
-
-## Overview
 
 > `dyno` is a tool for testing if a piece of code can withstand 
 > a certain rate of production traffic
@@ -109,7 +107,7 @@ then:
 npm run benchmark
 ``` 
 
-## Example
+## Configuration
 
 > The following example benchmarks a `fibonnacci()` function
 > and a `sleep()` function while also using [`performance.timerify`][timerify] 
@@ -118,7 +116,7 @@ npm run benchmark
 ### Main file
 
 ```js
- // run.js
+ // main.js
 import { join } from 'node:path'
 import { dyno } from '@nicholaswmin/dyno'
 

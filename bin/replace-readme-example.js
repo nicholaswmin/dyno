@@ -10,7 +10,7 @@ await replaceTokensInFile({
   entrypath: '@nicholaswmin/dyno',
   fragments: [
     { target: 'task.js', startToken: '// sample task file', endToken: '```' },
-    { target: 'run.js',  startToken: '// run.js', endToken: '```'  },
+    { target: 'main.js', startToken: '// main.js', endToken: '```'  },
     { target: 'task.js', startToken: '// task.js', endToken: '```' }
   ]
 })

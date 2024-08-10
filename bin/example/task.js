@@ -1,6 +1,6 @@
-import { run } from '{{entrypath}}'
+import { task } from '{{entrypath}}'
 
-run(async function task(parameters) {
+task(async function task(parameters) {
   // function under test
   function fibonacci(n) {
     return n < 1 ? 0
