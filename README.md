@@ -18,18 +18,18 @@ benchmarking in multiple threads
 
 ## Overview
 
-`dyno` is a tool for testing if a some code will withstand a 
-certain amount of traffic in production.
+`dyno` is a tool for testing if a piece of code can withstand 
+a certain rate of production traffic
 
-Test parameters are set in a `main file`.   
-The benchmarked code is added to a `task file`.   
+Test parameters are set in a `main file` &
+the benchmarked code is added to a `task file`.   
 
-The main file is then run which in turn repeatedly runs 
-the task file in cycles; based on a configured 
-`cycles per second` rate & for a configured `test duration`.  
+The main file then repeatedly runs the task file in cycles; 
+based on a configured `cycles per second` rate,
+for a configured `test duration`.  
 
-A test is deemed succesful if the test duration elapses 
-without creating a `cycle backlog`.
+A test is deemed succesful if the test duration 
+elapses w/o creating a `cycle backlog`.
 
 ```js
 // sample task file
