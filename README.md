@@ -235,24 +235,19 @@ npm run checks
 
 ## Misc
 
-> for users 
+> create a runnable sample benchmark
 
 ```bash
 npx init
 ```
 
-> create a runnable sample benchmark, 
-> like the one listed above
-
-> for contributors
+> insert/update example snippets in README  
 
 ```bash
 npm run maintenance:update:readme
 ```
-> insert/update example snippets in README  
-> note: does not update the "output" section
-
-Example code snippets are located in: [`/bin/example`](./bin/example)
+> note: does not update the "output" section  
+> Example code snippets are located in: [`/bin/example`](./bin/example)
 
 ## Authors
 
