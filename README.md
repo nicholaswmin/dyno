@@ -18,8 +18,8 @@ benchmarking in multiple threads
 
 ## Overview
 
-`dyno` is a tool for testing if a piece of code can withstand 
-a certain rate of production traffic
+> `dyno` is a tool for testing if a piece of code can withstand 
+> a certain rate of production traffic
 
 Test parameters are set in a `main file` &
 the benchmarked code is added to a `task file`.   
