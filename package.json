@@ -10,6 +10,7 @@
   "scripts": {
     "test": "NODE_ENV=test node --test --test-reporter=@voxpelli/node-test-pretty-reporter --no-warnings test/index.test.js",
     "test:coverage": "NODE_ENV=test node --test --no-warnings --experimental-test-coverage test/index.test.js",
+    "checks": "npx eslint && npm audit",
     "maintenance:update:readme": "bin/replace-readme-example.js"
   },
   "engines": {
@@ -28,6 +29,8 @@
     "asciichart": "^1.5.25"
   },
   "devDependencies": {
-    "@voxpelli/node-test-pretty-reporter": "^1.1.2"
+    "@eslint/js": "^9.9.0",
+    "@voxpelli/node-test-pretty-reporter": "^1.1.2",
+    "globals": "^15.9.0"
   }
 }
