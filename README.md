@@ -297,6 +297,15 @@ npm run checks
 
 ## Misc
 
+> for users 
+
+```bash
+npx init
+```
+
+> create a runnable sample benchmark, 
+> like the one listed above
+
 > for contributors
 
 ```bash
