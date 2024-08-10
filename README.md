@@ -108,8 +108,9 @@ npm run benchmark
 
 ## Example
 
-> The following example benchmark  a `fibonnacci()` function, 
-> using [`performance.timerify`][timerify] to record timings
+> The following example benchmarks a `fibonnacci()` function
+> and a `sleep()` function, using [`performance.timerify`][timerify] 
+> to record timings
 
 ### Run file
 
