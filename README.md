@@ -39,7 +39,7 @@ run(async function task(parameters) {
 })
 ```
 
-> requires test configuration in another file, `run.js`, see below
+> note: requires additional configuration, see below
 
 renders:
 
