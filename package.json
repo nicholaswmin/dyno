@@ -1,0 +1,33 @@
+{
+  "name": "@nicholaswmin/dyno",
+  "type": "module",
+  "version": "0.1.0",
+  "description": "runs code on separate threads and logs runtime measurements",
+  "main": "index.js",
+  "bin": {
+    "init": "bin/create-example.js"
+  },
+  "scripts": {
+    "test": "NODE_ENV=test node --test --test-reporter=@voxpelli/node-test-pretty-reporter --no-warnings test/index.test.js",
+    "test:coverage": "NODE_ENV=test node --test --no-warnings --experimental-test-coverage test/index.test.js",
+    "maintenance:update:readme": "bin/replace-readme-example.js"
+  },
+  "engines": {
+    "node": ">=22.5.1"
+  },
+  "keywords": [
+    "test",
+    "benchmark",
+    "performance"
+  ],
+  "author": "@nicholaswmin",
+  "license": "MIT",
+  "dependencies": {
+    "@inquirer/input": "^2.2.4",
+    "ascii-table3": "^0.9.0",
+    "asciichart": "^1.5.25"
+  },
+  "devDependencies": {
+    "@voxpelli/node-test-pretty-reporter": "^1.1.2"
+  }
+}

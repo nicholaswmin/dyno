@@ -1,0 +1,12 @@
+{
+  "name": "benchmark",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "A benchmark using the dyno module",
+  "scripts": {
+    "benchmark": "node run.js",
+    "start": "node bind.js"
+  },
+  "author": "unspecified",
+  "license": "ISC"
+}

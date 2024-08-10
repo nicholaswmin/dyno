@@ -1,0 +1,1 @@
+import './table.test.js'
