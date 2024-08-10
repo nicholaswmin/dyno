@@ -30,16 +30,16 @@ let counter = 0
 
 run(async function task(parameters) {
   function fibonacci_1(n) {
-      return n < 1 ? 0
-            : n <= 2 ? 1
-            : fibonacci_1(n - 1) + fibonacci_1(n - 2)
-    }
+    return n < 1 ? 0
+      : n <= 2 ? 1
+      : fibonacci_1(n - 1) + fibonacci_1(n - 2)
+  }
 
   function fibonacci_2(n) {
-      return n < 1 ? 0
-            : n <= 2 ? 1
-            : fibonacci_2(n - 1) + fibonacci_2(n - 2)
-    }
+    return n < 1 ? 0
+    : n <= 2 ? 1
+    : fibonacci_2(n - 1) + fibonacci_2(n - 2)
+  }
 
   performance.timerify(fibonacci_1)(parameters.FOO * Math.sin(++counter))
   performance.timerify(fibonacci_2)(parameters.BAR * Math.sin(++counter))  
@@ -143,74 +143,66 @@ import { join } from 'node:path'
 import { dyno, view } from '@nicholaswmin/dyno'
 
 await dyno({
-  // location of task file
+  // location of the task file
   task: join(import.meta.dirname, 'task.js'),
+
+  // test parameters
   parameters: {
-    // required test parameters
-    CYCLES_PER_SECOND: 75, 
+    // required
+    CYCLES_PER_SECOND: 40, 
     CONCURRENCY: 4, 
     DURATION_MS: 10 * 1000,
     
-    // custom parameters,
-    // passed on to 'task.js'
-    FOO: 25,
+    // custom, optional
+    // passed-on to 'task.js'
+    FOO: 30,
     BAR: 35
   },
   
-  // render live test logs
-  render: function({ main, threads }) {
-    // `main` contains: 
-    // 
+  // Render output using `view.Table` & `view.Plot`
+  render: function({ main, threads, thread }) {
     // - `main` contains general test stats
-    // - `threads` contains histograms & their snapshots,
-    //   per task, per thread
+    //    - `sent`   : number of issued cycles 
+    //    - `done`   : number of completed cycles 
+    //    - `uptime` : test duration in seconds
     // 
+    // - `threads` contains task/threads measures
+    //    - `task`  : duration of a cycle
+    //    - `eloop` : duration of event loop
+    //    - any user-defined measures from `task.js`
+    // 
+    // - `thread` is just the 1st of `threads`
     const views = [
-      // Log main output: 
-      // general test stats, 
-      // cycles sent/finished, backlog etc..
-      // 
-      // Available measures:
-      // 
-      // - 'sent', number of issued cycles 
-      // - 'done', number of completed cycles 
-      // - 'backlog', backlog of issued yet uncompleted cycles
-      // - 'uptime', current test duration
-      // 
-      new view.Table('Cycles', [{
+
+      // Build main output as ASCII Table
+      new view.Table('General', [{
         'sent':    main?.sent?.count,
         'done':    main?.done?.count,
         'backlog': main?.sent?.count - main?.done?.count,
         'uptime':  main?.uptime?.count
       }]),
-      // Log task output:
-      //
-      // - Per thread measurements from 'task.js'
-      // 
-      // Available measures:
-      // - 'task', duration of a cycle/task
-      // - Custom measurements appear here
-      //
+
+      // Build per-thread output as ASCII Table
       new view.Table(
-        'Timings', 
+        'Cycles', 
         Object.keys(threads)
         .map(pid => ({
           'thread id': pid,
           'cycle (mean/ms)': Math.round(threads[pid].task?.mean),
           'fibonacci_1 (mean/ms)': Math.round(threads[pid].fibonacci_1?.mean),
           'fibonacci_2 (mean/ms)': Math.round(threads[pid].fibonacci_2?.mean)
-          // display only the top 5 threads, 
-          // sorted by mean cycle duration
+          // show top 5 threads, sorted by cycle time
         })).sort((a, b) => b[1] - a[1]).slice(0, 5)
       ),
 
-      new view.Plot('Task timings', { 
-        properties: [
-          'task', 'fibonacci_1', 'fibonacci_2'
-        ]
-      }).plot(Object.values(threads)[0])
+      // Build an ASCII chart of per-task timings,
+      // excluding event-loop timings
+      new view.Plot('mean/ms timings', thread, { 
+        exclude: ['eloop']
+      })
     ]
     
+    // Render the views in the terminal
     console.clear()
     views.forEach(view => view.render())  
   }
@@ -238,16 +230,16 @@ let counter = 0
 
 run(async function task(parameters) {
   function fibonacci_1(n) {
-      return n < 1 ? 0
-            : n <= 2 ? 1
-            : fibonacci_1(n - 1) + fibonacci_1(n - 2)
-    }
+    return n < 1 ? 0
+      : n <= 2 ? 1
+      : fibonacci_1(n - 1) + fibonacci_1(n - 2)
+  }
 
   function fibonacci_2(n) {
-      return n < 1 ? 0
-            : n <= 2 ? 1
-            : fibonacci_2(n - 1) + fibonacci_2(n - 2)
-    }
+    return n < 1 ? 0
+    : n <= 2 ? 1
+    : fibonacci_2(n - 1) + fibonacci_2(n - 2)
+  }
 
   performance.timerify(fibonacci_1)(parameters.FOO * Math.sin(++counter))
   performance.timerify(fibonacci_2)(parameters.BAR * Math.sin(++counter))  
