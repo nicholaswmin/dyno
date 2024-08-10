@@ -160,8 +160,10 @@ await dyno({
     }
     
     console.clear()
+
     console.log('\n', 'general stats', '\n')
     console.table(tables.main)
+
     console.log('\n', 'cycle timings', '\n')
     console.table(tables.threads)
   }
