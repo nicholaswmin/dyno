@@ -11,7 +11,6 @@ benchmarking in multiple threads
 * [Example](#example)
   + [Run file](#run-file)
   + [Task file](#task-file)
-  + [Output](#output)
 * [Tests](#tests)
 * [Misc.](#misc)
 * [Authors](#authors)
@@ -243,29 +242,6 @@ run(async function task(parameters) {
   performance.timerify(fibonacci_1)(parameters.FOO * Math.sin(++counter))
   performance.timerify(fibonacci_2)(parameters.BAR * Math.sin(++counter))  
 })
-```
-
-### Output
-
-```js
-+--------------------------------+
-|             Tasks              |
-+------+------+---------+--------+
-| sent | done | backlog | uptime |
-+------+------+---------+--------+
-|   49 |   48 |       1 |      5 |
-+------+------+---------+--------+
-
-+--------------------------------------------------+
-|                  Task durations                  |
-+-----------+----------------+---------------------+
-| thread id | task (mean/ms) | fibonacci (mean/ms) |
-+-----------+----------------+---------------------+
-|     63511 |            157 |                  53 |
-|     63512 |            159 |                  53 |
-|     63513 |            174 |                  53 |
-|     63514 |            160 |                  54 |
-+-----------+----------------+---------------------+
 ```
 
 ## Tests
