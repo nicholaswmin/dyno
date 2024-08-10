@@ -33,6 +33,8 @@
 
 ## test
 
+- [ ] test new `prompt`
+- [ ] test `onMeasureUpdate` calls and arguments
 - [x] replace old tests with new tests on the rewrite
 - [x] split unit tests & integration tests
 - [x] ensure unit-tests run fast
@@ -48,6 +50,7 @@
 
 ## docs
 
+- [ ] document the `onMeasureUpdate` callback arguments `main` & `thread`s
 - [x] fix `npx init` docs after publishing
 - [x] Check if possible to DRY up example code via an `npx` script. 
   Right now theres 3 different & separate code examples:
