@@ -1,8 +1,4 @@
 import timer from 'timers/promises'
-
-import Table from './src/views/table/index.js'
-import Plot from './src/views/plot/index.js'
-
 import run from './src/task/index.js'
 import prompt from './src/prompt/index.js'
 import Uptimer from './src/uptimer/index.js'
@@ -48,6 +44,4 @@ const dyno = async ({ task, parameters, render = () => {} }) => {
   return collector.stats
 }
 
-const view = { Table, Plot }
-
-export { dyno, run, view }
+export { dyno, run }
