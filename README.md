@@ -19,29 +19,36 @@ run multithreaded benchmarks
 
 ## Overview
 
+Run the following piece of code `n` number of times 
+on `n` number of threads:
+
 ```js
 // benchmarked code
 import { run } from '@nicholaswmin/dyno'
 
+let counter = 0
+
 run(async function task(parameters) {
-  // function under test
-  function fibonacci(n) {
-    return n < 1 ? 0
-          : n <= 2 ? 1
-          : fibonacci(n - 1) + fibonacci(n - 2)
-  }
-  
-  // record measurements using `performance.timerify`
-  const timed_fibonacci = performance.timerify(fibonacci)
-  
-  for (let i = 0; i < parameters.ITERATIONS; i++)
-    timed_fibonacci(parameters.FIB_NUMBER)
+  function fibonacci_1(n) {
+      return n < 1 ? 0
+            : n <= 2 ? 1
+            : fibonacci_1(n - 1) + fibonacci_1(n - 2)
+    }
+
+  function fibonacci_2(n) {
+      return n < 1 ? 0
+            : n <= 2 ? 1
+            : fibonacci_2(n - 1) + fibonacci_2(n - 2)
+    }
+
+  performance.timerify(fibonacci_1)(parameters.FOO * Math.sin(++counter))
+  performance.timerify(fibonacci_2)(parameters.BAR * Math.sin(++counter))  
 })
 ```
 
 > note: requires additional configuration, see below
 
-renders:
+rendering live output:
 
 ```js
 +--------------------------------+
@@ -49,20 +56,37 @@ renders:
 +------+------+---------+--------+
 | sent | done | backlog | uptime |
 +------+------+---------+--------+
-|   49 |   48 |       1 |      5 |
+|  284 |  276 |       8 |      7 |
 +------+------+---------+--------+
 
-+--------------------------------------------------+
-|                      Timings                     |
-+-----------+----------------+---------------------+
-| thread id | task (mean/ms) | fibonacci (mean/ms) |
-+-----------+----------------+---------------------+
-|     63511 |            157 |                  49 |
-|     63512 |            141 |                  50 |
-|     63513 |            174 |                  65 |
-|     63514 |            160 |                  47 |
-+-----------+----------------+---------------------+
++-----------------------------------------------------------------------------+
+|                                   Timings                                   |
++-----------+-----------------+-----------------------+-----------------------+
+| thread id | cycle (mean/ms) | fibonacci_1 (mean/ms) | fibonacci_2 (mean/ms) |
++-----------+-----------------+-----------------------+-----------------------+
+|     97339 |              77 |                     1 |                    39 |
+|     97340 |              65 |                     1 |                    35 |
+|     97341 |              89 |                     1 |                    41 |
+|     97342 |              65 |                     1 |                    35 |
++-----------+-----------------+-----------------------+-----------------------+
+
+  Task timings
+
+  -- task  -- fibonacci_1  -- fibonacci_2
+
+ 148.86 ┼╮                                                                    
+ 134.08 ┤╰──╮                                                                 
+ 119.30 ┤   ╰─╮                                                               
+ 104.52 ┤     ╰──╮                                                            
+  89.74 ┤        ╰───────────────────╮                                        
+  74.96 ┼──╮                         ╰───────────────────╮                    
+  60.18 ┤  ╰─────╮                                       ╰─────────────────╮  
+  45.40 ┤        ╰───────────────────────────────────────╮                 │  
+  30.62 ┤                                                ╰──────────────────╮ 
+  15.84 ┤                                                                   ╰ 
+   1.06 ┼──────────────────────────────────────────────────────────────────── 
 ```
+
 ## Install
 
 ```bash
@@ -123,29 +147,24 @@ await dyno({
   task: join(import.meta.dirname, 'task.js'),
   parameters: {
     // required test parameters
-    CYCLES_PER_SECOND: 10, 
+    CYCLES_PER_SECOND: 75, 
     CONCURRENCY: 4, 
-    DURATION_MS: 5 * 1000,
+    DURATION_MS: 10 * 1000,
     
     // custom parameters,
     // passed on to 'task.js'
-    FIB_NUMBER: 35,
-    ITERATIONS: 3
+    FOO: 25,
+    BAR: 35
   },
   
   // render live test logs
-  render: function(threads) {
-    // `threads` contains: 
-    //
-    // - histograms & histogram snapshots,
-    //   per task, per thread
-    //
-    // - 1 of the threads is the 
-    //   primary/main process which 
-    //   contains general test stats
+  render: function({ main, threads }) {
+    // `main` contains: 
     // 
-    const pid  = process.pid.toString()
-    const main = threads[pid]
+    // - `main` contains general test stats
+    // - `threads` contains histograms & their snapshots,
+    //   per task, per thread
+    // 
     const views = [
       // Log main output: 
       // general test stats, 
@@ -155,6 +174,7 @@ await dyno({
       // 
       // - 'sent', number of issued cycles 
       // - 'done', number of completed cycles 
+      // - 'backlog', backlog of issued yet uncompleted cycles
       // - 'uptime', current test duration
       // 
       new view.Table('Cycles', [{
@@ -166,29 +186,31 @@ await dyno({
       // Log task output:
       //
       // - Per thread measurements from 'task.js'
-      // - Custom measurements can be recorded here
-      // - e.g the 'fibonacci' measurement is a 
-      //   custom measurement recorded using 
-      //   `performance.timerify`
       // 
       // Available measures:
       // - 'task', duration of a cycle/task
-      // 
-      // Custom measurements can also be 
-      // recorded in `task.js`
+      // - Custom measurements appear here
       //
-      new view.Table('Task durations', Object.keys(threads)
-      .filter(_pid => _pid !== pid)
-      .map(pid => ({
-        'thread id': pid,
-        'cycle (mean/ms)': Math.round(threads[pid].task?.mean),
-        'fibonacci (mean/ms)': Math.round(threads[pid].fibonacci?.mean)
-      })))
+      new view.Table(
+        'Timings', 
+        Object.keys(threads)
+        .map(pid => ({
+          'thread id': pid,
+          'cycle (mean/ms)': Math.round(threads[pid].task?.mean),
+          'fibonacci_1 (mean/ms)': Math.round(threads[pid].fibonacci_1?.mean),
+          'fibonacci_2 (mean/ms)': Math.round(threads[pid].fibonacci_2?.mean)
+          // display only the top 5 threads, 
+          // sorted by mean cycle duration
+        })).sort((a, b) => b[1] - a[1]).slice(0, 5)
+      ),
+
+      new view.Plot('Task timings', { 
+        properties: [
+          'task', 'fibonacci_1', 'fibonacci_2'
+        ]
+      }).plot(Object.values(threads)[0])
     ]
-    // display only the top 5 threads, 
-    // sorted by mean cycle duration
-    .sort((a, b) => b[1] - a[1]).slice(0, 5)
-    // render the tables
+    
     console.clear()
     views.forEach(view => view.render())  
   }
@@ -212,19 +234,23 @@ Custom measurements can be taken using the following
  // task.js
 import { run } from '@nicholaswmin/dyno'
 
+let counter = 0
+
 run(async function task(parameters) {
-  // function under test
-  function fibonacci(n) {
-    return n < 1 ? 0
-          : n <= 2 ? 1
-          : fibonacci(n - 1) + fibonacci(n - 2)
-  }
-  
-  // record measurements using `performance.timerify`
-  const timed_fibonacci = performance.timerify(fibonacci)
-  
-  for (let i = 0; i < parameters.ITERATIONS; i++)
-    timed_fibonacci(parameters.FIB_NUMBER)
+  function fibonacci_1(n) {
+      return n < 1 ? 0
+            : n <= 2 ? 1
+            : fibonacci_1(n - 1) + fibonacci_1(n - 2)
+    }
+
+  function fibonacci_2(n) {
+      return n < 1 ? 0
+            : n <= 2 ? 1
+            : fibonacci_2(n - 1) + fibonacci_2(n - 2)
+    }
+
+  performance.timerify(fibonacci_1)(parameters.FOO * Math.sin(++counter))
+  performance.timerify(fibonacci_2)(parameters.BAR * Math.sin(++counter))  
 })
 ```
 

@@ -4,15 +4,15 @@ import asciichart from 'asciichart'
 import View from '../view/index.js'
 
 class Plot extends View {
-  constructor(title = 'Plot', { 
+  constructor(title = 'Plot', obj, { 
     height = 10, 
     subtitle = '', 
-    properties = [] 
+    exclude = [] 
   } = {}) {
     super()
 
     this.unit = 'mean'
-    this.properties = properties
+    this.exclude = exclude
     this.colors = [
       'magenta', 'blue', 'cyan', 'green', 'yellow', 
       'lightmagenta', 'lightblue', 'lightcyan', 'lightgreen', 'lightyellow'
@@ -22,25 +22,27 @@ class Plot extends View {
     this.padding = ' '.repeat(this.config.padding.length - 5)
     this.chart = `\n${this.padding}${title}\n\n`
     
-    if (!properties.length)
-      throw new RangeError('must specify at least 1 property')
-
-    return this
+    return this.#plot(obj)
   }
   
-  plot(obj) {
+  #plot(obj) {
     if (!obj)
       return this
-    
+
     const br = '\n'.repeat(2)
-    const keys = Object.keys(obj).filter(key => this.properties.includes(key))
+    const keys = Object.keys(obj).filter(key => !this.exclude.includes(key))
     const cols = keys.map((_, i) => this.colors[i])
     const colors = cols.map(color => asciichart[color])
     const labels = keys.map((key, i) => styleText([cols[i]], `-- ${key}`))
     const arrays = keys
-      .map(key => obj[key].map(hgram => hgram[this.unit]).sort((a, b) => b - a))
+      .filter(key => !!obj[key])
+      .map(key => obj[key].snapshots)
+      .map(snaps => snaps.map(hgram => hgram[this.unit]).sort((a, b) => b - a))
       .filter(array => array.length)
     
+    if (!arrays.length)
+      return this
+
     try {
       this.chart += labels.reduce((acc, label) => acc += `  ${label}`, '') + br
       this.chart += asciichart.plot(arrays, { ...this.config, colors })    

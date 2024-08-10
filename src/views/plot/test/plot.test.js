@@ -4,34 +4,37 @@ import Plot from '../index.js'
 
 test('#view:Plot', async t => {
   let plot = null, input = {
-    foo: [
-      { min: 0, mean: 3, max: 4, count: 2 },
-      { min: 4, mean: 5, max: 6, count: 4 },
-      { min: 6, mean: 7, max: 8, count: 9 },
-    ],
-    bar: [
-      { min: 1, mean: 2, max: 3, count: 1 },
-      { min: 3, mean: 4, max: 5, count: 3 },
-      { min: 5, mean: 6, max: 7, count: 5 },
-      { min: 7, mean: 8, max: 9, count: 7 }
-    ],
-    baz: [
-      { min: 2, mean: 2.5, max: 3, count: 4 }
-    ]
+    foo: {
+      snapshots: [
+        { min: 0, mean: 3, max: 4, count: 2 },
+        { min: 4, mean: 5, max: 6, count: 4 },
+        { min: 6, mean: 7, max: 8, count: 9 },
+      ]
+    },
+    bar: {
+      snapshots: [
+        { min: 0, mean: 3, max: 4, count: 2 },
+        { min: 4, mean: 5, max: 6, count: 4 },
+        { min: 6, mean: 7, max: 8, count: 9 },
+      ]
+    },
+    baz: {
+      snapshots: [
+        { min: 0, mean: 3, max: 4, count: 2 }
+      ]
+    }
   }
 
   t.beforeEach(async () => {
-    plot = new Plot('Foo Plot', { 
-      properties: ['foo', 'bar'],
+    plot = new Plot('Foo Plot', input, { 
+      exclude: ['baz'],
       subtitle: 'foo subtitle'
     })
   })
   
   await t.test('properties array does not include a property', async t => {
-    await t.test('throws a RangeError', t => {
-      t.assert.throws(() => {
-         plot = new Plot('Plot', { properties: [] })
-      }, { name: 'RangeError' })
+    await t.test('instantiates', async t => {      
+      t.assert.ok(plot)
     })
   })
   
@@ -41,21 +44,13 @@ test('#view:Plot', async t => {
     })
   })
   
-  await t.test('#plot', async t => {
-    await t.test('does not throw', async t => {
-      t.assert.doesNotThrow(() => {
-        plot.plot(input)
-      })
-    })
-  })
-  
   await t.test('#render', async t => {    
     let stdout
 
     t.beforeEach(t => {
       console.log = t.mock.fn(console.log, () => {})
 
-      plot.plot(input).render()
+      plot.render()
       
       stdout = console.log.mock.calls.at(-1).arguments.at(0)
     })

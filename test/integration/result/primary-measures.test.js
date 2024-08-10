@@ -14,7 +14,7 @@ test('#dyno() records default cycle measurements', async t => {
       parameters
     })
 
-    primary = result[process.pid]
+    primary = result.main
   })
 
   await t.test('tracks cycle measurements', async t => {

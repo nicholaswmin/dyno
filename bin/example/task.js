@@ -1,16 +1,20 @@
 import { run } from '{{entrypath}}'
 
+let counter = 0
+
 run(async function task(parameters) {
-  // function under test
-  function fibonacci(n) {
+  function fibonacci_1(n) {
     return n < 1 ? 0
-          : n <= 2 ? 1
-          : fibonacci(n - 1) + fibonacci(n - 2)
+      : n <= 2 ? 1
+      : fibonacci_1(n - 1) + fibonacci_1(n - 2)
   }
-  
-  // record measurements using `performance.timerify`
-  const timed_fibonacci = performance.timerify(fibonacci)
-  
-  for (let i = 0; i < parameters.ITERATIONS; i++)
-    timed_fibonacci(parameters.FIB_NUMBER)
+
+  function fibonacci_2(n) {
+    return n < 1 ? 0
+    : n <= 2 ? 1
+    : fibonacci_2(n - 1) + fibonacci_2(n - 2)
+  }
+
+  performance.timerify(fibonacci_1)(parameters.FOO * Math.sin(++counter))
+  performance.timerify(fibonacci_2)(parameters.BAR * Math.sin(++counter))  
 })
