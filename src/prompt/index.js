@@ -1,4 +1,4 @@
-import input from '@inquirer/input'
+import { input } from './input.js'
 
 const types = {
   'string': String,
@@ -27,7 +27,8 @@ export default async (parameters, { skipUserInput = false } = {}) => {
       ? value : await input({
 
       message: `Configure value for: ${key}`,
-      default: value,
+
+      value: value,
 
       validate: answer => {
         switch (typeof value) {
