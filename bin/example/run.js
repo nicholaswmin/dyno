@@ -19,26 +19,27 @@ await dyno({
   },
   
   // Render output using `console.table`
-  render: function({ main, threads, thread }) {
-    console.clear()
+  onMeasureUpdate: function({ main, threads }) {    
+    const tables = {
+      main: [{ 
+        'sent'         : main.sent?.count, 
+        'done'         : main.done?.count,
+        'backlog'      : main.sent?.count -  main.done?.count,
+        'uptime (sec)' : main.uptime?.count
+      }],
 
-    console.log('\n', 'cycle stats', '\n')
-    console.table([{ 
-      sent    : main.sent?.count, 
-      done    : main.done?.count,
-      backlog : main.sent?.count -  main.done?.count,
-      uptime  : main.uptime?.count
-    }])
-    
-    console.log('\n', 'cycle timings (mean/ms)', '\n')
-    console.table(Object.keys(threads).reduce((acc, pid) => {
-      return [
-        ...acc, 
-        Object.keys(threads[pid]).reduce((acc, task) => ({
-          ...acc,
-          [task]: Math.round(threads[pid][task].mean)
+      threads: Object.keys(threads).reduce((acc, pid) => {
+        return [ ...acc, Object.keys(threads[pid]).reduce((acc, task) => ({
+            ...acc, thread: pid, [task]: Math.round(threads[pid][task].mean)
         }), {})]
-    }, []))
+      }, [])
+    }
+    
+    console.clear()
+    console.log('\n', 'general stats', '\n')
+    console.table(tables.main)
+    console.log('\n', 'cycle timings', '\n')
+    console.table(tables.threads)
   }
 })
 
