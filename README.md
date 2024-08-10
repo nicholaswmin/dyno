@@ -29,7 +29,7 @@ run(async function task(parameters) {
   function fibonacci(n) {
     return n < 1 ? 0
       : n <= 2 ? 1
-      : fibonacci_1(n - 1) + fibonacci_1(n - 2)
+      : fibonacci(n - 1) + fibonacci(n - 2)
   }
   
   function sleep(ms) {
@@ -46,21 +46,21 @@ while logging measurements timings:
 ```js
 general stats 
 
-┌─────────┬──────┬──────┬─────────┬──────────────┐
-│ (index) │ sent │ done │ backlog │ uptime (sec) │
-├─────────┼──────┼──────┼─────────┼──────────────┤
-│ 0       │ 132  │ 130  │ 2       │ 5            │
-└─────────┴──────┴──────┴─────────┴──────────────┘
+┌─────────┬─────────────┬─────────────┬────────────────┬──────────────┐
+│ (index) │ cycles sent │ cycles done │ cycles backlog │ uptime (sec) │
+├─────────┼─────────────┼─────────────┼────────────────┼──────────────┤
+│ 0       │ 177         │ 174         │ 3              │ 6            │
+└─────────┴─────────────┴─────────────┴────────────────┴──────────────┘
 
 cycle timings 
 
 ┌─────────┬─────────┬──────┬───────────┬───────┬──────────┐
 │ (index) │ thread  │ task │ fibonacci │ sleep │ eloop    │
 ├─────────┼─────────┼──────┼───────────┼───────┼──────────┤
-│ 0       │ '19517' │ 73   │ 73        │ 98    │ 30370723 │
-│ 1       │ '19518' │ 70   │ 70        │ 103   │ 28461987 │
-│ 2       │ '19519' │ 69   │ 69        │ 104   │ 28810519 │
-│ 3       │ '19520' │ 71   │ 71        │ 102   │ 26976256 │
+│ 0       │ '19679' │ 72   │ 72        │ 103   │ 28617933 │
+│ 1       │ '19680' │ 72   │ 72        │ 103   │ 30947191 │
+│ 2       │ '19681' │ 72   │ 72        │ 103   │ 30685594 │
+│ 3       │ '19682' │ 72   │ 72        │ 104   │ 28678007 │
 └─────────┴─────────┴──────┴───────────┴───────┴──────────┘
 ```
 
@@ -141,10 +141,10 @@ await dyno({
   onMeasureUpdate: function({ main, threads }) {    
     const tables = {
       main: [{ 
-        'sent'         : main.sent?.count, 
-        'done'         : main.done?.count,
-        'backlog'      : main.sent?.count -  main.done?.count,
-        'uptime (sec)' : main.uptime?.count
+        'cycles sent'    : main.sent?.count, 
+        'cycles done'    : main.done?.count,
+        'cycles backlog' : main.sent?.count -  main.done?.count,
+        'uptime (sec)'   : main.uptime?.count
       }],
 
       threads: Object.keys(threads).reduce((acc, pid) => {
@@ -186,7 +186,7 @@ run(async function task(parameters) {
   function fibonacci(n) {
     return n < 1 ? 0
       : n <= 2 ? 1
-      : fibonacci_1(n - 1) + fibonacci_1(n - 2)
+      : fibonacci(n - 1) + fibonacci(n - 2)
   }
   
   function sleep(ms) {

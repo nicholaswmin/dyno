@@ -22,10 +22,10 @@ await dyno({
   onMeasureUpdate: function({ main, threads }) {    
     const tables = {
       main: [{ 
-        'sent'         : main.sent?.count, 
-        'done'         : main.done?.count,
-        'backlog'      : main.sent?.count -  main.done?.count,
-        'uptime (sec)' : main.uptime?.count
+        'cycles sent'    : main.sent?.count, 
+        'cycles done'    : main.done?.count,
+        'cycles backlog' : main.sent?.count -  main.done?.count,
+        'uptime (sec)'   : main.uptime?.count
       }],
 
       threads: Object.keys(threads).reduce((acc, pid) => {
