@@ -46,8 +46,6 @@ run(async function task(parameters) {
 })
 ```
 
-> note: requires additional configuration, see below
-
 rendering live output:
 
 ```js
@@ -86,6 +84,8 @@ rendering live output:
   15.84 ┤                                                                   ╰ 
    1.06 ┼──────────────────────────────────────────────────────────────────── 
 ```
+
+> note: requires additional configuration, see below
 
 ## Install
 
