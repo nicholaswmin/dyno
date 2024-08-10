@@ -125,7 +125,6 @@ then:
 
 ```bash
 npm run benchmark
-# or just: node run.js
 ``` 
 
 ## Example
