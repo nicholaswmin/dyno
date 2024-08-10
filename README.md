@@ -18,11 +18,21 @@ benchmarking in multiple threads
 
 ## Overview
 
-Run the following piece of code `n` number of cycles, 
-on `n` number of threads:
+`dyno` is a tool for testing if a some code will withstand a 
+certain amount of traffic in production.
+
+Test parameters are set in a `main file`.   
+The benchmarked code is added to a `task file`.   
+
+The main file is then run which in turn repeatedly runs 
+the task file in cycles; based on a configured 
+`cycles per second` rate & for a configured `test duration`.  
+
+A test is deemed succesful if the test duration elapses 
+without creating a `cycle backlog`.
 
 ```js
-// benchmarked code
+// sample task file
 import { run } from '@nicholaswmin/dyno'
 
 run(async function task(parameters) {
@@ -41,7 +51,7 @@ run(async function task(parameters) {
 })
 ```
 
-while logging measurements timings:
+the test logs live measurements while it runs:
 
 ```js
 general stats 
@@ -64,8 +74,6 @@ cycle timings
 └─────────┴─────────┴──────┴───────────┴───────┴──────────┘
 ```
 
-> note: requires additional configuration, see below
-
 ## Install
 
 ```bash
@@ -74,25 +82,16 @@ npm i @nicholaswmin/dyno
 
 ## Quickstart
 
-### Overview 
-
-- Create a `run.js` file and set the test configuration
-- Create a `task.js` file and add the benchmarked code
-
-`run.js` runs multiple *cycles* of `task.js`, in multiple threads.
-
-View the [example](#example) below for guidance on configuration.
-
 ### Generate sample benchmark
 
 ```bash 
 npx init
 ```
 
-> Use the sample benchmark as a starting point 
-> by editing `run.js` & `task.js`
+> creates preconfigured `main.js` and `task.js` files.  
+> Use them as a starting point.
 
-### Run it
+#### run the above example:
 
 > navigate into the created `benchmark` folder:
 
@@ -109,12 +108,10 @@ npm run benchmark
 ## Example
 
 > The following example benchmarks a `fibonnacci()` function
-> and a `sleep()` function, using [`performance.timerify`][timerify] 
-> to record timings
+> and a `sleep()` function while also using [`performance.timerify`][timerify] 
+> to record custom timing measurements.
 
-### Run file
-
-Sets up the benchmark & internally controls the spawned threads.
+### Main file
 
 ```js
  // run.js

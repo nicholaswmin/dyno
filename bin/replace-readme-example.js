@@ -9,9 +9,9 @@ await replaceTokensInFile({
   filepath: path.join(import.meta.dirname, '../README.md'),
   entrypath: '@nicholaswmin/dyno',
   fragments: [
-    { target: 'task.js',  startToken: '// benchmarked code', endToken: '```'  },
-    { target: 'run.js',   startToken: '// run.js', endToken: '```'  },
-    { target: 'task.js',  startToken: '// task.js', endToken: '```' }
+    { target: 'task.js', startToken: '// sample task file', endToken: '```' },
+    { target: 'run.js',  startToken: '// run.js', endToken: '```'  },
+    { target: 'task.js', startToken: '// task.js', endToken: '```' }
   ]
 })
 
