@@ -289,6 +289,12 @@ test coverage:
 npm run test:coverage
 ```
 
+style checks/eslint:
+
+```bash
+npm run checks
+```
+
 ## Misc
 
 > for contributors
