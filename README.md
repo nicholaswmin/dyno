@@ -5,8 +5,8 @@
 > `dyno` is a tool for testing if a piece of code can withstand 
 > a certain rate of production traffic
 
-* [Install](#install)
 * [Quickstart](#quickstart)
+  + [Install](#install)
   + [Overview](#overview)
   + [Generate benchmark](#generate-sample-benchmark)
 * [Configuration](#configuration)
@@ -76,13 +76,13 @@ cycle timings
 └─────────┴─────────┴──────┴───────────┴───────┴──────────┘
 ```
 
-## Install
+## Quickstart
+
+### Install
 
 ```bash
 npm i @nicholaswmin/dyno
 ```
-
-## Quickstart
 
 ### Generate sample benchmark
 
