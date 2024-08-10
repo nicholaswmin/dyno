@@ -51,6 +51,7 @@
 ## docs
 
 - [ ] document the `onMeasureUpdate` callback arguments `main` & `thread`s
+- [ ] document the task `before/after` hooks
 - [x] fix `npx init` docs after publishing
 - [x] Check if possible to DRY up example code via an `npx` script. 
   Right now theres 3 different & separate code examples:
