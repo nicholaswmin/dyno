@@ -17,6 +17,52 @@ run multithreaded benchmarks
 * [Authors](#authors)
 * [License](#license)
 
+## Overview
+
+```js
+// benchmarked code
+import { run } from '@nicholaswmin/dyno'
+
+run(async function task(parameters) {
+  // function under test
+  function fibonacci(n) {
+    return n < 1 ? 0
+          : n <= 2 ? 1
+          : fibonacci(n - 1) + fibonacci(n - 2)
+  }
+  
+  // record measurements using `performance.timerify`
+  const timed_fibonacci = performance.timerify(fibonacci)
+  
+  for (let i = 0; i < parameters.ITERATIONS; i++)
+    timed_fibonacci(parameters.FIB_NUMBER)
+})
+```
+
+> requires test configuration in another file, `run.js`, see below
+
+renders:
+
+```js
++--------------------------------+
+|             Tasks              |
++------+------+---------+--------+
+| sent | done | backlog | uptime |
++------+------+---------+--------+
+|   49 |   48 |       1 |      5 |
++------+------+---------+--------+
+
++--------------------------------------------------+
+|                  Task durations                  |
++-----------+----------------+---------------------+
+| thread id | task (mean/ms) | fibonacci (mean/ms) |
++-----------+----------------+---------------------+
+|     63511 |            157 |                  53 |
+|     63512 |            159 |                  53 |
+|     63513 |            174 |                  53 |
+|     63514 |            160 |                  54 |
++-----------+----------------+---------------------+
+```
 ## Install
 
 ```bash
@@ -70,7 +116,7 @@ Sets up the benchmark & internally controls the spawned threads.
 ```js
  // run.js
 import { join } from 'node:path'
-import { dyno, Table } from '@nicholaswmin/dyno'
+import { dyno, view } from '@nicholaswmin/dyno'
 
 await dyno({
   // location of task file
@@ -87,7 +133,7 @@ await dyno({
     ITERATIONS: 3
   },
   
-  // render live test output
+  // render live test logs
   render: function(threads) {
     // `threads` contains: 
     //
@@ -112,24 +158,31 @@ await dyno({
       // - 'backlog', backlog of issued yet uncompleted cycles
       // - 'uptime', current test duration
       // 
-      new Table('Cycles', [{
+      new view.Table('Cycles', [{
         'sent':    main?.sent?.count,
         'done':    main?.done?.count,
         'backlog': main?.sent?.count - main?.done?.count,
         'uptime':  main?.uptime?.count
       }]),
       // Log task output:
-      // Per thread measurements from 'task.js'
       //
+      // - Per thread measurements from 'task.js'
+      // - Custom measurements can be recorded here
+      // - e.g the 'fibonacci' measurement is a 
+      //   custom measurement recorded using 
+      //   `performance.timerify`
+      // 
       // Available measures:
       // - 'task', duration of a cycle/task
-      // - any custom measurement, recorded in `task.js`
+      // 
+      // Custom measurements can also be 
+      // recorded in `task.js`
       //
-      new Table('Task durations', Object.keys(threads)
+      new view.Table('Task durations', Object.keys(threads)
       .filter(_pid => _pid !== pid)
       .map(pid => ({
         'thread id': pid,
-        'cycle (mean/ms)': Math.round(threads[pid].cycle?.mean),
+        'cycle (mean/ms)': Math.round(threads[pid].task?.mean),
         'fibonacci (mean/ms)': Math.round(threads[pid].fibonacci?.mean)
       })))
     ]
@@ -161,9 +214,6 @@ Custom measurements can be taken using the following
 import { run } from '@nicholaswmin/dyno'
 
 run(async function task(parameters) {
-  // parameters set in `run.js` 
-  // are available here
-
   // function under test
   function fibonacci(n) {
     return n < 1 ? 0

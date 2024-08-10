@@ -14,7 +14,6 @@ const replaceTokensInFile = async ({
     const contents = await fs.readFile(srcpath, 'utf8')
     const processed = contents
       .replaceAll('{{entrypath}}', entrypath)
-      .replace(/\/\*[\s\S]*?\*\/|(?<=[^:])\/\/.*|^\/\/.*/g,'')
 
     const existing = await fs.readFile(filepath, 'utf8')
 

@@ -1,9 +1,6 @@
 import { run } from '{{entrypath}}'
 
 run(async function task(parameters) {
-  // parameters set in `run.js` 
-  // are available here
-
   // function under test
   function fibonacci(n) {
     return n < 1 ? 0
