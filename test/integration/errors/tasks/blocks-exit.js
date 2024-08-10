@@ -1,8 +1,8 @@
 // all threads block clean exit/disconnect
 import { setTimeout } from 'node:timers/promises'
-import { run } from '../../../../index.js'
+import { task } from '../../../../index.js'
 
-run(async function task() {  
+task(async function task() {  
   
 }, {
   after: () => {

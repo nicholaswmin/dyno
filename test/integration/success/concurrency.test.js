@@ -1,13 +1,13 @@
 import test from 'node:test'
 import { join } from 'node:path'
 
-import { dyno } from '../../../index.js'
+import { main } from '../../../index.js'
 
-test('#dyno() cycles in x amount of threads', async t => {
+test('#main() cycles in x amount of threads', async t => {
   let result = null
   
   t.before(async () => {
-    result = await dyno({
+    result = await main({
       task: join(import.meta.dirname, 'tasks/records-bar.js'),
       parameters: {  CYCLES_PER_SECOND: 500, CONCURRENCY: 2, DURATION_MS: 750 }
     })

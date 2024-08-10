@@ -1,15 +1,15 @@
 import test from 'node:test'
 import { join } from 'node:path'
 
-import { dyno } from '../../../index.js'
+import { main } from '../../../index.js'
 
-test('#dyno() records default cycle measurements', async t => {
+test('#main() records default cycle measurements', async t => {
   let result = null, primary, parameters = { 
     CYCLES_PER_SECOND: 200, CONCURRENCY: 2, DURATION_MS: 500 
   }
 
   t.before(async () => {
-    result = await dyno({
+    result = await main({
       task: join(import.meta.dirname, 'tasks/records-foo.js'),
       parameters
     })

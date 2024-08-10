@@ -1,15 +1,15 @@
 import test from 'node:test'
 import { join } from 'node:path'
 
-import { dyno } from '../../../index.js'
+import { main } from '../../../index.js'
 
-test('#dyno() custom-measurement:performance.timerify', async t => {
+test('#main() custom-measurement:performance.timerify', async t => {
   let result = null, thread, parameters = { 
     CYCLES_PER_SECOND: 200, CONCURRENCY: 2, DURATION_MS: 1000 
   }
 
   t.before(async () => {
-    result = await dyno({
+    result = await main({
       task: join(import.meta.dirname, 'tasks/performance-timerify.js'),
       parameters
     })

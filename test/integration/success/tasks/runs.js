@@ -1,5 +1,5 @@
-import { run } from '../../../../index.js'
+import { task } from '../../../../index.js'
 
-run(async function task() {
+task(async function task() {
   // does nothing, just runs
 })

@@ -47,18 +47,18 @@ test('$ npx init: creates sample benchmark', async t => {
       )
     })
     
-    await t.test('a run.js', async t => {
+    await t.test('a main.js', async t => {
       await t.test('creates file', async t => {
         t.assert.ok(
-          await fileExists(path.join(folderpaths.benchmark, 'run.js')), 
-          'cannot find benchmark/run.js file'
+          await fileExists(path.join(folderpaths.benchmark, 'main.js')), 
+          'cannot find benchmark/main.js file'
         )
       })
       
       await t.test('with content', async t => {
         t.assert.ok(
-          await readFile(path.join(folderpaths.benchmark, 'run.js'), 'utf8'), 
-          'run.js file has no content'
+          await readFile(path.join(folderpaths.benchmark, 'main.js'), 'utf8'), 
+          'main.js file has no content'
         )
       })
     })
@@ -133,7 +133,7 @@ test('$ npx init: creates sample benchmark', async t => {
     // issues with `npm link` create files with wrong `../index.js` main entry
     t.todo('runs the example', async t => {
       await t.test('logs some meaningful output', async t => {
-        const out = await execQuick('NODE_ENV=test node run.js', { 
+        const out = await execQuick('NODE_ENV=test node main.js', { 
           cwd: folderpaths.benchmark
         })
     

@@ -1,7 +1,7 @@
 import { join } from 'node:path'
-import { dyno } from '{{entrypath}}'
+import { main } from '{{entrypath}}'
 
-await dyno({
+await main({
   // task file path
   task: join(import.meta.dirname, 'task.js'),
 

@@ -2,15 +2,15 @@ import test from 'node:test'
 import cp from 'node:child_process'
 import { join } from 'node:path'
 
-import { dyno } from '../../../index.js'
+import { main } from '../../../index.js'
 
-test('#dyno() exits gracefully', async t => {
+test('#main() exits gracefully', async t => {
   t.beforeEach(() => t.mock.reset())
 
   t.before(() => {
     cp.fork = t.mock.fn(cp.fork)
 
-    dyno({
+    main({
       task: join(import.meta.dirname, 'tasks/records-bar.js'),
       parameters: {  CYCLES_PER_SECOND: 500, CONCURRENCY: 4, DURATION_MS: 500 }
     })

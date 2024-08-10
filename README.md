@@ -2,7 +2,8 @@
 
 # :stopwatch: dyno
 
-benchmarking in multiple threads
+> `dyno` is a tool for testing if a piece of code can withstand 
+> a certain rate of production traffic
 
 * [Install](#install)
 * [Quickstart](#quickstart)
@@ -16,8 +17,7 @@ benchmarking in multiple threads
 * [Authors](#authors)
 * [License](#license)
 
-> `dyno` is a tool for testing if a piece of code can withstand 
-> a certain rate of production traffic
+## Overview
 
 Test parameters are set in a `main file` &
 the benchmarked code is added to a `task file`.   
@@ -31,9 +31,9 @@ elapses w/o creating a `cycle backlog`.
 
 ```js
 // sample task file
-import { run } from '@nicholaswmin/dyno'
+import { task } from '@nicholaswmin/dyno'
 
-run(async function task(parameters) {
+task(async function task(parameters) {
   // function under test
   function fibonacci(n) {
     return n < 1 ? 0
@@ -93,7 +93,7 @@ npx init
 > creates preconfigured `main.js` and `task.js` files.  
 > Use them as a starting point.
 
-#### run the above example:
+#### run the above example
 
 > navigate into the created `benchmark` folder:
 
@@ -118,9 +118,9 @@ npm run benchmark
 ```js
  // main.js
 import { join } from 'node:path'
-import { dyno } from '@nicholaswmin/dyno'
+import { main } from '@nicholaswmin/dyno'
 
-await dyno({
+await main({
   // task file path
   task: join(import.meta.dirname, 'task.js'),
 
@@ -180,9 +180,9 @@ Custom measurements can be taken using the following
 
 ```js
  // task.js
-import { run } from '@nicholaswmin/dyno'
+import { task } from '@nicholaswmin/dyno'
 
-run(async function task(parameters) {
+task(async function task(parameters) {
   // function under test
   function fibonacci(n) {
     return n < 1 ? 0
