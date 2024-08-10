@@ -1,4 +1,4 @@
-[![test-workflow][test-badge]][test-workflow] [![codeql-workflow][codeql-badge]][codeql-workflow]
+[![test-workflow][test-badge]][test-workflow] [![coverage-workflow][coverage-badge]][coverage-report] [![codeql-workflow][codeql-badge]][codeql-workflow]
 
 # :stopwatch: dyno
 
@@ -303,6 +303,9 @@ Nicholas Kyriakides, [@nicholaswmin][nicholaswmin]
 
 [test-badge]: https://github.com/nicholaswmin/dyno/actions/workflows/test.yml/badge.svg
 [test-workflow]: https://github.com/nicholaswmin/dyno/actions/workflows/test:unit.yml
+
+[coverage-badge]: https://coveralls.io/repos/github/nicholaswmin/dyno/badge.svg?branch=main
+[coverage-report]: https://coveralls.io/github/nicholaswmin/dyno?branch=main
 
 [codeql-badge]: https://github.com/nicholaswmin/dyno/actions/workflows/codeql.yml/badge.svg
 [codeql-workflow]: https://github.com/nicholaswmin/dyno/actions/workflows/codeql.yml
