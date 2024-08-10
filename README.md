@@ -25,48 +25,43 @@ on `n` number of threads:
 // benchmarked code
 import { run } from '@nicholaswmin/dyno'
 
-let counter = 0
-
 run(async function task(parameters) {
-  function fibonacci_1(n) {
+  function fibonacci(n) {
     return n < 1 ? 0
       : n <= 2 ? 1
-      : fibonacci_1(n - 1) + fibonacci_1(n - 2)
+      : fibonacci(n - 1) + fibonacci(n - 2)
   }
-
-  function fibonacci_2(n) {
-    return n < 1 ? 0
-    : n <= 2 ? 1
-    : fibonacci_2(n - 1) + fibonacci_2(n - 2)
+  
+  function sleep(ms) {
+    return new Promise(res => setTimeout(res, ms))
   }
-
-  performance.timerify(fibonacci_1)(parameters.FOO * Math.sin(++counter))
-  performance.timerify(fibonacci_2)(parameters.BAR * Math.sin(++counter))  
+  
+  performance.timerify(fibonacci)(parameters.FOO)
+  performance.timerify(sleep)(parameters.BAR)
 })
 ```
 
-while rendering live output:
+while logging measurements timings:
 
 ```js
-
 general stats 
 
-┌─────────┬──────┬──────┬─────────┬────────┐
-│ (index) │ sent │ done │ backlog │ uptime │
-├─────────┼──────┼──────┼─────────┼────────┤
-│ 0       │ 179  │ 178  │ 1       │ 6      │
-└─────────┴──────┴──────┴─────────┴────────┘
+┌─────────┬─────────────┬─────────────┬────────────────┬──────────────┐
+│ (index) │ cycles sent │ cycles done │ cycles backlog │ uptime (sec) │
+├─────────┼─────────────┼─────────────┼────────────────┼──────────────┤
+│ 0       │ 177         │ 174         │ 3              │ 6            │
+└─────────┴─────────────┴─────────────┴────────────────┴──────────────┘
 
-cycle timings (mean/ms) 
+cycle timings 
 
-┌─────────┬──────┬─────────────┬─────────────┬──────────┐
-│ (index) │ task │ fibonacci_1 │ fibonacci_2 │ eloop    │
-├─────────┼──────┼─────────────┼─────────────┼──────────┤
-│ 0       │ 14   │ 2           │ 13          │ 12797591 │
-│ 1       │ 15   │ 2           │ 13          │ 12780725 │
-│ 2       │ 16   │ 2           │ 14          │ 12793736 │
-│ 3       │ 15   │ 2           │ 14          │ 12919025 │
-└─────────┴──────┴─────────────┴─────────────┴──────────┘
+┌─────────┬─────────┬──────┬───────────┬───────┬──────────┐
+│ (index) │ thread  │ task │ fibonacci │ sleep │ eloop    │
+├─────────┼─────────┼──────┼───────────┼───────┼──────────┤
+│ 0       │ '19679' │ 72   │ 72        │ 103   │ 28617933 │
+│ 1       │ '19680' │ 72   │ 72        │ 103   │ 30947191 │
+│ 2       │ '19681' │ 72   │ 72        │ 103   │ 30685594 │
+│ 3       │ '19682' │ 72   │ 72        │ 104   │ 28678007 │
+└─────────┴─────────┴──────┴───────────┴───────┴──────────┘
 ```
 
 > note: requires additional configuration, see below
@@ -126,43 +121,46 @@ import { join } from 'node:path'
 import { dyno } from '@nicholaswmin/dyno'
 
 await dyno({
-  // location of the task file
+  // task file path
   task: join(import.meta.dirname, 'task.js'),
 
-  // test parameters
+  // parameters
   parameters: {
     // required
     CYCLES_PER_SECOND: 40, 
     CONCURRENCY: 4, 
     DURATION_MS: 10 * 1000,
     
-    // custom, optional
+    // optional,
     // passed-on to 'task.js'
-    FOO: 30,
-    BAR: 35
+    FOO: 35,
+    BAR: 50
   },
   
   // Render output using `console.table`
-  render: function({ main, threads, thread }) {
+  onMeasureUpdate: function({ main, threads }) {    
+    const tables = {
+      main: [{ 
+        'cycles sent'    : main.sent?.count, 
+        'cycles done'    : main.done?.count,
+        'cycles backlog' : main.sent?.count -  main.done?.count,
+        'uptime (sec)'   : main.uptime?.count
+      }],
+
+      threads: Object.keys(threads).reduce((acc, pid) => {
+        return [ ...acc, Object.keys(threads[pid]).reduce((acc, task) => ({
+          ...acc, thread: pid, [task]: Math.round(threads[pid][task].mean)
+        }), {})]
+      }, [])
+    }
+    
     console.clear()
 
-    console.log('\n', 'cycle stats', '\n')
-    console.table([{ 
-      sent    : main.sent?.count, 
-      done    : main.done?.count,
-      backlog : main.sent?.count -  main.done?.count,
-      uptime  : main.uptime?.count
-    }])
-    
-    console.log('\n', 'cycle timings (mean/ms)', '\n')
-    console.table(Object.keys(threads).reduce((acc, pid) => {
-      return [
-        ...acc, 
-        Object.keys(threads[pid]).reduce((acc, task) => ({
-          ...acc,
-          [task]: Math.round(threads[pid][task].mean)
-        }), {})]
-    }, []))
+    console.log('\n', 'general stats', '\n')
+    console.table(tables.main)
+
+    console.log('\n', 'cycle timings', '\n')
+    console.table(tables.threads)
   }
 })
 
@@ -184,23 +182,19 @@ Custom measurements can be taken using the following
  // task.js
 import { run } from '@nicholaswmin/dyno'
 
-let counter = 0
-
 run(async function task(parameters) {
-  function fibonacci_1(n) {
+  function fibonacci(n) {
     return n < 1 ? 0
       : n <= 2 ? 1
-      : fibonacci_1(n - 1) + fibonacci_1(n - 2)
+      : fibonacci(n - 1) + fibonacci(n - 2)
   }
-
-  function fibonacci_2(n) {
-    return n < 1 ? 0
-    : n <= 2 ? 1
-    : fibonacci_2(n - 1) + fibonacci_2(n - 2)
+  
+  function sleep(ms) {
+    return new Promise(res => setTimeout(res, ms))
   }
-
-  performance.timerify(fibonacci_1)(parameters.FOO * Math.sin(++counter))
-  performance.timerify(fibonacci_2)(parameters.BAR * Math.sin(++counter))  
+  
+  performance.timerify(fibonacci)(parameters.FOO)
+  performance.timerify(sleep)(parameters.BAR)
 })
 ```
 
@@ -232,24 +226,19 @@ npm run checks
 
 ## Misc
 
-> for users 
+> create a runnable sample benchmark
 
 ```bash
 npx init
 ```
 
-> create a runnable sample benchmark, 
-> like the one listed above
-
-> for contributors
+> insert/update example snippets in README  
 
 ```bash
 npm run maintenance:update:readme
 ```
-> insert/update example snippets in README  
-> note: does not update the "output" section
-
-Example code snippets are located in: [`/bin/example`](./bin/example)
+> note: does not update the "output" section  
+> Example code snippets are located in: [`/bin/example`](./bin/example)
 
 ## Authors
 

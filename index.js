@@ -6,7 +6,7 @@ import threader from './src/threader/index.js'
 import Collector from './src/collector/index.js'
 import Scheduler from './src/scheduler/index.js'
 
-const dyno = async ({ task, parameters, render = () => {} }) => {
+const dyno = async ({ task, parameters, onMeasureUpdate = () => {} }) => {
   parameters = await prompt(parameters, {
     skipUserInput: ['test'].includes(process.env.NODE_ENV)
   })
@@ -23,7 +23,7 @@ const dyno = async ({ task, parameters, render = () => {} }) => {
   })
   
   process.start()
-  collector.start(threads, render.bind(this))
+  collector.start(threads, onMeasureUpdate.bind(this))
   scheduler.start(threads)
   uptimer.start()
 

@@ -6,7 +6,7 @@ class Collector {
     this.on = true    
     
     this.stats = {
-      main:    {},
+      main: {},
       threads: {},
       get thread() {
         return this.threads[Object.keys(this.threads)[0]] || {}
