@@ -28,7 +28,6 @@
     "@inquirer/input": "^2.2.4"
   },
   "devDependencies": {
-    "@eslint/js": "^9.9.0",
     "globals": "^15.9.0"
   }
 }
