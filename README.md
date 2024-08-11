@@ -17,10 +17,9 @@
 
 ## Overview
 
-It repeatedly runs a *task* function, for a specified *duration*,  
-across multiple threads.
+It loops a *task* function, for a given *duration*, across multiple threads.
 
-The test is succesful if it ends without creating a *cycle backlog*.
+A test is succesful if it ends without creating a *cycle backlog*.
 
 ```js
 // example
