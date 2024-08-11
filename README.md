@@ -179,7 +179,7 @@ test coverage:
 npm run test:coverage
 ```
 
-style checks/eslint:
+meta checks:
 
 ```bash
 npm run checks
