@@ -91,9 +91,9 @@ node benchmark.js
 
 ## Avoiding self-forking
 
-Because of how the [`fork` mechanism][cp-fork] works,   
-running single-file benchmarks causes the `benchmark.js` file itself to be   
-run `n` amount of times, where `n` is the number of specified `threads`.  
+Because of how the [`fork` mechanism][cp-fork] works, 
+running single-file benchmarks causes any code outside the `dyno` blocks
+to run an `n` amount of times, where `n` is the number of specified `threads`.  
 
 In the following code, `'done'` is logged `3` times, instead of `1`: 
 
@@ -110,8 +110,11 @@ console.log('done')
 // 'done'
 ```
 
-This precludes using this module as part of an automated test suite or 
-doing anything useful before or after the test ends.
+This can create issues when using this module as part of an automated test 
+suite and/or attempting to do anything with the test results.
+
+> Note: external `import` or `require` module imports don't have any issues  
+> with self-forking because they are cached.
 
 ### Task file workaround
 
