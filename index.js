@@ -8,7 +8,7 @@ import Scheduler from './src/scheduler/index.js'
 
 const isPrimary = !Object.hasOwn(process.env, 'thread_index')
 
-const dyno = async (taskFn, { parameters, onMeasure = () => {} }) => {
+const dyno = async (taskFn, { parameters, onTick = () => {} }) => {
   if (isPrimary) {  
     parameters = await prompt(parameters, {
       skipUserInput: ['test'].includes(process.env.NODE_ENV)
@@ -28,7 +28,7 @@ const dyno = async (taskFn, { parameters, onMeasure = () => {} }) => {
     })
     
     process.start()
-    collector.start(threads, onMeasure.bind(this))
+    collector.start(threads, onTick.bind(this))
     scheduler.start(threads)
     uptimer.start()
   

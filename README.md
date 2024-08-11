@@ -24,6 +24,9 @@ for a specified *test duration*.
 A test is deemed succesful if the *test duration*
 elapses without creating a *cycle backlog*.
 
+To maximize efficiency and mimic a production environment,   
+the provided task is run across multiple threads.
+
 ```js
 // example
 import { dyno } from '@nicholaswmin/dyno'
@@ -39,8 +42,8 @@ const result = await dyno(async function task() {
 }, {
   parameters: { CYCLES_PER_SECOND: 40, CONCURRENCY: 4, DURATION_MS: 10000 },
   
-  onMeasureUpdate: function({ main, threads }) {    
-    console.log(threads)
+  onTick: stats => {    
+    console.log(stats)
   }
 })
 
@@ -133,7 +136,7 @@ await dyno(async function task(parameters) {
   },
   
   // Render output using `console.table`
-  onMeasure: function({ main, threads }) {    
+  onTick: ({ main, threads }) => {    
     const tables = {
       main: [{ 
         'cycles sent'    : main.sent?.count, 

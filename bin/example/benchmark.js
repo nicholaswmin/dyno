@@ -30,7 +30,7 @@ await dyno(async function task(parameters) {
   },
   
   // Render output using `console.table`
-  onMeasure: function({ main, threads }) {    
+  onTick: ({ main, threads }) => {    
     const tables = {
       main: [{ 
         'cycles sent'    : main.sent?.count, 
