@@ -1,18 +1,18 @@
 {
   "name": "@nicholaswmin/dyno",
   "type": "module",
-  "version": "0.3.8",
+  "version": "0.4.1",
   "description": "a multithreaded benchmarker",
   "main": "index.js",
   "bin": {
-    "init": "bin/create-simple-example.js",
-    "init-cloud": "bin/create-cloud-example.js"
+    "init": "bin/create-benchmark.js",
+    "init-cloud": "bin/create-benchmark-cloud.js"
   },
   "scripts": {
     "test": "NODE_ENV=test node --test --no-warnings test/index.test.js",
     "test:coverage": "NODE_ENV=test node --test --no-warnings --experimental-test-coverage test/index.test.js",
     "checks": "npx eslint && npm audit",
-    "example:update": "bin/replace-readme-snippets.js"
+    "examples:update": "bin/update-readme.js"
   },
   "engines": {
     "node": ">=22.5.1"

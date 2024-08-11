@@ -12,7 +12,7 @@ class Scheduler {
   
   start(threads) {
     this.#throwIfRunning()
-    this.#addCycleDoneListeners(threads)
+    this.#addCycleCompletedListeners(threads)
 
     this.timer = setInterval(
       this.#scheduleOnNextThread.bind(this, threads),
@@ -25,7 +25,7 @@ class Scheduler {
 
     this.on = false
     this.#stopTaskScheduling()
-    this.#removeCycleDoneListeners()
+    this.#removeCycleCompletedListeners()
     process.stop()
   }
   
@@ -34,13 +34,13 @@ class Scheduler {
     this.timer = null
   }
 
-  #addCycleDoneListeners(threads) {
+  #addCycleCompletedListeners(threads) {
     Object.values(threads).forEach(thread => {
       const listener = {
         thread: thread,
-        handler: function measureDone({ name }) {
-          if (['cycle:done'].includes(name))
-            histogram('done').record(1)
+        handler: function measureCompleted({ name }) {
+          if (['cycle:completed'].includes(name))
+            histogram('completed').record(1)
         }
       }
 
@@ -49,7 +49,7 @@ class Scheduler {
     })
   }
 
-  #removeCycleDoneListeners() {
+  #removeCycleCompletedListeners() {
     this.listeners.forEach(listener => 
       listener.thread.off('message', listener.handler))
     
@@ -81,7 +81,7 @@ class Scheduler {
   
       thread && thread.connected && this.on
         ? thread.send({ name: 'cycle:start' }) 
-          ? histogram('sent').record(1)
+          ? histogram('issued').record(1)
           : (() => {
             throw new Error('IPC oversaturated. Set "cyclesPerSecond" lower')
           })

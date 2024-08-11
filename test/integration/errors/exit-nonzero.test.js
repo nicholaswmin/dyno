@@ -12,7 +12,7 @@ test('#dyno() exits gracefully on error', async t => {
     const start = performance.now()
 
     return dyno(path.join(import.meta.dirname, './tasks/exits-1.js'), {
-      parameters: { CYCLES_PER_SECOND: 10, CONCURRENCY: 4, DURATION_MS: 1000 }
+      parameters: { cyclesPerSecond: 10, threads: 4, durationMs: 1000 }
     })
     .catch((err = true) => {
       error = err

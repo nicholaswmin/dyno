@@ -14,7 +14,7 @@ const run = async (taskFn, {
 
   const timed_task = performance.timerify(taskFn.bind(this))
   const taskRunner = parameters => timed_task(parameters)
-  const loopObserver = new LoopDelayObserver(histogram('eloop').record)
+  const loopObserver = new LoopDelayObserver(histogram('evt_loop').record)
   const perfObserver = new PerformanceObserver(mapToEntries(entry => {
     histogram(entry.name).record(entry.duration)
   }))
@@ -31,7 +31,7 @@ const run = async (taskFn, {
   
   process.on('cycle:start', async () => {
     await taskRunner(parameters)
-    process.send({ name: 'cycle:done' })
+    process.send({ name: 'cycle:completed' })
   }) 
   
   loopObserver.observe()

@@ -10,7 +10,7 @@ test('#dyno() cycles in x amount of threads', async t => {
   t.before(async () => {
     await performance.timerify(dyno, { histogram })(
       path.join(import.meta.dirname, 'tasks/runs.js'), {
-      parameters: {  CYCLES_PER_SECOND: 300, CONCURRENCY: 2, DURATION_MS: 250 }
+      parameters: { cyclesPerSecond: 300, threads: 2, durationMs: 250 }
     })
   })
   

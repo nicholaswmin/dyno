@@ -26,7 +26,7 @@ export default async (parameters, { skipUserInput = false } = {}) => {
     const answer = skipUserInput 
       ? value : await input({
 
-      message: `Configure value for: ${key}`,
+      message: `Configure: "${key}"`,
 
       value: value,
 

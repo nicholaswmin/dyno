@@ -8,7 +8,7 @@ import { fileExists, onStdout } from './utils/utils.js'
 const tempdir = path.join(import.meta.dirname, './temp')
 const exec = util.promisify(child_process.exec)
 
-test('$ npx init: creates a simple benchmark', async t => {
+test('$ npx init: creates a benchmark', async t => {
   t.before(async () => {
     await exec('npx init', { cwd: tempdir })
   })

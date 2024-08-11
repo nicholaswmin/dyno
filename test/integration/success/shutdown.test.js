@@ -5,16 +5,20 @@ import cp from 'node:child_process'
 import { dyno } from '../../../index.js'
 
 test('#dyno() exits gracefully', async t => {
-  t.before(() => {
+  t.before(async () => {
     cp.fork = t.mock.fn(cp.fork)
+    t.mock.reset()
 
-    return dyno(path.join(import.meta.dirname, 'tasks/runs.js'), {
-      parameters: { CYCLES_PER_SECOND: 500, CONCURRENCY: 2, DURATION_MS: 250 }
+    await dyno(path.join(import.meta.dirname, 'tasks/runs.js'), {
+      parameters: { cyclesPerSecond: 500, threads: 2, durationMs: 250 }
     })
   })
   
   await t.test('all threads exit with code: 0', async t => {
-    const exit0 = cp.fork.mock.calls.map(c => c.result).filter(t => !t.exitCode)
+    const exit0 = cp.fork.mock.calls
+      .map(call => call.result)
+      .filter(thread => Object.hasOwn(thread, 'exitCode') && !thread.exitCode)
+
     t.assert.strictEqual(exit0.length, 2)
   })
 })

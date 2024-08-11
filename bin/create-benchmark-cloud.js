@@ -4,7 +4,6 @@
 
 import path from 'node:path'
 import { createExample } from './builder/index.js'
-import { styleText } from 'node:util'
 
 await createExample({
   srcfolder: './example',
@@ -18,4 +17,4 @@ await createExample({
   ]
 })
 
-console.log(styleText(['green'], 'done:success'))
+console.log('done!')

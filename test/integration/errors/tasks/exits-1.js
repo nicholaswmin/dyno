@@ -2,6 +2,6 @@
 import { task } from '../../../../index.js'
 
 task(async function task() {
-  if (+process.env.thread_index === 1)
+  if (+process.env.THREAD_INDEX === 1)
     process.exit(1)
 })
