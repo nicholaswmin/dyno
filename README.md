@@ -214,7 +214,7 @@ Nicholas Kyriakides, [@nicholaswmin][nicholaswmin]
 
 ## License
 
-[MIT "No Attribution" License][license]
+[MIT-0 License][license]
 
 <!--- Badges -->
 
