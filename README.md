@@ -8,8 +8,8 @@
 * [Install](#install)
 * [Generate benchmark](#generate-sample-benchmark)
 * [Avoiding self-forking](#avoiding-self-forking)
-  + [Workaround](#workaround)
-  + [Alt. workaround](#alternative-workaround)
+  + [Task file workaround](#task-file-workaround)
+  + [Env. var workaround](#env.-var-workaround)
 * [Tests](#tests)
 * [Misc.](#misc)
 * [Authors](#authors)
@@ -113,7 +113,7 @@ console.log('done')
 This precludes using this module as part of an automated test suite or 
 doing anything useful before or after the test ends.
 
-### Workaround
+### Task file workaround
 
 To work around this, the *task function* can be extracted into it's own file,
 like so:
@@ -142,7 +142,7 @@ console.log('done')
 // 'done'
 ```
 
-#### Alternative workaround 
+### Env. var workaround
 
 Alternatively, a check can be made against the `THREAD_INDEX` env. var:
 
