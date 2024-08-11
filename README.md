@@ -9,7 +9,7 @@
 * [Generate benchmark](#generate-sample-benchmark)
 * [Avoiding self-forking](#avoiding-self-forking)
   + [Task file workaround](#task-file-workaround)
-  + [Env. var workaround](#env.-var-workaround)
+  + [Env. var workaround](#env-var-workaround)
 * [Tests](#tests)
 * [Misc.](#misc)
 * [Authors](#authors)
@@ -142,7 +142,7 @@ console.log('done')
 // 'done'
 ```
 
-### Env. var workaround
+### Env var workaround
 
 Alternatively, a check can be made against the `THREAD_INDEX` env. var:
 
