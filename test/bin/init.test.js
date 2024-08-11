@@ -5,17 +5,18 @@ import child_process from 'node:child_process'
 import fs, { readFile } from 'node:fs/promises'
 import { fileExists, onStdout } from './utils/utils.js'
 
-const tempdir = path.join(import.meta.dirname, './temp/test')
+const tempdir = path.join(import.meta.dirname, './temp')
 const exec = util.promisify(child_process.exec)
 
 test('$ npx init: creates a simple benchmark', async t => {
   t.before(async () => {
-    await fs.rm(tempdir, { recursive: true, force: true })
     await exec('npx init', { cwd: tempdir })
   })
   
   t.after(async () => {
-    await fs.rm(tempdir, { recursive: true, force: true })
+    await fs.rm(path.join(tempdir, '/benchmark.js'), { 
+      recursive: true, force: true 
+    })
   })
     
   await t.test('creates a benchmark.js file', async t => {
