@@ -2,6 +2,7 @@
 
 ## fix
 
+- [ ] add parameters getter, so that printing parameters is easy
 - [ ] add a simplified `snapshots` getter to make plotting with `asciichart` 
       easy
 - [x] simplify `onTick` arguments so the simple example can log easily 
