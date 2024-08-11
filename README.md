@@ -187,13 +187,13 @@ npm run checks
 
 ## Misc
 
-> generate a runnable benchmark
+> generate sample benchmark
 
 ```bash
 npx init
 ```
 
-> generate a [Heroku-deployable][heroku] benchmark
+> generate [Heroku-deployable][heroku] benchmark
 
 ```bash
 npx init-cloud
