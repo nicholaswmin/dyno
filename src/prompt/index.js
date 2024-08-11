@@ -17,14 +17,15 @@ const validateTypes = (obj, types) => {
   }
 }
 
-export default async (parameters, { skipUserInput = false } = {}) => {
+export default async (parameters, { disabled = false, defaults = {} } = {}) => {
+  parameters = { ...defaults, ...parameters }
+
   validateTypes(parameters, types)
   
   for (const key of Object.keys(parameters || {})) {
     const value = parameters[key]
 
-    const answer = skipUserInput 
-      ? value : await input({
+    const answer = disabled ? value : await input({
 
       message: `Configure: "${key}"`,
 

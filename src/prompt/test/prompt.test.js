@@ -6,15 +6,14 @@ test('#prompt()', async t => {
   
   t.beforeEach(async () => {
     result = await prompt({ FOO: 30, BAR: 'BAR', BAZ: false }, {
-      skipUserInput: true
+      disabled: true,
+      defaults: { BAX: 50 }
     }) 
   })
 
   t.todo('asks for user input', async t => {
     // @TODO 
     // - Test actual user input
-    // - note: when run using `node --test`, 
-    //  `inquirer/input` does not register  keypress answers
     t.todo('parameter type: Number', () => {
       t.todo('allows only whole numbers', () => {})
       t.todo('allows only positive numbers ', () => {})
@@ -31,9 +30,14 @@ test('#prompt()', async t => {
   
   await t.test('returns a parameters object', async t => {
     await t.test('has the correct properties', async t => {
-      t.assert.deepStrictEqual(Object.keys(result), [
-        'FOO', 'BAR', 'BAZ'
+      t.assert.deepStrictEqual(Object.keys(result).sort(), [
+        'BAR', 'BAX', 'BAZ', 'FOO'
       ])
+    })
+    
+    await t.test('sets defaults', async t => {
+      t.assert.ok(Object.hasOwn(result, 'BAX'), 'BAX default not found')
+      t.assert.strictEqual(result.BAX, 50)
     })
 
     await t.test('type: Number', async t => {
