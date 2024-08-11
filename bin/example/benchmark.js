@@ -1,4 +1,4 @@
-import { dyno } from '@nicholaswmin/dyno'
+import { dyno } from '{{entrypath}}'
 
 await dyno(async function task(parameters) { 
   // function under test

@@ -9,6 +9,8 @@ const replaceTokensInFile = async ({
   entrypath,
   tokens 
 }) => {    
+  entrypath = entrypath === 'index.js' ? './index.js' : entrypath
+
   for (const token of tokens) {
     const srcpath = path.join(dirname, `../${srcfolder}/${token.target}`)
     const contents = await fs.readFile(srcpath, 'utf8')
@@ -32,6 +34,8 @@ const createExample = async ({
   entrypath, 
   fragments 
 }) => {
+  entrypath = entrypath === 'index.js' ? './index.js' : entrypath
+
   try {
     await fs.rm(targetfolder, { recursive: true, force: true })
     if (targetfolder) await fs.mkdir(targetfolder)
