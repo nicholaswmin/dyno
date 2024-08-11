@@ -201,7 +201,7 @@ npx init-cloud
 update `README.md` code snippets:
 
 ```bash
-npm run example:update:readme
+npm run example:update
 ```
 
 ## Authors
