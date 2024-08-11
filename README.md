@@ -205,8 +205,6 @@ npx init-cloud
 npm run example:update:readme
 ```
 
-> source examples are located in: [`/bin/example`](./bin/example)
-
 ## Authors
 
 Nicholas Kyriakides, [@nicholaswmin][nicholaswmin]
