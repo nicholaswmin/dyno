@@ -17,12 +17,11 @@
 
 ## Overview
 
-The runner repeatedly runs a specified *task* 
-for a specified *cycle per seconds* rate, 
-for a specified *test duration*.
+The runner repeatedly runs a specified `task function`   
+for a specified `cycle per seconds` rate, for a specified `test duration`.
 
-A test is deemed succesful if the *test duration*
-elapses without creating a *cycle backlog*.
+A test is deemed succesful if the test duration elapses  
+without creating a *cycle backlog*.
 
 To maximize efficiency and mimic a production environment,   
 the provided task is run across multiple threads.
