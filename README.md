@@ -4,11 +4,9 @@
 
 > test code against a *certain rate* of production traffic
 
-* [Quickstart](#quickstart)
-  + [Install](#install)
-  + [Overview](#overview)
-  + [Generate benchmark](#generate-sample-benchmark)
-* [Complete Example](#complete-example)
+* [Overview](#overview)
+* [Install](#install)
+* [Generate benchmark](#generate-sample-benchmark)
 * [Tests](#tests)
 * [Misc.](#misc)
 * [Authors](#authors)
@@ -33,21 +31,54 @@ await dyno(async function task() {
   })(30)
 
 }, {
-  parameters: { CYCLES_PER_SECOND: 40, CONCURRENCY: 4, DURATION_MS: 10000 },
+  parameters: { 
+    cyclesPerSecond: 40, 
+    durationMs: 10000,
+    threads: 4
+  },
   
-  onTick: stats => console.log(stats)
+  onTick: ({ main, tasks }) => {    
+    console.clear()
+
+    console.log('general')
+    console.table([main])
+
+    console.log('cycle timings (average, in ms)')
+    console.table(tasks)
+  }
 })
 ```
 
-## Quickstart
+which logs: 
 
-### Install
+```js
+general
+
+┌─────────┬────────┬──────┬──────┬─────────┐
+│ (index) │ uptime │ sent │ done │ backlog │
+├─────────┼────────┼──────┼──────┼─────────┤
+│ 0       │ 10     │ 98   │ 98   │ 0       │
+└─────────┴────────┴──────┴──────┴─────────┘
+
+cycle timings (average, in ms)
+
+┌─────────┬─────────┬───────┬───────┬───────────┐
+│ (index) │ thread  │ eloop │ task  │ fibonacci │
+├─────────┼─────────┼───────┼───────┼───────────┤
+│ 0       │ '45884' │ 11.18 │ 15.04 │ 14.83     │
+│ 1       │ '45885' │ 11.11 │ 15.08 │ 14.96     │
+│ 2       │ '45886' │ 11.1  │ 15.04 │ 14.92     │
+│ 3       │ '45887' │ 11.14 │ 15.5  │ 15.29     │
+└─────────┴─────────┴───────┴───────┴───────────┘
+```
+
+## Install
 
 ```bash
 npm i @nicholaswmin/dyno
 ```
 
-### Generate sample benchmark
+## Generate sample benchmark
 
 ```bash 
 npx init
@@ -55,107 +86,11 @@ npx init
 
 > creates a preconfigured `benchmark.js`  
 
-#### run the sample
+### run
 
 ```bash
 node benchmark.js
 ``` 
-
-## Complete example
-
-> The following example benchmarks a `fibonnacci()` function
-> and a `sleep()` function.  
->
-> [`performance.timerify`][timerify] is used to record timing measurements.
->
-> Live results are logged as tables.
-
-```js
-// complete example
-import { dyno } from '@nicholaswmin/dyno'
-
-await dyno(async function task(parameters) { 
-  // function under test
-  function fibonacci(n) {
-    return n < 1 ? 0
-      : n <= 2 ? 1
-      : fibonacci(n - 1) + fibonacci(n - 2)
-  }
-
-  // another function under test
-  function sleep(ms) {
-    return new Promise(res => setTimeout(res, ms))
-  }
-  
-  // wrap both of them in `performance.timerify` 
-  // so we can log their timings in the test output
-  performance.timerify(fibonacci)(parameters.FOO)
-  performance.timerify(sleep)(parameters.BAR)
-}, {
-  parameters: {
-    // required
-    CYCLES_PER_SECOND: 10, 
-    CONCURRENCY: 4, 
-    DURATION_MS: 10 * 1000,
-    
-    // optional
-    FOO: 35,
-    BAR: 50
-  },
-  
-  // Render output using `console.table`
-  onTick: ({ main, threads }) => {    
-    const tables = {
-      main: [{ 
-        'cycles sent'    : main.sent?.count, 
-        'cycles done'    : main.done?.count,
-        'cycles backlog' : main.sent?.count -  main.done?.count,
-        'uptime (sec)'   : main.uptime?.count
-      }],
-
-      threads: Object.keys(threads).reduce((acc, pid) => {
-        return [ ...acc, Object.keys(threads[pid]).reduce((acc, task) => ({
-          ...acc, thread: pid, [task]: Math.round(threads[pid][task].mean)
-        }), {})]
-      }, [])
-    }
-    
-    console.clear()
-
-    console.log('\n', 'general stats', '\n')
-    console.table(tables.main)
-
-    console.log('\n', 'cycle timings', '\n')
-    console.table(tables.threads)
-  }
-})
-
-console.log('test ended succesfully')
-```
-
-this renders live results like so:
-
-```js
-general stats 
-
-┌─────────┬─────────────┬─────────────┬────────────────┬──────────────┐
-│ (index) │ cycles sent │ cycles done │ cycles backlog │ uptime (sec) │
-├─────────┼─────────────┼─────────────┼────────────────┼──────────────┤
-│ 0       │ 177         │ 174         │ 3              │ 6            │
-└─────────┴─────────────┴─────────────┴────────────────┴──────────────┘
-
-cycle timings 
-
-┌─────────┬─────────┬──────┬───────────┬───────┬──────────┐
-│ (index) │ thread  │ task │ fibonacci │ sleep │ eloop    │
-├─────────┼─────────┼──────┼───────────┼───────┼──────────┤
-│ 0       │ '19679' │ 72   │ 72        │ 103   │ 28617933 │
-│ 1       │ '19680' │ 72   │ 72        │ 103   │ 30947191 │
-│ 2       │ '19681' │ 72   │ 72        │ 103   │ 30685594 │
-│ 3       │ '19682' │ 72   │ 72        │ 104   │ 28678007 │
-└─────────┴─────────┴──────┴───────────┴───────┴──────────┘
-```
-
 
 ## Tests
 
@@ -200,8 +135,10 @@ npx init-cloud
 update `README.md` code snippets:
 
 ```bash
-npm run example:update
+npm run examples:update
 ```
+
+> examples source is located in: [`/bin/examples`](./bin/examples)
 
 ## Authors
 

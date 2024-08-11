@@ -1,12 +1,50 @@
 import { Bus } from '../bus/index.js'
 import { ProcessStat } from './process-stat/index.js'
 
+const round = num => (Math.round((num + Number.EPSILON) * 100) / 100) || 'n/a'
+const nsToMs = num => round(num / 1000000)
+const pid = process.pid.toString()
+
 class Collector {
   constructor() {
-    this.on = true    
-    this.stats = {}
+    this.on = true  
+    this.bus = Bus()  
     
-    this.bus = Bus()
+    this.stats = {
+      threads: {},
+
+      get main() {
+        const stats = Object.keys(this.threads[pid])
+          .reduce((acc, key) => ({
+            ...acc,
+            [key]: this.threads[pid][key]?.count
+          }), {})
+        
+        return {
+          ...stats,
+          backlog: stats.sent - stats.done,
+          uptime: stats.uptime
+        }
+      },
+
+      get tasks() {
+        return Object.keys(this.threads)
+          .filter(_pid => _pid !== pid)
+          .reduce((acc, pid) => ([ 
+            ...acc, 
+            Object.keys(this.threads[pid])
+              .reduce((acc, task) => ({
+                ...acc, 
+                thread: pid, 
+                // @NOTE declare tasks that need `ns` -> `ms` conversion
+                // @REVIEW bad hack, the emitters must always emit in `ms`
+                [task]: ['eloop'].includes(task) 
+                  ? nsToMs(this.threads[pid][task].mean)
+                  : round(this.threads[pid][task].mean)
+              }), {})
+          ]), [])
+      }
+    }
   }
   
   start(threads, cb) {
@@ -29,17 +67,17 @@ class Collector {
   }
   
   #record({ pid, name, value }) {
-    // @REVIEW, 
-    // - `stats` is not a good name for this, 
-    //   too long to carry around in userland when building views
-
-    if (!this.stats[pid])
-      return this.stats[pid] = new ProcessStat({ name, value })
+    if (!this.stats.threads[pid])
+      return this.stats.threads[pid] = new ProcessStat({ 
+        name, value 
+      })
     
-    if (!this.stats[pid][name])
-      return this.stats[pid].createTimeseriesHistogram({ name, value })
+    if (!this.stats.threads[pid][name])
+      return this.stats.threads[pid].createTimeseriesHistogram({ 
+        name, value 
+      })
 
-    this.stats[pid][name].record(value)
+    this.stats.threads[pid][name].record(value)
   }
 }
 
