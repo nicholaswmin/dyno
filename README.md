@@ -58,7 +58,6 @@ npx init
 ```
 
 > creates a preconfigured `benchmark.js`  
-> Use it as a starting point.
 
 #### run the sample
 
