@@ -24,9 +24,6 @@
   ],
   "author": "@nicholaswmin",
   "license": "MIT",
-  "dependencies": {
-    "@inquirer/input": "^2.2.4"
-  },
   "devDependencies": {
     "globals": "^15.9.0"
   }
