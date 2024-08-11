@@ -10,6 +10,10 @@
 
 ## feat 
 
+- [ ] Implement progressive-rate
+  - start at a given cycles-per-second and increase automatically. 
+  - detect when a backlog is created and stop.
+  - the current cycles-per-second rate is the result score of the benchmark
 - [ ] warmup period
 - [x] event loop measures for each thread
 - [ ] implement max backlog limit

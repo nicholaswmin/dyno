@@ -32,7 +32,7 @@ process._on_original('message', data => {
   cbs 
     ? cbs.forEach(cb => cb(data))
     : (() => {
-      throw new Error(`cannot find registered listeners for: ${data.name}`)
+      return process.emitWarning(`no registered listeners for: ${data.name}`)
     })()
 })
 

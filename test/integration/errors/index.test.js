@@ -1,2 +1,2 @@
- import './thread-exit-code-1.test.js'
- import './thread-exit-hangs.test.js'
+ import './exit-nonzero.test.js'
+ import './exit-hangs.test.js'

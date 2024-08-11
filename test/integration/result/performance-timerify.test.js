@@ -1,51 +1,34 @@
 import test from 'node:test'
-import { join } from 'node:path'
+import path from 'node:path'
 
 import { dyno } from '../../../index.js'
 
 test('#dyno() custom-measurement:performance.timerify', async t => {
-  let result = null, thread, parameters = { 
-    CYCLES_PER_SECOND: 200, CONCURRENCY: 2, DURATION_MS: 1000 
-  }
+  let result
 
   t.before(async () => {
-    result = await dyno({
-      task: join(import.meta.dirname, 'tasks/performance-timerify.js'),
-      parameters
+    result = await dyno(path.join(import.meta.dirname,'tasks/timerify.js'), {
+      parameters: { CYCLES_PER_SECOND: 100, CONCURRENCY: 2, DURATION_MS: 250 }
     })
-    
-    thread = result.thread
+    .then(res => res.thread)
   })
 
   await t.test('tracks the measurement', async t => {
-    t.assert.ok(Object.hasOwn(thread, 'sleep'), 
+    t.assert.ok(Object.hasOwn(result, 'sleep'), 
       'Cannot find tracked measurement "sleep" on thread'
     )
   })
 
-  await t.test('records the value as a histogram', async t => {
-    t.assert.ok(
-      Object.hasOwn(thread.sleep, 'count'), 
-      'cant find prop "count" on task.sleep'
-    )
-    
-    t.assert.ok(
-      Object.hasOwn(thread.sleep, 'min'), 
-      'cant find prop "min" on task.sleep'
-    )
-    
-    t.assert.ok(
-      Object.hasOwn(thread.sleep, 'mean'), 
-      'cant find prop "mean" on task.sleep'
-    )
-    
-    t.assert.ok(
-      Object.hasOwn(thread.sleep, 'max'), 
-      'cant find prop "max" on task.sleep'
-    )
+  await t.test('records the value as a timeline histogram', async t => {
+    t.assert.ok(Object.hasOwn(result.sleep, 'last'),  'missing key "last"')
+    t.assert.ok(Object.hasOwn(result.sleep, 'count'), 'no prop "count"')
+    t.assert.ok(Object.hasOwn(result.sleep, 'min'),   'no prop "min"')
+    t.assert.ok(Object.hasOwn(result.sleep, 'mean'),  'no prop "mean"')
+    t.assert.ok(Object.hasOwn(result.sleep, 'max'),   'no prop "max"')
   })
   
   await t.test('records snapshots of the histogram', async t => {
-    t.assert.ok(thread.sleep.snapshots.length > 0, 'found 0 task.sleep snapshots')
+    t.assert.ok(Object.hasOwn(result.sleep, 'snapshots'), 'no prop "snapshots"')
+    t.assert.ok(result.sleep.snapshots.length > 0, 'got 0 "sleep" snapshots')
   })
 })

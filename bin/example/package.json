@@ -4,9 +4,9 @@
   "type": "module",
   "description": "A benchmark using the dyno module",
   "scripts": {
-    "benchmark": "node run.js",
+    "benchmark": "node benchmark.js",
     "start": "node bind.js"
   },
-  "author": "unspecified",
-  "license": "ISC"
+  "author": "",
+  "license": "UNLICENSED"
 }

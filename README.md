@@ -2,15 +2,13 @@
 
 # :stopwatch: dyno
 
-benchmarking in multiple threads
+> test code against a *certain rate* of production traffic
 
-* [Install](#install)
 * [Quickstart](#quickstart)
+  + [Install](#install)
   + [Overview](#overview)
   + [Generate benchmark](#generate-sample-benchmark)
-* [Example](#example)
-  + [Run file](#run-file)
-  + [Task file](#task-file)
+* [Complete Example](#complete-example)
 * [Tests](#tests)
 * [Misc.](#misc)
 * [Authors](#authors)
@@ -18,70 +16,36 @@ benchmarking in multiple threads
 
 ## Overview
 
-Run the following piece of code `n` number of cycles, 
-on `n` number of threads:
+It loops a *task* function, for a given *duration*, across multiple threads.
+
+A test is succesful if it ends without creating a *cycle backlog*.
 
 ```js
-// benchmarked code
-import { run } from '@nicholaswmin/dyno'
+// example
+import { dyno } from '@nicholaswmin/dyno'
 
-run(async function task(parameters) {
-  function fibonacci(n) {
+await dyno(async function task() { 
+
+  performance.timerify(function fibonacci(n) {
     return n < 1 ? 0
       : n <= 2 ? 1
       : fibonacci(n - 1) + fibonacci(n - 2)
-  }
+  })(30)
+
+}, {
+  parameters: { CYCLES_PER_SECOND: 40, CONCURRENCY: 4, DURATION_MS: 10000 },
   
-  function sleep(ms) {
-    return new Promise(res => setTimeout(res, ms))
-  }
-  
-  performance.timerify(fibonacci)(parameters.FOO)
-  performance.timerify(sleep)(parameters.BAR)
+  onTick: stats => console.log(stats)
 })
-```
-
-while logging measurements timings:
-
-```js
-general stats 
-
-┌─────────┬─────────────┬─────────────┬────────────────┬──────────────┐
-│ (index) │ cycles sent │ cycles done │ cycles backlog │ uptime (sec) │
-├─────────┼─────────────┼─────────────┼────────────────┼──────────────┤
-│ 0       │ 177         │ 174         │ 3              │ 6            │
-└─────────┴─────────────┴─────────────┴────────────────┴──────────────┘
-
-cycle timings 
-
-┌─────────┬─────────┬──────┬───────────┬───────┬──────────┐
-│ (index) │ thread  │ task │ fibonacci │ sleep │ eloop    │
-├─────────┼─────────┼──────┼───────────┼───────┼──────────┤
-│ 0       │ '19679' │ 72   │ 72        │ 103   │ 28617933 │
-│ 1       │ '19680' │ 72   │ 72        │ 103   │ 30947191 │
-│ 2       │ '19681' │ 72   │ 72        │ 103   │ 30685594 │
-│ 3       │ '19682' │ 72   │ 72        │ 104   │ 28678007 │
-└─────────┴─────────┴──────┴───────────┴───────┴──────────┘
-```
-
-> note: requires additional configuration, see below
-
-## Install
-
-```bash
-npm i @nicholaswmin/dyno
 ```
 
 ## Quickstart
 
-### Overview 
+### Install
 
-- Create a `run.js` file and set the test configuration
-- Create a `task.js` file and add the benchmarked code
-
-`run.js` runs multiple *cycles* of `task.js`, in multiple threads.
-
-View the [example](#example) below for guidance on configuration.
+```bash
+npm i @nicholaswmin/dyno
+```
 
 ### Generate sample benchmark
 
@@ -89,56 +53,58 @@ View the [example](#example) below for guidance on configuration.
 npx init
 ```
 
-> Use the sample benchmark as a starting point 
-> by editing `run.js` & `task.js`
+> creates a preconfigured `benchmark.js`  
 
-### Run it
-
-> navigate into the created `benchmark` folder:
+#### run the sample
 
 ```bash
-cd benchmark
-```
-
-then:
-
-```bash
-npm run benchmark
+node benchmark.js
 ``` 
 
-## Example
+## Complete example
 
-> The following example benchmark  a `fibonnacci()` function, 
-> using [`performance.timerify`][timerify] to record timings
-
-### Run file
-
-Sets up the benchmark & internally controls the spawned threads.
+> The following example benchmarks a `fibonnacci()` function
+> and a `sleep()` function.  
+>
+> [`performance.timerify`][timerify] is used to record timing measurements.
+>
+> Live results are logged as tables.
 
 ```js
- // run.js
-import { join } from 'node:path'
+// complete example
 import { dyno } from '@nicholaswmin/dyno'
 
-await dyno({
-  // task file path
-  task: join(import.meta.dirname, 'task.js'),
+await dyno(async function task(parameters) { 
+  // function under test
+  function fibonacci(n) {
+    return n < 1 ? 0
+      : n <= 2 ? 1
+      : fibonacci(n - 1) + fibonacci(n - 2)
+  }
 
-  // parameters
+  // another function under test
+  function sleep(ms) {
+    return new Promise(res => setTimeout(res, ms))
+  }
+  
+  // wrap both of them in `performance.timerify` 
+  // so we can log their timings in the test output
+  performance.timerify(fibonacci)(parameters.FOO)
+  performance.timerify(sleep)(parameters.BAR)
+}, {
   parameters: {
     // required
-    CYCLES_PER_SECOND: 40, 
+    CYCLES_PER_SECOND: 10, 
     CONCURRENCY: 4, 
     DURATION_MS: 10 * 1000,
     
-    // optional,
-    // passed-on to 'task.js'
+    // optional
     FOO: 35,
     BAR: 50
   },
   
   // Render output using `console.table`
-  onMeasureUpdate: function({ main, threads }) {    
+  onTick: ({ main, threads }) => {    
     const tables = {
       main: [{ 
         'cycles sent'    : main.sent?.count, 
@@ -164,39 +130,32 @@ await dyno({
   }
 })
 
-console.log('test ended succesfully!')
+console.log('test ended succesfully')
 ```
 
-### Task file
-
-The task file is run in its own isolated [V8 process][v8] 
-`times x THREAD_COUNT`, concurrently, on separate threads.
-
-Custom measurements can be taken using the following 
-[Performance Measurement APIs][perf-api]:
-
-- [`performance.timerify`][timerify]
-- [`performance.measure`][measure]
+this renders live results like so:
 
 ```js
- // task.js
-import { run } from '@nicholaswmin/dyno'
+general stats 
 
-run(async function task(parameters) {
-  function fibonacci(n) {
-    return n < 1 ? 0
-      : n <= 2 ? 1
-      : fibonacci(n - 1) + fibonacci(n - 2)
-  }
-  
-  function sleep(ms) {
-    return new Promise(res => setTimeout(res, ms))
-  }
-  
-  performance.timerify(fibonacci)(parameters.FOO)
-  performance.timerify(sleep)(parameters.BAR)
-})
+┌─────────┬─────────────┬─────────────┬────────────────┬──────────────┐
+│ (index) │ cycles sent │ cycles done │ cycles backlog │ uptime (sec) │
+├─────────┼─────────────┼─────────────┼────────────────┼──────────────┤
+│ 0       │ 177         │ 174         │ 3              │ 6            │
+└─────────┴─────────────┴─────────────┴────────────────┴──────────────┘
+
+cycle timings 
+
+┌─────────┬─────────┬──────┬───────────┬───────┬──────────┐
+│ (index) │ thread  │ task │ fibonacci │ sleep │ eloop    │
+├─────────┼─────────┼──────┼───────────┼───────┼──────────┤
+│ 0       │ '19679' │ 72   │ 72        │ 103   │ 28617933 │
+│ 1       │ '19680' │ 72   │ 72        │ 103   │ 30947191 │
+│ 2       │ '19681' │ 72   │ 72        │ 103   │ 30685594 │
+│ 3       │ '19682' │ 72   │ 72        │ 104   │ 28678007 │
+└─────────┴─────────┴──────┴───────────┴───────┴──────────┘
 ```
+
 
 ## Tests
 
@@ -218,7 +177,7 @@ test coverage:
 npm run test:coverage
 ```
 
-style checks/eslint:
+meta checks:
 
 ```bash
 npm run checks
@@ -226,19 +185,23 @@ npm run checks
 
 ## Misc
 
-> create a runnable sample benchmark
+generate sample benchmark:
 
 ```bash
 npx init
 ```
 
-> insert/update example snippets in README  
+generate [Heroku-deployable][heroku] benchmark:
 
 ```bash
-npm run maintenance:update:readme
+npx init-cloud
 ```
-> note: does not update the "output" section  
-> Example code snippets are located in: [`/bin/example`](./bin/example)
+
+update `README.md` code snippets:
+
+```bash
+npm run example:update
+```
 
 ## Authors
 
@@ -246,7 +209,7 @@ Nicholas Kyriakides, [@nicholaswmin][nicholaswmin]
 
 ## License
 
-[MIT "No Attribution" License][license]
+[MIT-0 License][license]
 
 <!--- Badges -->
 
@@ -261,6 +224,7 @@ Nicholas Kyriakides, [@nicholaswmin][nicholaswmin]
 
 <!--- Content -->
 
+[heroku]: https://heroku.com
 [perf-api]: https://nodejs.org/api/perf_hooks.html#performance-measurement-apis
 [timerify]: https://nodejs.org/api/perf_hooks.html#performancetimerifyfn-options
 [measure]: https://nodejs.org/api/perf_hooks.html#class-performancemeasure

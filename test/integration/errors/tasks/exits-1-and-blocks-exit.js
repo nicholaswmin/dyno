@@ -1,8 +1,8 @@
 // 1st thread exits with code: 1 & all threads block clean exit/disconnect
 import { setTimeout } from 'node:timers/promises'
-import { run } from '../../../../index.js'
+import { task } from '../../../../index.js'
 
-run(async function task() {   
+task(async function task() {   
   if (+process.env.index === 1)
     process.exit(1)
 }, {
