@@ -8,7 +8,7 @@ test('#dyno() custom-measurement:performance.measure', async t => {
 
   t.before(async () => {
     result = await dyno(path.join(import.meta.dirname,'tasks/measure.js'), {
-      parameters: { CYCLES_PER_SECOND: 100, CONCURRENCY: 2, DURATION_MS: 250 }
+      parameters: { cyclesPerSecond: 100, threads: 2, durationMs: 250 }
     })
     .then(res => res.thread)
   })

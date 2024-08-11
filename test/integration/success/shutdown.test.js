@@ -9,7 +9,7 @@ test('#dyno() exits gracefully', async t => {
     cp.fork = t.mock.fn(cp.fork)
 
     return dyno(path.join(import.meta.dirname, 'tasks/runs.js'), {
-      parameters: { CYCLES_PER_SECOND: 500, CONCURRENCY: 2, DURATION_MS: 250 }
+      parameters: { cyclesPerSecond: 500, threads: 2, durationMs: 250 }
     })
   })
   

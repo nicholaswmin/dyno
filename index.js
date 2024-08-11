@@ -17,13 +17,11 @@ const dyno = async (taskFn, { parameters, onTick = () => {} }) => {
     const abortctrl = new AbortController()
     const collector = new Collector()
     const uptimer = new Uptimer()
-    const scheduler = new Scheduler({ 
-      cyclesPerSecond: parameters.CYCLES_PER_SECOND 
-    })
+    const scheduler = new Scheduler(parameters)
     const threads = await threader.fork(
       // @TODO document the following line intention
       typeof taskFn === 'function' ? process.argv[1] : taskFn, { 
-      concurrency: parameters.CONCURRENCY,
+      concurrency: parameters.threads,
       parameters: parameters
     })
     
@@ -35,7 +33,7 @@ const dyno = async (taskFn, { parameters, onTick = () => {} }) => {
     try {
       await Promise.race([
         threader.watch(threads, abortctrl),
-        timer.setTimeout(parameters.DURATION_MS, null, abortctrl)
+        timer.setTimeout(parameters.durationMs, null, abortctrl)
       ])
     } finally {
       abortctrl.abort()

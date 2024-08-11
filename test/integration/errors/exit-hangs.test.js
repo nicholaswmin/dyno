@@ -12,7 +12,7 @@ test('#dyno() force kills non-exiting threads', async t => {
       cp.fork = t.mock.fn(cp.fork)
   
       return dyno(path.join(import.meta.dirname, './tasks/blocks-exit.js'), {
-        parameters: { CYCLES_PER_SECOND: 10, CONCURRENCY: 4, DURATION_MS: 300 }
+        parameters: { cyclesPerSecond: 10, threads: 4, durationMs: 300 }
       })
       .catch((err = true) => error = err)
     })
@@ -39,7 +39,7 @@ test('#dyno() force kills non-exiting threads', async t => {
     await t.test('SIGKILLS the remaining threads and rejects', t => {
       return t.assert.rejects(() => {
         return dyno(path.join(import.meta.dirname, './tasks/blocks-exit.js'), {
-          parameters: { CYCLES_PER_SECOND: 5, CONCURRENCY: 4, DURATION_MS: 500 }
+          parameters: { cyclesPerSecond: 5, threads: 4, durationMs: 500 }
         })
       }, { message: 'process:disconnect timeout. Exited with:SIGKILL' })
     })

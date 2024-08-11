@@ -14,15 +14,15 @@ const forkProcess = (task, { parameters, threadIndex }) =>
     }).once('spawn', onSpawn).once('error', onError)
 })
 
-const fork = async (task, { parameters, concurrency = 4 }) => {
-  const threads = await Promise.all(
-    Array.from({ length: concurrency }, 
+const fork = async (task, { parameters, threads = 4 }) => {
+  const forked = await Promise.all(
+    Array.from({ length: threads }, 
         (_, i) => forkProcess(task, { parameters, threadIndex: i })))
       .then(threads => threads.reduce((acc, thread) => ({ 
         ...acc, [thread.pid]: thread 
       }), {}))
   
-  return Object.freeze(threads)
+  return Object.freeze(forked)
 }
 
 const watch = (threads, { signal }) => {

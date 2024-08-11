@@ -8,7 +8,7 @@ test('#primary() records default cycle measurements', async t => {
 
   t.before(async () => {
     primary = await dyno(path.join(import.meta.dirname, 'tasks/records.js'), {
-      parameters: { CYCLES_PER_SECOND: 200, CONCURRENCY: 2, DURATION_MS: 500 }
+      parameters: { cyclesPerSecond: 200, threads: 2, durationMs: 500 }
     }).then(res => res.main)
   })
 
