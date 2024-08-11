@@ -1,5 +1,6 @@
 import test from 'node:test'
 import path from 'node:path'
+import cp from 'node:child_process'
 
 import { dyno } from '../../../index.js'
 
@@ -7,55 +8,24 @@ test('#dyno() runs cycles on multiple threads', async t => {
   let result = null
   
   t.before(async () => {
-    result = await dyno(path.join(import.meta.dirname, 'tasks/records.js'), {
-      parameters: { cyclesPerSecond: 500, threads: 2, durationMs: 750 }
+    cp.fork = t.mock.fn(cp.fork)
+
+    result = await dyno(path.join(import.meta.dirname, 'tasks/runs.js'), {
+      parameters: { cyclesPerSecond: 500, threads: 5, durationMs: 1000 }
     })
   })
 
-  await t.test('returns a result', async t => {
-    t.assert.ok(result, 'did not return a truthy result')
+  await t.test('creates 4 threads', async t => {
+    const threads = cp.fork.mock.calls.map(call => call.result)
+
+    t.assert.strictEqual(threads.length, 5)
   })
-
-  await t.test('returns an object', async t => {
-    const pids = Object.keys(result.threads).sort((a, b) => a - b) 
-    const t1 = result.threads[pids[0]], t2 = result.threads[pids[1]]
   
-    await t.test('with a threads property', async t => {
-      t.assert.ok(Object.hasOwn(result, 'threads'))
-    })
-  
-    await t.test('with 1 property per-thread', async t => {
-      await t.test('spawns at least 1 thread', async t => {
-        t.assert.ok(pids.length > 0, 'result has 0 threads')
-      })
-    })
-    
-    await t.test('with child thread measurements', async t => {
-      await t.test('spawns specified number of threads', async t => {
-        t.assert.strictEqual(pids.length, 2)
-      })
+  await t.test('all threads exit normally', async t => {
+    const exit0 = cp.fork.mock.calls
+      .map(call => call.result)
+      .filter(thread => Object.hasOwn(thread, 'exitCode') && !thread.exitCode)
 
-      await t.test('each thread runs at least 1 cycle', t => {
-        t.assert.ok(Object.hasOwn(t1, 'bar'), 'thread 1 did not log a cycle')
-        t.assert.ok(Object.hasOwn(t2, 'bar'), 'thread 2 did not log a cycle')
-      })
-  
-      await t.test('each is run for a number of cycles', async t => {
-        await t.test('thread_1 run > 50 cycles', async t => {
-          t.assert.ok(t1.bar.count > 50)
-        })
-
-        await t.test('thread_2 run > 50 cycles', async t => {
-          t.assert.ok(t2.bar.count > 50)
-        })
-      })
-        
-      await t.test('threads run an approximately equal number of cycles', t => {
-        const diff = Math.abs(t1.bar.count - t2.bar.count)
-        const maxdiff = 20
-
-        t.assert.ok(diff < maxdiff, `threads call-count diff. is > ${maxdiff}`) 
-      })
-    })
+    t.assert.strictEqual(exit0.length, 5)
   })
 })

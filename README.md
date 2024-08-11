@@ -22,7 +22,7 @@ A test is succesful if it ends without creating a *cycle backlog*.
 // example
 import { dyno } from '@nicholaswmin/dyno'
 
-await dyno(async function task() { 
+await dyno(async function cycle() { 
 
   performance.timerify(function fibonacci(n) {
     return n < 1 ? 0
@@ -32,18 +32,14 @@ await dyno(async function task() {
 
 }, {
   parameters: { 
-    cyclesPerSecond: 40, 
-    durationMs: 10000,
+    cyclesPerSecond: 20, 
+    durationMs: 4000,
     threads: 4
   },
   
   onTick: ({ main, tasks }) => {    
     console.clear()
-
-    console.log('general')
-    console.table([main])
-
-    console.log('cycle timings (average, in ms)')
+    console.table(main)
     console.table(tasks)
   }
 })
@@ -52,24 +48,22 @@ await dyno(async function task() {
 which logs: 
 
 ```js
-general
+┌─────────┬────────┬────────┬───────────┬─────────┐
+│ (index) │ uptime │ issued │ completed │ backlog │
+├─────────┼────────┼────────┼───────────┼─────────┤
+│ 0       │ 4      │ 100    │ 95        │ 5       │
+└─────────┴────────┴────────┴───────────┴─────────┘
 
-┌─────────┬────────┬──────┬──────┬─────────┐
-│ (index) │ uptime │ sent │ done │ backlog │
-├─────────┼────────┼──────┼──────┼─────────┤
-│ 0       │ 10     │ 98   │ 98   │ 0       │
-└─────────┴────────┴──────┴──────┴─────────┘
+timings (average, in ms)
 
-cycle timings (average, in ms)
-
-┌─────────┬─────────┬───────┬───────┬───────────┐
-│ (index) │ thread  │ eloop │ task  │ fibonacci │
-├─────────┼─────────┼───────┼───────┼───────────┤
-│ 0       │ '45884' │ 11.18 │ 15.04 │ 14.83     │
-│ 1       │ '45885' │ 11.11 │ 15.08 │ 14.96     │
-│ 2       │ '45886' │ 11.1  │ 15.04 │ 14.92     │
-│ 3       │ '45887' │ 11.14 │ 15.5  │ 15.29     │
-└─────────┴─────────┴───────┴───────┴───────────┘
+┌─────────┬─────────┬───────┬───────────┬──────────┐
+│ (index) │ thread  │ cycle │ fibonacci │ evt_loop │
+├─────────┼─────────┼───────┼───────────┼──────────┤
+│ 0       │ '46781' │ 9.47  │ 9.42      │ 11.01    │
+│ 1       │ '46782' │ 9.61  │ 9.30      │ 11.14    │ 
+│ 2       │ '46783' │ 9.65  │ 9.55      │ 11.18    │
+│ 3       │ '46784' │ 9.47  │ 9.32      │ 11.09    │
+└─────────┴─────────┴───────┴───────────┴──────────┘
 ```
 
 ## Install
@@ -84,9 +78,9 @@ npm i @nicholaswmin/dyno
 npx init
 ```
 
-> creates a preconfigured `benchmark.js`  
+creates a preconfigured `benchmark.js`.
 
-### run
+Run it with:
 
 ```bash
 node benchmark.js

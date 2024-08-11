@@ -20,11 +20,11 @@ class Collector {
             [key]: this.threads[pid][key]?.count
           }), {})
         
-        return {
+        return [{
           ...stats,
-          backlog: stats.sent - stats.done,
+          backlog: stats.issued - stats.completed,
           uptime: stats.uptime
-        }
+        }]
       },
 
       get tasks() {
@@ -38,7 +38,7 @@ class Collector {
                 thread: pid, 
                 // @NOTE declare tasks that need `ns` -> `ms` conversion
                 // @REVIEW bad hack, the emitters must always emit in `ms`
-                [task]: ['eloop'].includes(task) 
+                [task]: ['evt_loop'].includes(task) 
                   ? nsToMs(this.threads[pid][task].mean)
                   : round(this.threads[pid][task].mean)
               }), {})

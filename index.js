@@ -21,7 +21,7 @@ const dyno = async (taskFn, { parameters, onTick = () => {} }) => {
     const threads = await threader.fork(
       // @TODO document the following line intention
       typeof taskFn === 'function' ? process.argv[1] : taskFn, { 
-      concurrency: parameters.threads,
+      threads: parameters.threads,
       parameters: parameters
     })
     

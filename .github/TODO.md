@@ -2,13 +2,8 @@
 
 ## fix
 
-- [ ] simplify `onTick` arguments so the simple example can log easily 
-      a `console.table(stats)` of the following:
-      - `cycles sent`
-      - `cycles done`
-      - `cycle duration`
-      - `thread memory`
-      - any custom measures
+- [x] simplify `onTick` arguments so the simple example can log easily 
+      with a `console.table()`
 - [ ] wait for `queue drain`-type of event before resolving `bus.stop` or 
       `process.stop`, otherwise race conditions occur.
       - theres now a problem on >5k tasks per second and the `task:after` 
@@ -45,7 +40,7 @@
 ## test
 
 - [ ] test new `prompt`
-- [ ] test `onMeasureUpdate` calls and arguments
+- [x] test `onTick` calls and arguments
 - [x] replace old tests with new tests on the rewrite
 - [x] split unit tests & integration tests
 - [x] ensure unit-tests run fast
@@ -61,8 +56,9 @@
 
 ## docs
 
-- [ ] document the `onMeasureUpdate` callback arguments `main` & `thread`s
-- [ ] document the task `before/after` hooks
+- [ ] document the "running using a taskfile" case
+- [ ] document the `onTick` callback arguments `main` & `tasks`s
+- [ ] document any `before/after` hooks
 - [x] fix `npx init` docs after publishing
 - [x] Check if possible to DRY up example code via an `npx` script. 
   Right now theres 3 different & separate code examples:

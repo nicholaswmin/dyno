@@ -8,7 +8,7 @@ test('#dyno() force kills non-exiting threads', async t => {
   await t.test('thread does not exit', async t => {
     let error = null
     
-    t.before(() => {
+    t.before(async () => {
       cp.fork = t.mock.fn(cp.fork)
   
       return dyno(path.join(import.meta.dirname, './tasks/blocks-exit.js'), {

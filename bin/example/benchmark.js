@@ -1,6 +1,6 @@
 import { dyno } from '{{entrypath}}'
 
-await dyno(async function task() { 
+await dyno(async function cycle() { 
 
   performance.timerify(function fibonacci(n) {
     return n < 1 ? 0
@@ -17,11 +17,7 @@ await dyno(async function task() {
   
   onTick: ({ main, tasks }) => {    
     console.clear()
-
-    console.log('general')
-    console.table([main])
-
-    console.log('cycle timings (average, in ms)')
+    console.table(main)
     console.table(tasks)
   }
 })
