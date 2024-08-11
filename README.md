@@ -3,8 +3,7 @@
 # :stopwatch: dyno
 
 
-> a tool for testing if a piece of code can withstand 
-> a *certain rate* of production traffic
+> test if a piece of code can withstand a *certain rate* of production traffic
 
 * [Quickstart](#quickstart)
   + [Install](#install)
