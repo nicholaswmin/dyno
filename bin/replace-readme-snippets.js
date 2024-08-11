@@ -11,8 +11,8 @@ await replaceTokensInFile({
   filepath: path.join(import.meta.dirname, '../README.md'),
   entrypath: '@nicholaswmin/dyno',
   tokens: [
-    { target: 'benchmark.js', start: '// benchmark-1', end: '```' },
-    { target: 'benchmark.js', start: '// benchmark-2', end: '```'  }
+    { target: 'benchmark-simple.js', start: '// example', end: '```' },
+    { target: 'benchmark.js', start: '// advanced example', end: '```'  }
   ]
 })
 

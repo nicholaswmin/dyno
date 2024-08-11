@@ -1,14 +1,26 @@
-import { join } from 'node:path'
-import { main } from '{{entrypath}}'
+import { dyno } from '@nicholaswmin/dyno'
 
-await main({
-  // task file path
-  task: join(import.meta.dirname, 'task.js'),
+await dyno(async function task(parameters) { 
+  // function under test
+  function fibonacci(n) {
+    return n < 1 ? 0
+      : n <= 2 ? 1
+      : fibonacci(n - 1) + fibonacci(n - 2)
+  }
 
-  // parameters
+  // another function under test
+  function sleep(ms) {
+    return new Promise(res => setTimeout(res, ms))
+  }
+  
+  // wrap both of them in `performance.timerify` 
+  // so we can log their timings in the test output
+  performance.timerify(fibonacci)(parameters.FOO)
+  performance.timerify(sleep)(parameters.BAR)
+}, {
   parameters: {
     // required
-    CYCLES_PER_SECOND: 40, 
+    CYCLES_PER_SECOND: 10, 
     CONCURRENCY: 4, 
     DURATION_MS: 10 * 1000,
     
@@ -19,7 +31,7 @@ await main({
   },
   
   // Render output using `console.table`
-  onMeasureUpdate: function({ main, threads }) {    
+  onMeasure: function({ main, threads }) {    
     const tables = {
       main: [{ 
         'cycles sent'    : main.sent?.count, 
@@ -45,4 +57,4 @@ await main({
   }
 })
 
-console.log('test ended succesfully!')
+console.log('test ended succesfully')
