@@ -8,7 +8,7 @@ test('#dyno() runs cycles on multiple threads', async t => {
   
   t.before(async () => {
     result = await dyno(path.join(import.meta.dirname, 'tasks/records.js'), {
-      parameters: {  CYCLES_PER_SECOND: 500, CONCURRENCY: 2, DURATION_MS: 250 }
+      parameters: {  CYCLES_PER_SECOND: 500, CONCURRENCY: 2, DURATION_MS: 750 }
     })
   })
 
