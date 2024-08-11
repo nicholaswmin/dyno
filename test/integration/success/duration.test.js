@@ -4,7 +4,7 @@ import perf from 'node:perf_hooks'
 
 import { dyno } from '../../../index.js'
 
-test('#main() cycles in x amount of threads', async t => {
+test('#dyno() cycles in x amount of threads', async t => {
   const histogram = perf.createHistogram()
 
   t.before(async () => {

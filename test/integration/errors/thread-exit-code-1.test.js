@@ -3,7 +3,7 @@ import cp from 'node:child_process'
 import path from 'node:path'
 import { dyno } from '../../../index.js'
 
-test('#main() exits gracefully on error', async t => {
+test('#dyno() exits gracefully on error', async t => {
   let error, duration = null
   
   t.before(() => {

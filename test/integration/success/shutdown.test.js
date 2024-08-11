@@ -4,7 +4,7 @@ import cp from 'node:child_process'
 
 import { dyno } from '../../../index.js'
 
-test('#main() exits gracefully', async t => {
+test('#dyno() exits gracefully', async t => {
   t.before(() => {
     cp.fork = t.mock.fn(cp.fork)
 

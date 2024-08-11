@@ -5,14 +5,14 @@ const fileExists = path => fs.access(path).then(() => !!1).catch(() => !!0)
 
 const onStdout = (cmd, { cwd }) => {
   const ctrlr = new AbortController()
-  const timer = setTimeout(() => {
-    reject(new Error('Did not log in stdout within 1000ms'), 1000)
-    ctrlr.abort()
-  })
 
   return new Promise((resolve, reject) => {
-    const res = child_process.exec(cmd, { cwd, signal: ctrl.signal })
-    
+    const res = child_process.exec(cmd, { cwd, signal: ctrlr.signal })
+    const timer = setTimeout(() => {
+      reject(new Error('Did not log in stdout within 1000ms'), 1000)
+      ctrlr.abort()
+    })
+
     res.stderr.once('data', data => reject(new Error(data)))
     res.stdout.once('data', data => {
       clearTimeout(timer)

@@ -3,7 +3,7 @@ import path from 'node:path'
 
 import { dyno } from '../../../index.js'
 
-test('#main() custom-measurement:performance.measure', async t => {
+test('#dyno() custom-measurement:performance.measure', async t => {
   let result
 
   t.before(async () => {

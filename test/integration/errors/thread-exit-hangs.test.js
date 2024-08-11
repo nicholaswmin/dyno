@@ -4,7 +4,7 @@ import path from 'node:path'
 
 import { dyno } from '../../../index.js'
 
-test('#main() force kills non-exiting threads', async t => {
+test('#dyno() force kills non-exiting threads', async t => {
   await t.test('thread does not exit', async t => {
     let error = null
     
@@ -38,7 +38,7 @@ test('#main() force kills non-exiting threads', async t => {
   t.todo('error thrown in a thread', async t => {
     await t.test('SIGKILLS the remaining threads and rejects', t => {
       return t.assert.rejects(() => {
-        return main(path.join(import.meta.dirname, './tasks/blocks-exit.js'), {
+        return dyno(path.join(import.meta.dirname, './tasks/blocks-exit.js'), {
           parameters: { CYCLES_PER_SECOND: 5, CONCURRENCY: 4, DURATION_MS: 500 }
         })
       }, { message: 'process:disconnect timeout. Exited with:SIGKILL' })

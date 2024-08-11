@@ -3,7 +3,7 @@ import path from 'node:path'
 
 import { dyno } from '../../../index.js'
 
-test('#main() runs cycles on multiple threads', async t => {
+test('#dyno() runs cycles on multiple threads', async t => {
   let result = null
   
   t.before(async () => {
