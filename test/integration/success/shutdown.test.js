@@ -1,28 +1,20 @@
 import test from 'node:test'
+import path from 'node:path'
 import cp from 'node:child_process'
-import { join } from 'node:path'
 
-import { main } from '../../../index.js'
+import { dyno } from '../../../index.js'
 
 test('#main() exits gracefully', async t => {
-  t.beforeEach(() => t.mock.reset())
-
   t.before(() => {
     cp.fork = t.mock.fn(cp.fork)
 
-    main({
-      task: join(import.meta.dirname, 'tasks/records-bar.js'),
-      parameters: {  CYCLES_PER_SECOND: 500, CONCURRENCY: 4, DURATION_MS: 500 }
+    return dyno(path.join(import.meta.dirname, 'tasks/runs.js'), {
+      parameters: { CYCLES_PER_SECOND: 500, CONCURRENCY: 2, DURATION_MS: 250 }
     })
   })
   
-  await t.test('no thread has exit code > 0', async t => {
-    const exitCodes = {
-      zero: cp.fork.mock.calls.map(c => c.result).filter(t => !t.exitCode),
-      nonZero: cp.fork.mock.calls.map(c => c.result).filter(t => t.exitCode > 0)
-    }
-
-    t.assert.strictEqual(exitCodes.zero.length, 4)
-    t.assert.strictEqual(exitCodes.nonZero.length, 0)
+  await t.test('all threads exit with code: 0', async t => {
+    const exit0 = cp.fork.mock.calls.map(c => c.result).filter(t => !t.exitCode)
+    t.assert.strictEqual(exit0.length, 2)
   })
 })

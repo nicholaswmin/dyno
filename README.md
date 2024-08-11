@@ -19,21 +19,18 @@
 
 ## Overview
 
-Test parameters are set in a `main file` &
-the benchmarked code is added to a `task file`.   
+The runner repeatedly runs a specified *task* 
+for a specified *cycle per seconds* rate, 
+for a specified *test duration*.
 
-The main file then repeatedly runs the task file in cycles; 
-based on a configured `cycles per second` rate,
-for a configured `test duration`.  
-
-A test is deemed succesful if the test duration 
-elapses w/o creating a `cycle backlog`.
+A test is deemed succesful if the *test duration*
+elapses without creating a *cycle backlog*.
 
 ```js
-// sample task file
-import { task } from '@nicholaswmin/dyno'
+// benchmark-1
+import { dyno } from '@nicholaswmin/dyno'
 
-task(async function task(parameters) {
+await dyno(async function task(parameters) { 
   // function under test
   function fibonacci(n) {
     return n < 1 ? 0
@@ -50,86 +47,10 @@ task(async function task(parameters) {
   // so we can log their timings in the test output
   performance.timerify(fibonacci)(parameters.FOO)
   performance.timerify(sleep)(parameters.BAR)
-})
-```
-
-the test logs live measurements while it runs:
-
-```js
-general stats 
-
-┌─────────┬─────────────┬─────────────┬────────────────┬──────────────┐
-│ (index) │ cycles sent │ cycles done │ cycles backlog │ uptime (sec) │
-├─────────┼─────────────┼─────────────┼────────────────┼──────────────┤
-│ 0       │ 177         │ 174         │ 3              │ 6            │
-└─────────┴─────────────┴─────────────┴────────────────┴──────────────┘
-
-cycle timings 
-
-┌─────────┬─────────┬──────┬───────────┬───────┬──────────┐
-│ (index) │ thread  │ task │ fibonacci │ sleep │ eloop    │
-├─────────┼─────────┼──────┼───────────┼───────┼──────────┤
-│ 0       │ '19679' │ 72   │ 72        │ 103   │ 28617933 │
-│ 1       │ '19680' │ 72   │ 72        │ 103   │ 30947191 │
-│ 2       │ '19681' │ 72   │ 72        │ 103   │ 30685594 │
-│ 3       │ '19682' │ 72   │ 72        │ 104   │ 28678007 │
-└─────────┴─────────┴──────┴───────────┴───────┴──────────┘
-```
-
-> an example `main` file is [documented below](#main-file):
-
-## Quickstart
-
-### Install
-
-```bash
-npm i @nicholaswmin/dyno
-```
-
-### Generate sample benchmark
-
-```bash 
-npx init
-```
-
-> creates preconfigured `main.js` and `task.js` files.  
-> Use them as a starting point.
-
-#### run the above example
-
-> navigate into the created `benchmark` folder:
-
-```bash
-cd benchmark
-```
-
-then:
-
-```bash
-npm run benchmark
-``` 
-
-## Configuration
-
-> The following example benchmarks a `fibonnacci()` function
-> and a `sleep()` function while also using [`performance.timerify`][timerify] 
-> to record custom timing measurements.
-
-### Main file
-
-```js
- // main.js
-import { join } from 'node:path'
-import { main } from '@nicholaswmin/dyno'
-
-await main({
-  // task file path
-  task: join(import.meta.dirname, 'task.js'),
-
-  // parameters
+}, {
   parameters: {
     // required
-    CYCLES_PER_SECOND: 40, 
+    CYCLES_PER_SECOND: 10, 
     CONCURRENCY: 4, 
     DURATION_MS: 10 * 1000,
     
@@ -140,7 +61,7 @@ await main({
   },
   
   // Render output using `console.table`
-  onMeasureUpdate: function({ main, threads }) {    
+  onMeasure: function({ main, threads }) {    
     const tables = {
       main: [{ 
         'cycles sent'    : main.sent?.count, 
@@ -166,25 +87,66 @@ await main({
   }
 })
 
-console.log('test ended succesfully!')
+console.log('test ended succesfully')
 ```
 
-### Task file
-
-The task file is run in its own isolated [V8 process][v8] 
-`times x THREAD_COUNT`, concurrently, on separate threads.
-
-Custom measurements can be taken using the following 
-[Performance Measurement APIs][perf-api]:
-
-- [`performance.timerify`][timerify]
-- [`performance.measure`][measure]
+the test logs live measurements while it runs:
 
 ```js
- // task.js
-import { task } from '@nicholaswmin/dyno'
+general stats 
 
-task(async function task(parameters) {
+┌─────────┬─────────────┬─────────────┬────────────────┬──────────────┐
+│ (index) │ cycles sent │ cycles done │ cycles backlog │ uptime (sec) │
+├─────────┼─────────────┼─────────────┼────────────────┼──────────────┤
+│ 0       │ 177         │ 174         │ 3              │ 6            │
+└─────────┴─────────────┴─────────────┴────────────────┴──────────────┘
+
+cycle timings 
+
+┌─────────┬─────────┬──────┬───────────┬───────┬──────────┐
+│ (index) │ thread  │ task │ fibonacci │ sleep │ eloop    │
+├─────────┼─────────┼──────┼───────────┼───────┼──────────┤
+│ 0       │ '19679' │ 72   │ 72        │ 103   │ 28617933 │
+│ 1       │ '19680' │ 72   │ 72        │ 103   │ 30947191 │
+│ 2       │ '19681' │ 72   │ 72        │ 103   │ 30685594 │
+│ 3       │ '19682' │ 72   │ 72        │ 104   │ 28678007 │
+└─────────┴─────────┴──────┴───────────┴───────┴──────────┘
+```
+
+## Quickstart
+
+### Install
+
+```bash
+npm i @nicholaswmin/dyno
+```
+
+### Generate sample benchmark
+
+```bash 
+npx init
+```
+
+> creates a preconfigured `benchmark.js`  
+> Use it as a starting point.
+
+#### run the sample
+
+```bash
+node benchmark.js
+``` 
+
+## Configuration
+
+> The following example benchmarks a `fibonnacci()` function
+> and a `sleep()` function while also using [`performance.timerify`][timerify] 
+> to record custom timing measurements.
+
+```js
+// benchmark-2
+import { dyno } from '@nicholaswmin/dyno'
+
+await dyno(async function task(parameters) { 
   // function under test
   function fibonacci(n) {
     return n < 1 ? 0
@@ -201,7 +163,47 @@ task(async function task(parameters) {
   // so we can log their timings in the test output
   performance.timerify(fibonacci)(parameters.FOO)
   performance.timerify(sleep)(parameters.BAR)
+}, {
+  parameters: {
+    // required
+    CYCLES_PER_SECOND: 10, 
+    CONCURRENCY: 4, 
+    DURATION_MS: 10 * 1000,
+    
+    // optional,
+    // passed-on to 'task.js'
+    FOO: 35,
+    BAR: 50
+  },
+  
+  // Render output using `console.table`
+  onMeasure: function({ main, threads }) {    
+    const tables = {
+      main: [{ 
+        'cycles sent'    : main.sent?.count, 
+        'cycles done'    : main.done?.count,
+        'cycles backlog' : main.sent?.count -  main.done?.count,
+        'uptime (sec)'   : main.uptime?.count
+      }],
+
+      threads: Object.keys(threads).reduce((acc, pid) => {
+        return [ ...acc, Object.keys(threads[pid]).reduce((acc, task) => ({
+          ...acc, thread: pid, [task]: Math.round(threads[pid][task].mean)
+        }), {})]
+      }, [])
+    }
+    
+    console.clear()
+
+    console.log('\n', 'general stats', '\n')
+    console.table(tables.main)
+
+    console.log('\n', 'cycle timings', '\n')
+    console.table(tables.threads)
+  }
 })
+
+console.log('test ended succesfully')
 ```
 
 ## Tests
@@ -232,19 +234,26 @@ npm run checks
 
 ## Misc
 
-> create a runnable sample benchmark
+> create a simple runnable benchmark
 
 ```bash
 npx init
 ```
 
-> insert/update example snippets in README  
+> create a [Heroku-deployable][heroku] benchmark
 
 ```bash
-npm run maintenance:update:readme
+npx init-cloud
 ```
-> note: does not update the "output" section  
-> Example code snippets are located in: [`/bin/example`](./bin/example)
+
+> insert/update `README.md` example code snippets  
+
+```bash
+npm run example:update:readme
+```
+
+> note: does not update example "output"  
+> The examples source is located in: [`/bin/example`](./bin/example)
 
 ## Authors
 
@@ -267,6 +276,7 @@ Nicholas Kyriakides, [@nicholaswmin][nicholaswmin]
 
 <!--- Content -->
 
+[heroku]: https://heroku.com
 [perf-api]: https://nodejs.org/api/perf_hooks.html#performance-measurement-apis
 [timerify]: https://nodejs.org/api/perf_hooks.html#performancetimerifyfn-options
 [measure]: https://nodejs.org/api/perf_hooks.html#class-performancemeasure

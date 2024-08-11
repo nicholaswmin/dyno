@@ -1,16 +1,19 @@
 import test from 'node:test'
-import { join } from 'node:path'
+import path from 'node:path'
 
-import { main } from '../../../index.js'
+import { dyno } from '../../../index.js'
 
-test('#main() cycles in x amount of threads', async t => {
+test('#main() runs cycles on multiple threads', async t => {
   let result = null
   
   t.before(async () => {
-    result = await main({
-      task: join(import.meta.dirname, 'tasks/records-bar.js'),
-      parameters: {  CYCLES_PER_SECOND: 500, CONCURRENCY: 2, DURATION_MS: 750 }
+    result = await dyno(path.join(import.meta.dirname, 'tasks/records.js'), {
+      parameters: {  CYCLES_PER_SECOND: 500, CONCURRENCY: 2, DURATION_MS: 250 }
     })
+  })
+
+  await t.test('returns a result', async t => {
+    t.assert.ok(result, 'did not return a truthy result')
   })
 
   await t.test('returns an object', async t => {

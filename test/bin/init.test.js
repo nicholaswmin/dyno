@@ -3,141 +3,46 @@ import path from 'node:path'
 import util from 'node:util'
 import child_process from 'node:child_process'
 import fs, { readFile } from 'node:fs/promises'
+import { fileExists, onStdout } from './utils/utils.js'
 
-const folderpaths = {
-  test: path.join(import.meta.dirname, './temp/test'),
-  benchmark: path.join(import.meta.dirname, './temp/test/benchmark')
-}
-
-const fileExists = filepath =>  fs.access(filepath)
-  .then(() => true)
-  .catch(() => false)
-
+const tempdir = path.join(import.meta.dirname, './temp/test')
 const exec = util.promisify(child_process.exec)
 
-const execQuick = (cmd, { cwd }) => {
-  const ctrl = new AbortController()
-
-  return new Promise((resolve, reject) => {
-    const res = child_process.exec(cmd, { cwd, signal: ctrl.signal })
-    
-    res.stderr.once('data', data => reject(new Error(data)))
-    res.stdout.once('data', data => {
-      resolve(data.toString())
-      ctrl.abort()
-    })
-  })
-}
-
-test('$ npx init: creates sample benchmark', async t => {
+test('$ npx init: creates a simple benchmark', async t => {
   t.before(async () => {
-    await fs.rm(folderpaths.benchmark, { recursive: true, force: true })
-    await exec('npx init', { cwd: folderpaths.test })
+    await fs.rm(tempdir, { recursive: true, force: true })
+    await fs.mkdir(tempdir)
+    await exec('npx init', { cwd: tempdir })
   })
   
   t.after(async () => {
-    await fs.rm(folderpaths.benchmark, { recursive: true, force: true })
+    await fs.rm(tempdir, { recursive: true, force: true })
   })
     
-  await t.test('creates files & folders', async t => {
-    await t.test('a benchmark folder', async t => {
+  await t.test('creates a benchmark.js file', async t => {
+    await t.test('creates file', async t => {
       t.assert.ok(
-        await fileExists(folderpaths.benchmark), 
-        'cannot find /benchmark folder'
+        await fileExists(path.join(tempdir, 'benchmark.js')), 
+        'cannot find benchmark.js file'
       )
     })
     
-    await t.test('a main.js', async t => {
-      await t.test('creates file', async t => {
-        t.assert.ok(
-          await fileExists(path.join(folderpaths.benchmark, 'main.js')), 
-          'cannot find benchmark/main.js file'
-        )
-      })
-      
-      await t.test('with content', async t => {
-        t.assert.ok(
-          await readFile(path.join(folderpaths.benchmark, 'main.js'), 'utf8'), 
-          'main.js file has no content'
-        )
-      })
-    })
-    
-    await t.test('a task.js', async t => {
-      await t.test('creates file', async t => {
-        t.assert.ok(
-          await fileExists(path.join(folderpaths.benchmark, 'README.md')), 
-          'cannot find benchmark/README.md file'
-        )
-      })
-      
-      await t.test('with content', async t => {
-        t.assert.ok(
-          await readFile(path.join(folderpaths.benchmark, 'task.js'), 'utf8'), 
-          'task.js file has no content'
-        )
-      })
-    })
-    
-    await t.test('a README.md', async t => {
-      await t.test('creates file', async t => {
-        t.assert.ok(
-          await fileExists(path.join(folderpaths.benchmark, 'README.md')), 
-          'cannot find benchmark/README.md file'
-        )
-      })
-      
-      await t.test('with content', async t => {
-        t.assert.ok(
-          await readFile(path.join(folderpaths.benchmark, 'README.md'), 'utf8'), 
-          'README.md file has no content'
-        )
-      })
-    })
-    
-    await t.test('a bind.js', async t => {
-      await t.test('creates file', async t => {
-        t.assert.ok(
-          await fileExists(path.join(folderpaths.benchmark, 'bind.js')), 
-          'cannot find benchmark/bind.js file'
-        )
-      })
-      
-      await t.test('with content', async t => {
-        t.assert.ok(
-          await readFile(
-            path.join(folderpaths.benchmark, 'bind.js'), 'utf8'), 
-          'bind.js file has no content'
-        )
-      })
-    })
-    
-    await t.test('creates a package.json', async t => {
-      await t.test('creates file', async t => {
-        t.assert.ok(
-          await fileExists(path.join(folderpaths.benchmark, 'package.json')), 
-          'cannot find benchmark/package.json file'
-        )
-      })
-      
-      await t.test('with content', async t => {
-        t.assert.ok(
-          await readFile(
-            path.join(folderpaths.benchmark, 'package.json'), 'utf8'), 
-          'package.json file has no content'
-        )
-      })
+    await t.test('with content', async t => {
+      t.assert.ok(
+        await readFile(path.join(tempdir, 'benchmark.js'), 'utf8'), 
+        'benchmark.js file has no content'
+      )
     })
     
     // @FIXME
     // issues with `npm link` create files with wrong `../index.js` main entry
     t.todo('runs the example', async t => {
       await t.test('logs some meaningful output', async t => {
-        const out = await execQuick('NODE_ENV=test node main.js', { 
-          cwd: folderpaths.benchmark
+        const stdout = await onStdout('NODE_ENV=test node benchmark.js', { 
+          cwd: tempdir
         })
     
-        t.assert.ok(out.includes('Tasks'))
+        t.assert.ok(stdout.includes('Tasks'))
       })
     })
   })

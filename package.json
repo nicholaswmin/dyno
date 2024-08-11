@@ -5,13 +5,14 @@
   "description": "benchmarking in multiple threads",
   "main": "index.js",
   "bin": {
-    "init": "bin/create-example.js"
+    "init": "bin/create-simple-example.js",
+    "init-cloud": "bin/create-cloud-example.js"
   },
   "scripts": {
     "test": "NODE_ENV=test node --test --no-warnings test/index.test.js",
     "test:coverage": "NODE_ENV=test node --test --no-warnings --experimental-test-coverage test/index.test.js",
     "checks": "npx eslint && npm audit",
-    "maintenance:update:readme": "bin/replace-readme-example.js"
+    "example:update:readme": "bin/replace-readme-snippets.js"
   },
   "engines": {
     "node": ">=22.5.1"

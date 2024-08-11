@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+// create a Heroku-deployable benchmark example
+
 import path from 'node:path'
 import { createExample } from './builder/index.js'
 import { styleText } from 'node:util'
@@ -9,12 +11,11 @@ await createExample({
   targetfolder: './benchmark',
   entrypath: path.relative(process.cwd(), '../index.js'),
   fragments: [
-    { target: 'main.js'        },
-    { target: 'task.js'        },
-    { target: 'bind.js'        },
-    { target: 'package.json'   },
-    { target: 'README.md'      }
+    { target: 'benchmark.js' },
+    { target: 'bind.js'      },
+    { target: 'package.json' },
+    { target: 'README.md'    }
   ]
 })
 
-console.log(styleText(['green'], `Created example in: ./benchmark`))
+console.log(styleText(['green'], 'done:success'))

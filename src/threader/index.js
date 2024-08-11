@@ -1,6 +1,6 @@
 import child_process from 'node:child_process'
 
-const forkProcess = (task, { parameters, index }) => 
+const forkProcess = (task, { parameters, threadIndex }) => 
   new Promise((resolve, reject) => {
     const onSpawn = function ()    { this.off('error', onError); resolve(this) }
     const onError = function (err) { this.off('spawn', onSpawn); reject(err)   }
@@ -9,7 +9,7 @@ const forkProcess = (task, { parameters, index }) =>
       env: { 
         ...process.env, 
         parameters: JSON.stringify(parameters),
-        index: index
+        thread_index: threadIndex
       }
     }).once('spawn', onSpawn).once('error', onError)
 })
@@ -17,7 +17,7 @@ const forkProcess = (task, { parameters, index }) =>
 const fork = async (task, { parameters, concurrency = 4 }) => {
   const threads = await Promise.all(
     Array.from({ length: concurrency }, 
-        (_, index) => forkProcess(task, { parameters, index })))
+        (_, i) => forkProcess(task, { parameters, threadIndex: i })))
       .then(threads => threads.reduce((acc, thread) => ({ 
         ...acc, [thread.pid]: thread 
       }), {}))
