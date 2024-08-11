@@ -64,6 +64,7 @@
 
 - [x] document the "running using a taskfile" case
 - [ ] document the `onTick` callback arguments `main` & `tasks`s
+- [ ] document the `parameters`, inc. their defaults
 - [ ] document any `before/after` hooks
 - [x] fix `npx init` docs after publishing
 - [x] Check if possible to DRY up example code via an `npx` script. 
