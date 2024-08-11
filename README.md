@@ -10,8 +10,6 @@
   + [Overview](#overview)
   + [Generate benchmark](#generate-sample-benchmark)
 * [Configuration](#configuration)
-  + [Main file](#main-file)
-  + [Task file](#task-file)
 * [Tests](#tests)
 * [Misc.](#misc)
 * [Authors](#authors)
@@ -127,8 +125,7 @@ await dyno(async function task(parameters) {
     CONCURRENCY: 4, 
     DURATION_MS: 10 * 1000,
     
-    // optional,
-    // passed-on to 'task.js'
+    // optional
     FOO: 35,
     BAR: 50
   },

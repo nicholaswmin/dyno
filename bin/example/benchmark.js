@@ -24,8 +24,7 @@ await dyno(async function task(parameters) {
     CONCURRENCY: 4, 
     DURATION_MS: 10 * 1000,
     
-    // optional,
-    // passed-on to 'task.js'
+    // optional
     FOO: 35,
     BAR: 50
   },
