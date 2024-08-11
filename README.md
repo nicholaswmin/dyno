@@ -94,7 +94,7 @@ node benchmark.js
 ## Avoiding self-forking
 
 Because of how the [`fork` mechanism][cp-fork] works, 
-running single-file benchmarks causes any code *outside the `dyno` blocks*
+running single-file benchmarks causes any code *outside* the `dyno` blocks
 to *also* run in a separate thread.
 
 In the following code, `'done'` is logged `3` times, instead of `1`: 
