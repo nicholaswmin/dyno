@@ -147,22 +147,21 @@ console.log('done')
 
 ### Env var workaround
 
-Alternatively, a check can be made against the `THREAD_INDEX` env. var:
+Alternatively, a check can be made against the `IS_PRIMARY` env. var:
 
 ```js
-// the main process lacks this env. variable
-const isMain = !Object.hasOwn(process.env, 'THREAD_INDEX')
 const result = await dyno(async function cycle() { 
   // task code ...
 }, { threads: 2 })
 
-if (isMain) {
+if (process.env.IS_PRIMARY) {
   // code in this block runs only in the main process
 
   console.log('done')
   // 'done'
 }
 ```
+
 
 ## Tests
 
