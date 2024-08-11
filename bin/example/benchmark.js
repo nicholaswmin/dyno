@@ -10,8 +10,8 @@ await dyno(async function task() {
 
 }, {
   parameters: { 
-    cyclesPerSecond: 40, 
-    durationMs: 10000,
+    cyclesPerSecond: 20, 
+    durationMs: 4000,
     threads: 4
   },
   
