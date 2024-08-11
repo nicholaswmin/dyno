@@ -10,7 +10,15 @@ const exec = util.promisify(child_process.exec)
 
 test('$ npx init: creates a simple benchmark', async t => {
   t.before(async () => {
-    await fs.rm(tempdir, { recursive: true, force: true })
+    try {
+      await fs.rm(tempdir, { recursive: true, force: true })      
+    } catch (err) {
+      if (err.code === 'ENOENT')
+        return console.log(err.code)
+
+      throw err
+    }
+
     await fs.mkdir(tempdir)
     await exec('npx init', { cwd: tempdir })
   })
