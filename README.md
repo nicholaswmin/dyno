@@ -68,8 +68,8 @@ node benchmark.js
 ## Configuration
 
 > The following example benchmarks a `fibonnacci()` function
-> and a `sleep()` function while also using [`performance.timerify`][timerify] 
-> to record custom timing measurements.
+> and a `sleep()` function.  
+> [`performance.timerify`][timerify] is used to record timing measurements.
 
 ```js
 // advanced example
@@ -134,7 +134,7 @@ await dyno(async function task(parameters) {
 console.log('test ended succesfully')
 ```
 
-which renders live results like so:
+this renders live results like so:
 
 ```js
 general stats 
