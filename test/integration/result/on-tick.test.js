@@ -3,7 +3,7 @@ import path from 'node:path'
 
 import { dyno } from '../../../index.js'
 
-test('#onTick callback', async t => {
+test('#onTick() callback', async t => {
   const onTick = t.mock.fn(function() {})
 
   t.before(() => dyno(path.join(import.meta.dirname, 'tasks/perf_apis.js'), {
