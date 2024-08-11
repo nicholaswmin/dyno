@@ -113,9 +113,6 @@ console.log('done')
 This can create issues when using this module as part of an automated test 
 suite and/or attempting to do anything with the test results.
 
-> Note: external `import` or `require` module imports don't have any issues  
-> with self-forking because they are cached.
-
 ### Task file workaround
 
 To work around this, the *task function* can be extracted into it's own file,
@@ -155,7 +152,7 @@ const result = await dyno(async function cycle() {
 }, { threads: 2 })
 
 if (process.env.IS_PRIMARY) {
-  // code in this block runs only in the main process
+  // code in this block runs only in the primary/main process
 
   console.log('done')
   // 'done'
