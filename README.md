@@ -2,7 +2,7 @@
 
 # :stopwatch: dyno
 
-> test code against a *certain rate* of production traffic
+> test code against a certain *rate* of production traffic
 
 * [Overview](#overview)
 * [Install](#install)
