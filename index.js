@@ -12,7 +12,7 @@ const dyno = async (taskFn, { parameters, onTick = () => {} }) => {
 
   if (isPrimary) {  
     parameters = await prompt(parameters, {
-      disabled: ['TEST'].includes(process.env.NODE_ENV.toUpperCase()),
+      disabled: ['TEST'].includes(process.env.NODE_ENV?.toUpperCase()),
       defaults: {
         cyclesPerSecond: 10,
         durationMs: 5000,
