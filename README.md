@@ -181,7 +181,6 @@ npm run test:coverage
 meta checks:
 
 ```bash
-npm i -g @eslint/js
 npm run checks
 ```
 
