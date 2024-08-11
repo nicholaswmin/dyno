@@ -19,8 +19,7 @@
 
 It runs a **task** function in **cycles**, for a specified **duration**.
 
-A test is deemed succesful if the test duration elapses  
-without creating a **cycle backlog**.
+The test is succesful if it ends without creating a **cycle backlog**.
 
 The provided task is run across multiple threads.
 
