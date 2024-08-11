@@ -22,8 +22,7 @@ It runs a **task** function in **cycles**, for a specified **duration**.
 A test is deemed succesful if the test duration elapses  
 without creating a **cycle backlog**.
 
-To maximize efficiency and mimic a production environment,   
-the provided task is run across multiple threads.
+The provided task is run across multiple threads.
 
 ```js
 // example
