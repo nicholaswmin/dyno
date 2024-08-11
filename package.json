@@ -5,8 +5,8 @@
   "description": "a multithreaded benchmarker",
   "main": "index.js",
   "bin": {
-    "init": "bin/create-example.js",
-    "init-cloud": "bin/create-cloud-example.js"
+    "init": "bin/create-benchmark.js",
+    "init-cloud": "bin/create-benchmark-cloud.js"
   },
   "scripts": {
     "test": "NODE_ENV=test node --test --no-warnings test/index.test.js",
