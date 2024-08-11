@@ -2,6 +2,13 @@
 
 ## fix
 
+- [ ] simplify `onTick` arguments so the simple example can log easily 
+      a `console.table(stats)` of the following:
+      - `cycles sent`
+      - `cycles done`
+      - `cycle duration`
+      - `thread memory`
+      - any custom measures
 - [ ] wait for `queue drain`-type of event before resolving `bus.stop` or 
       `process.stop`, otherwise race conditions occur.
       - theres now a problem on >5k tasks per second and the `task:after` 
