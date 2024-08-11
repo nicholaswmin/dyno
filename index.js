@@ -6,10 +6,10 @@ import threader from './src/threader/index.js'
 import Collector from './src/collector/index.js'
 import Scheduler from './src/scheduler/index.js'
 
-process.env.IS_PRIMARY = !Object.hasOwn(process.env, 'THREAD_INDEX')
-
 const dyno = async (taskFn, { parameters, onTick = () => {} }) => {
-  if (process.env.IS_PRIMARY) {  
+  const isPrimary = !Object.hasOwn(process.env, 'THREAD_INDEX')
+
+  if (isPrimary) {  
     parameters = await prompt(parameters, {
       skipUserInput: ['test'].includes(process.env.NODE_ENV)
     })

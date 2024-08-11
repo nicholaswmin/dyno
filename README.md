@@ -146,14 +146,16 @@ console.log('done')
 
 ### Env var workaround
 
-Alternatively, a check can be made against the `IS_PRIMARY` env. var:
+Alternatively, a check can be made against the `THREAD_INDEX` env. var.  
+since that environmental variable is only set on `task` processes.
 
 ```js
+const isPrimary = !Object.hasOwn(process.env, 'THREAD_INDEX')
 const result = await dyno(async function cycle() { 
   // task code ...
 }, { threads: 2 })
 
-if (process.env.IS_PRIMARY) {
+if (isPrimary) {
   // only runs if process is primary/main
 
   console.log('done')
