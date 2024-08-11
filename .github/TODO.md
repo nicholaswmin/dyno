@@ -2,6 +2,8 @@
 
 ## fix
 
+- [ ] add a simplified `snapshots` getter to make plotting with `asciichart` 
+      easy
 - [x] simplify `onTick` arguments so the simple example can log easily 
       with a `console.table()`
 - [ ] wait for `queue drain`-type of event before resolving `bus.stop` or 
