@@ -199,7 +199,7 @@ npx init
 npx init-cloud
 ```
 
-> insert/update `README.md` example code snippets  
+> update `README.md` code snippets  
 
 ```bash
 npm run example:update:readme
