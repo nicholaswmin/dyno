@@ -17,7 +17,7 @@
 > `dyno` is a tool for testing if a piece of code can withstand 
 > a certain *rate* of production traffic
 
-It runs a task function in **cycles**, for a **specified duration**.
+It runs a **task** function in **cycles**, for a specified **duration**.
 
 A test is deemed succesful if the test duration elapses  
 without creating a **cycle backlog**.
