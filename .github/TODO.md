@@ -58,7 +58,7 @@
 
 ## docs
 
-- [ ] document the "running using a taskfile" case
+- [x] document the "running using a taskfile" case
 - [ ] document the `onTick` callback arguments `main` & `tasks`s
 - [ ] document any `before/after` hooks
 - [x] fix `npx init` docs after publishing

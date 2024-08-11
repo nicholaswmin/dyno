@@ -7,6 +7,8 @@
 * [Overview](#overview)
 * [Install](#install)
 * [Generate benchmark](#generate-sample-benchmark)
+* [Self-forking](#avoid-self-forking)
+  +[Workaround](#workaround)
 * [Tests](#tests)
 * [Misc.](#misc)
 * [Authors](#authors)
@@ -85,6 +87,78 @@ Run it with:
 ```bash
 node benchmark.js
 ``` 
+
+## Avoid self-forking
+
+Because of how the `fork` mechanism works, running single-file benchmarks   
+causes the `benchmark.js` file itself to be run `n` amount of times,   
+where `n` is the number of specified `threads`.
+
+In the following code, `'done'` is logged `3` times, instead of `1`: 
+
+```js
+import { dyno } from '@nicholaswmin/dyno'
+
+const result = await dyno(async function cycle() { 
+  // task code ...
+}, { threads: 3 })
+
+console.log('done')
+// 'done'
+// 'done'
+// 'done'
+```
+
+This precludes using this module as part of an automated test suite or 
+doing anything useful before or after the test ends.
+
+### Workaround
+
+To work around this, the *task function* can be extracted into it's own file,
+like so:
+
+```js
+// task.js
+import { task } from '@nicholaswmin/dyno'
+
+task(async function task() {
+  // task code ...
+})
+```
+
+then referenced as a path in `benchmark.js`:
+
+```js
+// benchmark.js
+import path from 'node:path'
+import { dyno } from '@nicholaswmin/dyno'
+
+const result = await dyno(path.join(import.meta.dirname, './task.js'), { 
+  threads: 3
+})
+
+console.log('done')
+// 'done'
+```
+
+#### Alternative workaround 
+
+Alternatively, a check can be made against the `THREAD_INDEX` env. var:
+
+```js
+// the main process lacks this env. variable
+const isMain = !Object.hasOwn(process.env, 'THREAD_INDEX')
+const result = await dyno(async function cycle() { 
+  // task code ...
+}, { threads: 2 })
+
+if (isMain) {
+  // code in this block runs only in the main process
+
+  console.log('done')
+  // 'done'
+}
+```
 
 ## Tests
 

@@ -9,7 +9,7 @@ const forkProcess = (task, { parameters, threadIndex }) =>
       env: { 
         ...process.env, 
         parameters: JSON.stringify(parameters),
-        thread_index: threadIndex
+        THREAD_INDEX: threadIndex
       }
     }).once('spawn', onSpawn).once('error', onError)
 })
