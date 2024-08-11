@@ -3,7 +3,7 @@ import { setTimeout } from 'node:timers/promises'
 import { task } from '../../../../index.js'
 
 task(async function task() {   
-  if (+process.env.index === 1)
+  if (+process.env.THREAD_INDEX === 1)
     process.exit(1)
 }, {
   after: () => {
