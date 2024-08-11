@@ -7,7 +7,7 @@
 * [Overview](#overview)
 * [Install](#install)
 * [Generate benchmark](#generate-sample-benchmark)
-* [Avoiding self-forking](#avoid-self-forking)
+* [Avoiding self-forking](#avoiding-self-forking)
   + [Workaround](#workaround)
   + [Alt. workaround](#alternative-workaround)
 * [Tests](#tests)
