@@ -156,8 +156,6 @@ const result = await dyno(async function cycle() {
 }, { threads: 2 })
 
 if (isPrimary) {
-  // only runs if process is primary/main
-
   console.log('done')
   // 'done'
 }
