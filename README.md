@@ -2,6 +2,10 @@
 
 # :stopwatch: dyno
 
+
+> a tool for testing if a piece of code can withstand 
+> a *certain rate* of production traffic
+
 * [Quickstart](#quickstart)
   + [Install](#install)
   + [Overview](#overview)
@@ -13,9 +17,6 @@
 * [License](#license)
 
 ## Overview
-
-> `dyno` is a tool for testing if a piece of code can withstand 
-> a certain *rate* of production traffic
 
 It runs a **task** function in **cycles**, for a specified **duration**.
 
