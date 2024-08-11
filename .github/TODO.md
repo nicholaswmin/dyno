@@ -29,6 +29,9 @@
 
 ## refactor 
 
+- [ ] `histogram` emitter should always log in `ms`. 
+      Ditch `eloop` etc matchings in `collector` for specifying which props 
+      need `ns` -> `ms` conversions.
 - [x] `dyno` hooks before/after are unnecessary, ditch them.
 - [x] there is no need for a `Dyno` class. Export a simple function instead.
 - [x] `npx init` should generate the bare-minimum benchmark that includes 
