@@ -150,12 +150,12 @@ Alternatively, a check can be made against the `THREAD_INDEX` env. var.
 since that environmental variable is only set on `task` processes.
 
 ```js
-const isPrimary = !Object.hasOwn(process.env, 'THREAD_INDEX')
+const isMain = typeof process.env.THREAD_INDEX === 'undefined'
 const result = await dyno(async function cycle() { 
   // task code ...
 }, { threads: 2 })
 
-if (isPrimary) {
+if (isMain) {
   console.log('done')
   // 'done'
 }
