@@ -1,6 +1,6 @@
 import { dyno } from '@nicholaswmin/dyno'
 
-await dyno(async function task(parameters) { 
+const result = await dyno(async function task() { 
 
   performance.timerify(function fibonacci(n) {
     return n < 1 ? 0
@@ -15,3 +15,5 @@ await dyno(async function task(parameters) {
     console.log(threads)
   }
 })
+
+console.log('Test ended, results:', result)
