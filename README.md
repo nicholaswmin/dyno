@@ -91,9 +91,9 @@ node benchmark.js
 
 ## Avoiding self-forking
 
-Because of how the `fork` mechanism works, running single-file benchmarks   
-causes the `benchmark.js` file itself to be run `n` amount of times,   
-where `n` is the number of specified `threads`.
+Because of how the [`fork` mechanism][cp-fork] works,   
+running single-file benchmarks causes the `benchmark.js` file itself to be   
+run `n` amount of times, where `n` is the number of specified `threads`.  
 
 In the following code, `'done'` is logged `3` times, instead of `1`: 
 
@@ -231,6 +231,7 @@ Nicholas Kyriakides, [@nicholaswmin][nicholaswmin]
 <!--- Content -->
 
 [heroku]: https://heroku.com
+[cp-fork]: https://nodejs.org/api/child_process.html#child_processforkmodulepath-args-options
 [perf-api]: https://nodejs.org/api/perf_hooks.html#performance-measurement-apis
 [timerify]: https://nodejs.org/api/perf_hooks.html#performancetimerifyfn-options
 [measure]: https://nodejs.org/api/perf_hooks.html#class-performancemeasure
