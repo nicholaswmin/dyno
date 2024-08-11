@@ -7,8 +7,9 @@
 * [Overview](#overview)
 * [Install](#install)
 * [Generate benchmark](#generate-sample-benchmark)
-* [Self-forking](#avoid-self-forking)
-  +[Workaround](#workaround)
+* [Avoiding self-forking](#avoid-self-forking)
+  + [Workaround](#workaround)
+  + [Alt. workaround](#alternative-workaround)
 * [Tests](#tests)
 * [Misc.](#misc)
 * [Authors](#authors)
@@ -88,7 +89,7 @@ Run it with:
 node benchmark.js
 ``` 
 
-## Avoid self-forking
+## Avoiding self-forking
 
 Because of how the `fork` mechanism works, running single-file benchmarks   
 causes the `benchmark.js` file itself to be run `n` amount of times,   
