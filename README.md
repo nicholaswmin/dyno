@@ -51,6 +51,8 @@ await dyno(async function cycle() {
 which logs: 
 
 ```js
+cycle stats
+
 ┌─────────┬────────┬───────────┬─────────┐
 │ uptime  │ issued │ completed │ backlog │
 ├─────────┼────────┼───────────┼─────────┤
