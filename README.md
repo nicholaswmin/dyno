@@ -2,9 +2,6 @@
 
 # :stopwatch: dyno
 
-> `dyno` is a tool for testing if a piece of code can withstand 
-> a certain rate of production traffic
-
 * [Quickstart](#quickstart)
   + [Install](#install)
   + [Overview](#overview)
@@ -17,8 +14,11 @@
 
 ## Overview
 
-The runner repeatedly runs a specified `task function`   
-for a specified `cycle per seconds` rate, for a specified `test duration`.
+> `dyno` is a tool for testing if a piece of code can withstand 
+> a certain *rate* of production traffic
+
+It runs a `task` function, for a specified `cycle per seconds` rate,   
+for a specified `test duration`.
 
 A test is deemed succesful if the test duration elapses  
 without creating a `cycle backlog`.
