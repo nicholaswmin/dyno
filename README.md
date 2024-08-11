@@ -187,19 +187,19 @@ npm run checks
 
 ## Misc
 
-> generate sample benchmark
+generate sample benchmark:
 
 ```bash
 npx init
 ```
 
-> generate [Heroku-deployable][heroku] benchmark
+generate [Heroku-deployable][heroku] benchmark:
 
 ```bash
 npx init-cloud
 ```
 
-> update `README.md` code snippets  
+update `README.md` code snippets:
 
 ```bash
 npm run example:update:readme
