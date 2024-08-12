@@ -93,24 +93,47 @@ Run it with:
 node benchmark.js
 ``` 
 
+## Configuration
+
+```js
+import { dyno } from '{{entrypath}}'
+
+await dyno(async function cycle() { 
+  // benchmarked code goes here
+
+}, {
+  parameters: { 
+    // test parameters
+    // cyclesPerSecond
+  },
+  
+  onTick: ({ main, tasks }) => {    
+    // log render function
+  }
+})
+
+```
+
 ## Plottable benchmarks
 
-The following example benchmarks a couple of `async sleep` function,   
-and plots a timeline of their `mean/average` durations.
+Benchmark two `sleep` functions & live plot their duration as an ASCII chart
 
 > requires [`console.plot`][console-plot]
 
 ```js
-// requires console-plot:
 // run: `npm i --no-save https://github.com/nicholaswmin/console-plot`
-
 import { dyno } from '@nicholaswmin/dyno'
 import console from '@nicholaswmin/console-plot'
 
 await dyno(async function cycle() { 
-
-  // measure a 'sleep' random function
-  await performance.timerify(async function sleep() {
+  
+  // sleep one
+  await performance.timerify(async function sleepTwo() {
+    return new Promise(res => setTimeout(res, Math.random() * 20))
+  })()
+  
+  // sleep two
+  await performance.timerify(async function sleepOne() {
     return new Promise(res => setTimeout(res, Math.random() * 20))
   })()
 
@@ -121,71 +144,70 @@ await dyno(async function cycle() {
   },
   
   onTick: ({ main, tasks, snapshots }) => {   
-    delete snapshots.evt_loop // discard this
-
     console.clear()
     console.table(main)
     console.table(tasks)
     console.plot(snapshots, {
       title: 'Timings timeline',
       subtitle: 'average durations, in ms',
+      height: 15,
       width: 100
     })
   }
 })
 ```
 
-which logs: 
+logs: 
 
 ```js
-┌─────────┬────────┬────────┬───────────┬─────────┐
-│ (index) │ uptime │ issued │ completed │ backlog │
-├─────────┼────────┼────────┼───────────┼─────────┤
-│ 0       │ 20     │ 394    │ 394       │ 0       │
-└─────────┴────────┴────────┴───────────┴─────────┘
+Cycles
+┌─────────┬────────┬───────────┬─────────┐
+│ uptime  │ issued │ completed │ backlog │
+├─────────┼────────┼───────────┼─────────┤
+│ 33      │ 615    │ 614       │ 1       │ 
+└─────────┴────────┴───────────┴─────────┘
 
-Task Timings
-┌─────────┬─────────┬──────────┬───────┬──────────┬──────────┐
-│ (index) │ thread  │ sleepOne │ cycle │ sleepTwo │ evt_loop │
-├─────────┼─────────┼──────────┼───────┼──────────┼──────────┤
-│ 0       │ '80246' │ 2.29     │ 3.57  │ 2        │ 10.63    │
-│ 1       │ '80247' │ 2.13     │ 3     │ 1.88     │ 10.64    │
-│ 2       │ '80248' │ 2.38     │ 3.63  │ 2.13     │ 10.65    │
-│ 3       │ '80249' │ 2.25     │ 3.75  │ 2.25     │ 10.54    │
-└─────────┴─────────┴──────────┴───────┴──────────┴──────────┘
+Timings
+┌─────────┬─────────┬──────────┬──────────┐
+│ thread  │ cycle   │ sleepOne │ sleepTwo │
+├─────────┼─────────┼──────────┼──────────┤
+│ '80538' │ 23.11   │ 10.21    │ 18.79    │
+│ '80539' │ 25.61   │ 10.16    │ 19.51    │
+│ '80540' │ 21.19   │ 10.17    │ 20.18    │ 
+│ '80541' │ 20.11   │ 11.68    │ 21.09    │
+└─────────┴─────────┴──────────┴──────────┘
 
-Timeline
+  Timings timeline
 
--- cycle -- sleepOne  -- sleepTwo
+  -- cycle  -- sleepOne  -- sleepTwo
 
- 4.00 ┼─╮                                                                                            
- 3.87 ┤ │        ╭────╮                                                                              
- 3.74 ┤ ╰╮      ╭╯    ╰──────╮      ╭╮                                                               
- 3.62 ┤  │    ╭─╯            ╰──────╯╰──────╮       ╭─────────────────────────────────────────────── 
- 3.49 ┤  ╰─╮ ╭╯                             ╰───────╯                                                
- 3.36 ┤    │ │                                                                                       
- 3.23 ┤    ╰─╯                                                                                       
- 3.11 ┤                                                                                              
- 2.98 ┤                                                                                              
- 2.85 ┤                                                                                              
- 2.72 ┤                                                                                              
- 2.60 ┤╭╮       ╭─╮                                                                                  
- 2.47 ┤││    ╭──╯ ╰───╮  ╭─╮╭───╮   ╭────╮            ╭╮                                             
- 2.34 ┤│╰─╮  │   ╭╮╭─╯╰─────╮   ╰───╯    ╰────────────╯╰───────────────╭─╮────────────────────────── 
- 2.21 ┤│  ╰──╯   │╰╯        ╰──────────────────────────────────────────╯ ╰────────────────────────── 
- 2.09 ┼╯───╮ ╭───╯                                                                                   
- 1.96 ┤    │╭╯                                                                                       
- 1.83 ┤    ╰╯                                                                                        
+  21.57 ┤     ╭╮                                                                     
+  20.33 ┤  ╭──╯╰─────╮                                                               
+  19.09 ┤ ╭╯         ╰──╮ ╭╮╭──╮╭──╮         ╭╮╭───╮╭────────────────────────── 
+  17.86 ┤ │             ╰─╯╰╯  ╰╯  ╰─────────╯╰╯   ╰╯                                
+  16.62 ┤ │                                                                          
+  15.38 ┤ │                                                                          
+  14.14 ┤ │                                                                          
+  12.90 ┤ │╭╮ ╭╮╭╮╭──╮                                                               
+  11.67 ┤╭╯│╰─╯╰╯╰╯  ╰─╮                                     ╭╮                      
+  10.43 ┤│╭╯╭╮╭╮       ╰───╮╭─────╮        ╭─────────────────╯╰────────────────
+   9.19 ┤││││╰╯╰╮╭───╮╭────╰╯─────╰──────────────────────────────────────────── 
+   7.95 ┼╯│╰╯   ╰╯   ╰╯                                                              
+   6.71 ┤││                                                                          
+   5.48 ┼─╯                                                                          
+   4.24 ┤│                                                                           
+   3.00 ┼╯                                                                           
 
-cycle durations, average, in ms
-
-- last: 100 items
+  average durations, in ms
+  
+  last: 100 items
 ```
 
 ## Avoiding self-forking
 
-In order to allow single-file benchmarks, the benchmark self-forks itself.     
-This causes any code *outside* the `dyno` blocks to execute multiple times.
+Single-file benchmarks are straightforward to setup but suffer from a caveat
+where any code that exists *outside* the `dyno` block is also 
+executed multiple times.
 
 In the following example, `'done'` is logged `3` times instead of `1`: 
 
@@ -246,12 +268,16 @@ console.log('done')
 // 'done'
 ```
 
+This method is actually what is used to test the module itself.
+
 ### Using an env var
 
-Alternatively, a check can be made against the `THREAD_INDEX` env. var.  
-since that environmental variable is only set on `task` processes.
+Finally, you can use the same mechanism that `node:cluster` uses, 
+using an `env. var` & a conditional to only run code once,   
+as part of the `main` process.
 
 ```js
+// the main process does not have a `THREAD_INDEX` env. var.
 const isMain = typeof process.env.THREAD_INDEX === 'undefined'
 const result = await dyno(async function cycle() { 
   // task code ...
@@ -262,7 +288,6 @@ if (isMain) {
   // 'done'
 }
 ```
-
 
 ## Tests
 
@@ -307,6 +332,8 @@ npx init-cloud
 ## Contributors
 
 Todos are available [here][todos]
+
+### Scripts
 
 update `README.md` code snippets:
 

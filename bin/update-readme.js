@@ -9,7 +9,11 @@ await replaceTokensInFile({
   entrypath: '@nicholaswmin/dyno',
   tokens: [
     { target: 'benchmark.js', start: '// example', end: '```' },
-    { target: 'plottable.js', start: '// requires console-plot:', end: '```' }
+    { 
+      target: 'plottable.js', 
+      start: '// run: `npm i --no-save https://github.com/nicholaswmin/console-plot`', 
+      end: '```' 
+    }
   ]
 })
 
