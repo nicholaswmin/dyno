@@ -12,4 +12,4 @@ await replaceTokensInFile({
   ]
 })
 
-console.log('done!')
+console.log('\x1b[32mREADME updated!\x1b[0m')
