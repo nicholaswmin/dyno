@@ -8,8 +8,16 @@ await replaceTokensInFile({
   filepath: path.join(import.meta.dirname, '../README.md'),
   entrypath: '@nicholaswmin/dyno',
   tokens: [
-    { target: 'benchmark.js', start: '// example', end: '```' },
-    { target: 'benchmark-plot.js', start: '// plottable', end: '```' }
+    { target: 'benchmark.js', start: '// benchmark.js', end: '```' },
+    { 
+      target: 'timerified.js', 
+      start: '// timing a recursive fibonacci function', 
+      end: '```' },
+    { 
+      target: 'plottable.js', 
+      start: '// run: `npm i --no-save https://github.com/nicholaswmin/console-plot`', 
+      end: '```' 
+    }
   ]
 })
 

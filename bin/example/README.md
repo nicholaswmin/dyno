@@ -1,13 +1,6 @@
 # benchmark
 
-A benchmark of [this code][task], run via the [\`dyno\`][dyno-module] module
-
-## Usage
-
-- Edit `run.js` with own test parameters and log output
-- Edit `task.js` with own benchmarked code and custom measures
-
-then:
+A benchmark run via the [\`dyno\`][dyno-module] module
 
 > run the benchmark
 
@@ -26,5 +19,4 @@ A mock server is provided in `bind.js` that binds to a port.
 npm start
 ```
 
-[task]: ./task.js
 [dyno-module]: https://www.npmjs.com/package/@nicholaswmin/dyno

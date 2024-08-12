@@ -2,7 +2,10 @@
 
 ## fix
 
-- [ ] ensure all emitters report in `ms` (i.e `evt_loop`) and stop doing 
+- [ ] Sweep over values and make sure they are accurate - some timers miss
+      a second, other values have `off-by-one` issues.
+- [ ] The task hooks might not be needed, if so ditch them.
+- [x] ensure all emitters report in `ms` (i.e `evt_loop`) and stop doing 
       unit-conversions in  `collector.js`.
 - [ ] add parameters getter, so that printing parameters is easy
 - [x] add a simplified `snapshots` getter to make plotting with `asciichart` 
@@ -17,7 +20,7 @@
 
 ## feat 
 
-- [ ] Reimplement the global `before/after` hooks
+- [x] Reimplement the global `before/after` hooks
 - [ ] Implement progressive-rate
   - start at a given cycles-per-second and increase automatically. 
   - detect when a backlog is created and stop.
@@ -69,7 +72,7 @@
 - [x] document the "running using a taskfile" case
 - [ ] document the `onTick` callback arguments `main` & `tasks`s
 - [ ] document the `test` arguments`, inc. their defaults
-- [ ] document any `before/after` hooks
+- [x] document any `before/after` hooks
 - [x] fix `npx init` docs after publishing
 - [x] Check if possible to DRY up example code via an `npx` script. 
   Right now theres 3 different & separate code examples:

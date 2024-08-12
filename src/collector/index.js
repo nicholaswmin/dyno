@@ -2,7 +2,6 @@ import { Bus } from '../bus/index.js'
 import { ProcessStat } from './process-stat/index.js'
 
 const round = num => (Math.round((num + Number.EPSILON) * 100) / 100) || 'n/a'
-const nsToMs = num => round(num / 1000000)
 const pid = process.pid.toString()
 
 class Collector {
@@ -30,8 +29,7 @@ class Collector {
       get snapshots() {
         const thread = this.threads[
           Object.keys(this.threads)
-          .filter(id => id !== pid)[0]
-        ]
+          .filter(id => id !== pid)[0]]
 
         return thread 
           ? Object.keys(thread)
@@ -52,13 +50,7 @@ class Collector {
               .reduce((acc, task) => ({
                 ...acc, 
                 thread: pid, 
-                // @NOTE declare tasks that need `ns` -> `ms` conversion
-                // @REVIEW bad hack, this conversion is not the responsibility 
-                //         of the collector. The emitters must simply always
-                //         emit in `ms` instead.
-                [task]: ['evt_loop'].includes(task) 
-                  ? nsToMs(this.threads[pid][task].mean)
-                  : round(this.threads[pid][task].mean)
+                [task]: round(this.threads[pid][task].mean)
               }), {})
           ]), [])
       }

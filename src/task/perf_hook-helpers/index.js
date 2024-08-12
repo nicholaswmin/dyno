@@ -3,6 +3,8 @@
 
 import { monitorEventLoopDelay } from 'node:perf_hooks'
 
+const toRoundedMillis = nanos => Math.ceil(nanos / 1000000)
+
 class LoopDelayObserver {
   constructor (cb, interval = 250) {
     this.cb = cb
@@ -17,7 +19,7 @@ class LoopDelayObserver {
   observe() {
     this.histogram.enable()
     this.timer = setInterval(() => 
-      this.cb(Math.round(this.histogram.mean) || 1),
+      this.cb(toRoundedMillis(this.histogram.mean || 1)),
       this.interval
     )
   }

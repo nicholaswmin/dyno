@@ -1,10 +1,16 @@
+
 import { dyno } from '{{entrypath}}'
 import console from '@nicholaswmin/console-plot'
 
 await dyno(async function cycle() { 
-
-  // measure a 'sleep' random function
-  await performance.timerify(async function sleep() {
+  
+  // sleep one
+  await performance.timerify(async function sleepTwo() {
+    return new Promise(res => setTimeout(res, Math.random() * 20))
+  })()
+  
+  // sleep two
+  await performance.timerify(async function sleepOne() {
     return new Promise(res => setTimeout(res, Math.random() * 20))
   })()
 
@@ -15,14 +21,13 @@ await dyno(async function cycle() {
   },
   
   onTick: ({ main, tasks, snapshots }) => {   
-    delete snapshots.evt_loop // discard this
-
     console.clear()
     console.table(main)
     console.table(tasks)
     console.plot(snapshots, {
       title: 'Timings timeline',
       subtitle: 'average durations, in ms',
+      height: 15,
       width: 100
     })
   }

@@ -6,12 +6,15 @@
 
 * [Overview](#overview)
 * [Install](#install)
-* [Generate benchmark](#generate-sample)
-* [Plottable benchmark](#plottable-benchmarks)
-* [Avoiding self-forking](#avoiding-self-forking)
-  + [Using hooks](#using-hooks)
-  + [Using a task file](#using-a-task-file)
-  + [Using an env. var](#using-an-env-var)
+* [Quickstart](#generate-benchmark)
+* [How it works](#how-it-works)
+  + [Test parameters](#test-parameters)
+* [Plotting](#plotting)
+* [Gotchas](#gotchas)
+  + [Avoiding self-forking](#avoiding-self-forking)
+    - [Using hooks](#using-hooks)
+    - [Using a task file](#using-a-task-file)
+    - [Using an env. variable](#using-an-env-var)
 * [Tests](#tests)
 * [Misc.](#misc)
 * [Authors](#authors)
@@ -19,27 +22,26 @@
 
 ## Overview
 
-It loops a *task* function, for a given *duration*, across multiple threads.
+Loops a *task* function, for a given *duration* - across multiple threads.
 
-A test is succesful if it ends without creating a *cycle backlog*.
+A test is deemed succesful if it ends without creating a *cycle backlog*.
 
 ```js
-// example
+// benchmark.js
+
 import { dyno } from '@nicholaswmin/dyno'
 
 await dyno(async function cycle() { 
 
-  performance.timerify(function fibonacci(n) {
+  function fibonacci(n) {
     return n < 1 ? 0
       : n <= 2 ? 1
       : fibonacci(n - 1) + fibonacci(n - 2)
-  })(30)
+  }
 
 }, {
   parameters: { 
-    cyclesPerSecond: 20, 
-    durationMs: 4000,
-    threads: 4
+    cyclesPerSecond: 100
   },
   
   onTick: ({ main, tasks }) => {    
@@ -61,6 +63,139 @@ cycle stats
 │ 4       │ 100    │ 95        │ 5       │
 └─────────┴────────┴───────────┴─────────┘
 
+average timings/durations, in ms
+
+┌─────────┬───────────┬────────┐
+│ thread  │ evt_loop  │ cycle  │
+├─────────┼───────────┼────────┤
+│ '46781' │ 10.47     │ 10.42  │
+│ '46782' │ 10.51     │ 10.30  │
+│ '46783' │ 10.68     │ 10.55  │
+│ '46784' │ 10.47     │ 10.32  │
+└─────────┴───────────┴────────┘
+```
+
+## Install
+
+```bash
+npm i @nicholaswmin/dyno
+```
+
+## Generate benchmark
+
+```bash 
+npx init
+```
+
+> creates a preconfigured sample `benchmark.js`.
+
+Run it:
+
+```bash
+node benchmark.js
+``` 
+
+## How it works
+
+Internally, the benchmark spawns a *`primary`* or *`main`* process.   
+
+The primary process then spawns & controls an `x` amount of 
+concurrently-running *`tasks`* each having their own copy of the
+benchmarked code, running in it's own thread.
+
+The primary then starts issuing `cycles`, using [round-robin scheduling][rr], 
+to each thread, at a pre-configured rate.   
+A cycle command tells a thread to execute it's code and report it's duration.
+
+### Backlogs
+
+A thread is expected to execute it's benchmarked task faster
+than the time it takes for it's next cycle command to come through, 
+otherwise it risks accumulating a *`cycle backlog`*.
+
+As an example, a benchmark configured to 
+use `threads: 4` & `cyclesPerSecond: 4`, would need to have it's benchmarked 
+task execute in `< 1 second` to avoid accumulating a backlog. 
+
+### Scoring
+
+The `cyclesPerSecond` rate at which a backlog is created is deemed
+to be the absolute breaking point of that piece of code and the current
+*score*.
+
+Realistically speaking, it's operational limits are considerably lower 
+than that, since this benchmark runs locally, with no network in-between 
+to contribute to latency.
+
+> The `threads` parameter is more or less constant, 
+> since it should be set to the same number of available physical cores.
+
+### Structure
+
+```js
+import { dyno } from '@nicholaswmin/dyno'
+
+await dyno(async function cycle() { 
+
+  // add benchmarked task
+
+}, {
+  parameters: { 
+    // add test parameters
+  },
+  
+  onTick: ({ main, tasks, snapshots }) => {    
+    // log any of the provided timings, 
+    // or create custom ones (see below)
+  }
+})
+```
+
+### Test parameters
+
+| name            	| type     	| default    | description                 	|
+|-----------------  |----------	|----------- |----------------------------- |
+| `cyclesPerSecond` | `Number` 	| `20`       | global cycle issue rate     	|
+| `durationMs`      | `Number` 	| `10000`    | how long the dyno should run |
+| `threads`         | `Number` 	| `auto` 	   | number of spawned threads    |
+
+> these parameters are user-configurable on test startup.
+
+## Custom timings
+
+[`performance.timerify`][timerify] & [`performance.measure`][measure], both
+native `User Timing APIs`, can be used to capture custom timings:
+
+```js
+// timing a recursive fibonacci function
+
+import { dyno } from '@nicholaswmin/dyno'
+
+await dyno(async function cycle() { 
+
+  performance.timerify(function fibonacci(n) {
+    return n < 1 ? 0
+      : n <= 2 ? 1
+      : fibonacci(n - 1) + fibonacci(n - 2)
+  })(30)
+
+}, {
+  parameters: { 
+    cyclesPerSecond: 20
+  },
+  
+  onTick: ({ tasks, snapshots }) => {    
+    // custom timings are set in both 
+    // `tasks` & `snapshots` as Histograms
+    console.clear()
+    console.table(tasks)
+  }
+})
+```
+
+which logs:
+
+```js
 timings (average, in ms)
 
 ┌─────────┬───────────┬────────┬───────────┐
@@ -73,65 +208,41 @@ timings (average, in ms)
 └─────────┴───────────┴────────┴───────────┘
 ```
 
-## Install
+## Plotting
 
-```bash
-npm i @nicholaswmin/dyno
-```
+The [`console.plot`][console-plot] module can be used to plot a *timeline*, 
+using the collected `snapshots`.
 
-## Generate sample benchmark
-
-```bash 
-npx init
-```
-
-creates a preconfigured `benchmark.js`.
-
-Run it with:
-
-```bash
-node benchmark.js
-``` 
-
-## Plottable benchmarks
-
-The following example benchmarks an `async sleep` function and plots
-a timeline of the `mean` durations.
-
-> Uses [`console.plot`][console-plot]
-
-```bash 
-# install it
-npm i https://github.com/nicholaswmin/console-plot
-```
+The following example benchmarks 2 `sleep` functions & plots their 
+timings as an ASCII chart
 
 ```js
-// plottable
+// run: `npm i --no-save @nicholaswmin/console-plot`
+
 import { dyno } from '@nicholaswmin/dyno'
 import console from '@nicholaswmin/console-plot'
 
 await dyno(async function cycle() { 
 
-  // measure a 'sleep' random function
-  await performance.timerify(async function sleep() {
+  // sleep one
+  await performance.timerify(async function sleepTwo() {
+    return new Promise(res => setTimeout(res, Math.random() * 20))
+  })()
+  
+  // sleep two
+  await performance.timerify(async function sleepOne() {
     return new Promise(res => setTimeout(res, Math.random() * 20))
   })()
 
 }, {
-  parameters: { 
-    cyclesPerSecond: 50, 
-    durationMs: 20 * 1000
-  },
+  parameters: { cyclesPerSecond: 50, durationMs: 20 * 1000 },
   
-  onTick: ({ main, tasks, snapshots }) => {   
-    delete snapshots.evt_loop // discard this
-
+  onTick: ({ snapshots }) => {   
     console.clear()
-    console.table(main)
-    console.table(tasks)
     console.plot(snapshots, {
       title: 'Timings timeline',
       subtitle: 'average durations, in ms',
+      height: 15,
       width: 100
     })
   }
@@ -141,59 +252,51 @@ await dyno(async function cycle() {
 which logs: 
 
 ```js
-┌─────────┬────────┬────────┬───────────┬─────────┐
-│ (index) │ uptime │ issued │ completed │ backlog │
-├─────────┼────────┼────────┼───────────┼─────────┤
-│ 0       │ 20     │ 394    │ 394       │ 0       │
-└─────────┴────────┴────────┴───────────┴─────────┘
+  Timings timeline
 
-Task Timings
-┌─────────┬─────────┬────┬──────────┐
-│ (index) │ thread  │ cycle │ sleep │
-├─────────┼─────────┼───────┼───────┤
-│ 0       │ '75657' │ 10.32 │ 10.29 │ 
-│ 1       │ '75658' │ 11.31 │ 11.22 │
-│ 2       │ '75659' │ 10.76 │ 10.73 │ 
-│ 3       │ '75660' │ 11.02 │ 10.98 │ 
-└─────────┴─────────┴───────┴───────┘
+  -- cycle  -- sleepOne  -- sleepTwo
 
-  Timeline
+  21.57 ┤     ╭╮                                                                     
+  20.33 ┤  ╭──╯╰─────╮                                                               
+  19.09 ┤ ╭╯         ╰──╮ ╭╮╭──╮╭──╮         ╭╮╭───╮╭────────────────────────── 
+  17.86 ┤ │             ╰─╯╰╯  ╰╯  ╰─────────╯╰╯   ╰╯                                
+  16.62 ┤ │                                                                          
+  15.38 ┤ │                                                                          
+  14.14 ┤ │                                                                          
+  12.90 ┤ │╭╮ ╭╮╭╮╭──╮                                                               
+  11.67 ┤╭╯│╰─╯╰╯╰╯  ╰─╮                                     ╭╮                      
+  10.43 ┤│╭╯╭╮╭╮       ╰───╮╭─────╮        ╭─────────────────╯╰────────────────
+   9.19 ┤││││╰╯╰╮╭───╮╭────╰╯─────╰──────────────────────────────────────────── 
+   7.95 ┼╯│╰╯   ╰╯   ╰╯                                                              
+   6.71 ┤││                                                                          
+   5.48 ┼─╯                                                                          
+   4.24 ┤│                                                                           
+   3.00 ┼╯                                                                           
 
-  -- cycle  -- sleep
-
-  11.11 ┤                              ╭╭╮╭╮                          ╭───╮ ╭╮   ╭╮                        
-  10.73 ┤             ╭╮╮╭╮        ╭─╮╭─╯╰╯╰──╮               ╭───────╯   ╰──────────────╮╮                
-  10.35 ┤           ╭╮│╰╮│╰╮╭╮╭────╯ ╰╯       ╰───────────────╯                          ╰──────────────── 
-   9.96 ┤        ╭╮ │╰╯ ╰╯ ╰╯╰╯                                                                            
-   9.58 ┤       ╭╭──╯                                                                                      
-   9.20 ┤       ╭╯                                                                                         
-   8.82 ┤     ╭─╯                                                                                          
-   8.44 ┤     │                                                                                            
-   8.05 ┤     │                                                                                            
-   7.67 ┤╭╮  ╭╯                                                                                            
-   7.29 ┤││  │                                                                                             
-   6.91 ┤╭╮  │                                                                                             
-   6.53 ┤│╰╮─│                                                                                             
-   6.15 ┼│ ╰─╯                                                                                             
-   5.76 ┤│                                                                                                 
-   5.38 ┤│                                                                                                 
-   5.00 ┼╯                                                                                                 
-
-  cycle durations, average, in ms
+  average durations, in ms
+  
+  last: 100 items
 ```
 
-## Avoiding self-forking
+## Gotchas
 
-In order to allow single-file benchmarks, the benchmark self-forks itself.     
-This causes any code *outside* the `dyno` blocks to execute multiple times.
+### Avoiding self-forking
 
-In the following example, `'done'` is logged `3` times instead of `1`: 
+Single-file, self-contained (yet multithreaded) benchmarks suffer a 
+caveat where any code that exists *outside* the `dyno` block 
+is *also* run in multiple threads, as if it were a task.
+
+The benchmarker is not affected by this - but it can create issues if you 
+need to run code after the `dyno()` resolves/ends,
+or when running it as a part of an automated test suite.
+
+> In this example, `'done'` is logged `3` times instead of `1`: 
 
 ```js
 import { dyno } from '@nicholaswmin/dyno'
 
 const result = await dyno(async function cycle() { 
-  // task code ...
+  // task code, expected to run 3 times ...
 }, { threads: 3 })
 
 console.log('done')
@@ -202,21 +305,39 @@ console.log('done')
 // 'done'
 ```
 
-This can create issues when used as part of an automated test 
-suite and/or attempting to do any kind of work with the test results.
-
-### Using hooks
+#### Using hooks
 
 To work around this, the `before`/`after` hooks can be used for setup and
 teardown, like so:
 
 ```js
-// @TODO
+await dyno(async function cycle() { 
+  console.log('task')
+}, {
+  parameters: { durationMs: 5 * 1000, },
+
+  before: async parameters => {
+    console.log('before')
+  },
+
+  after: async (parameters, { main, tasks, snapshots }) => {
+    console.log('after')
+  }
+})
+
+// "before"
+// ...
+// "task"
+// "task"
+// "task"
+// "task"
+// ...  
+// "after"
 ```
 
-### Using a task file
+#### Using a task file
 
-Alternatively, the *task function* can be extracted into it's own file,
+Alternatively, the *task* function can be extracted into it's own file,
 like so:
 
 ```js
@@ -235,23 +356,28 @@ then referenced as a path in `benchmark.js`:
 
 ```js
 // benchmark.js
-import path from 'node:path'
+import { join } from 'node:path'
 import { dyno } from '@nicholaswmin/dyno'
 
-const result = await dyno(path.join(import.meta.dirname, './task.js'), { 
-  threads: 3
+const result = await dyno(join(import.meta.dirname, './task.js'), { 
+  threads: 5
 })
 
 console.log('done')
 // 'done'
 ```
 
-### Using an env var
+> This is the preferred method to use when 
+> running as part of a test suite. 
 
-Alternatively, a check can be made against the `THREAD_INDEX` env. var.  
-since that environmental variable is only set on `task` processes.
+#### Using an env var
+
+Finally, you can use a similar technique as `node:cluster`, 
+by using an `env. var` & a conditional to only run code if the 
+current process is the primary/main:
 
 ```js
+// the main process does not have a `THREAD_INDEX` env. var.
 const isMain = typeof process.env.THREAD_INDEX === 'undefined'
 const result = await dyno(async function cycle() { 
   // task code ...
@@ -262,7 +388,6 @@ if (isMain) {
   // 'done'
 }
 ```
-
 
 ## Tests
 
@@ -304,17 +429,23 @@ generate [Heroku-deployable][heroku] benchmark:
 npx init-cloud
 ```
 
+## Contributors
+
+Todos are available [here][todos]
+
+### Scripts
+
 update `README.md` code snippets:
 
 ```bash
 npm run examples:update
 ```
 
-> examples source is located in: [`/bin/examples`](./bin/examples)
+> source examples are located in: [`/bin/example`](./bin/example)
 
 ## Authors
 
-Nicholas Kyriakides, [@nicholaswmin][nicholaswmin]
+[@nicholaswmin][nicholaswmin]
 
 ## License
 
@@ -337,6 +468,7 @@ Nicholas Kyriakides, [@nicholaswmin][nicholaswmin]
 <!--- Content -->
 
 [heroku]: https://heroku.com
+[rr]: https://en.wikipedia.org/wiki/Round-robin_scheduling
 [cp-fork]: https://nodejs.org/api/child_process.html#child_processforkmodulepath-args-options
 [perf-api]: https://nodejs.org/api/perf_hooks.html#performance-measurement-apis
 [timerify]: https://nodejs.org/api/perf_hooks.html#performancetimerifyfn-options
@@ -349,3 +481,4 @@ Nicholas Kyriakides, [@nicholaswmin][nicholaswmin]
 [console-plot]: https://github.com/nicholaswmin/console-plot
 [nicholaswmin]: https://github.com/nicholaswmin
 [license]: ./LICENSE
+[todos]: ./.github/TODO.md
