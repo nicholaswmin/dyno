@@ -3,7 +3,7 @@ import timer from 'timers/promises'
 import task from './src/task/index.js'
 import prompt from './src/prompt/index.js'
 import Uptimer from './src/uptimer/index.js'
-import threader from './src/threader/index.js'
+import threadpool from './src/threadpool/index.js'
 import Collector from './src/collector/index.js'
 import Scheduler from './src/scheduler/index.js'
 
@@ -24,7 +24,7 @@ const dyno = async (taskFn, { parameters, onTick = () => {} }) => {
     const collector = new Collector()
     const uptimer = new Uptimer()
     const scheduler = new Scheduler(parameters)
-    const threads = await threader.fork(
+    const threads = await threadpool.fork(
       // @TODO document the following line intention
       typeof taskFn === 'function' ? process.argv[1] : taskFn, { 
       threads: parameters.threads,
@@ -38,7 +38,7 @@ const dyno = async (taskFn, { parameters, onTick = () => {} }) => {
   
     try {
       await Promise.race([
-        threader.watch(threads, abortctrl),
+        threadpool.watch(threads, abortctrl),
         timer.setTimeout(parameters.durationMs, null, abortctrl)
       ])
     } finally {
@@ -47,7 +47,7 @@ const dyno = async (taskFn, { parameters, onTick = () => {} }) => {
       scheduler.stop()
       collector.stop()
   
-      await threader.disconnect(threads)
+      await threadpool.disconnect(threads)
     }
   
     return collector.stats
