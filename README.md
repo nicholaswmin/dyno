@@ -107,6 +107,8 @@ The primary then starts issuing `cycles`, using [round-robin scheduling][rr],
 to each thread, at a pre-configured rate.   
 A cycle command tells a thread to execute it's code and report it's duration.
 
+### Backlogs
+
 A thread is expected to execute it's benchmarked task faster
 than the time it takes for it's next cycle command to come through, 
 otherwise it risks accumulating a *`cycle backlog`*.
@@ -115,15 +117,18 @@ As an example, a benchmark configured to
 use `threads: 4` & `cyclesPerSecond: 4`, would need to have it's benchmarked 
 task execute in `< 1 second` to avoid accumulating a backlog. 
 
+### Scoring
+
 The `cyclesPerSecond` rate at which a backlog is created is deemed
-to be the absolute breaking point of that piece of code. 
+to be the absolute breaking point of that piece of code and the current
+*score*.
 
-Realistically speaking, it should be considerably lower than that, since 
-this benchmark runs everything locally with no network in-between to contribute
-to latency.
+Realistically speaking, it's operational limits are considerably lower 
+than that, since this benchmark runs locally, with no network in-between 
+to contribute to latency.
 
-The `threads` parameter is more or less constant, since it should be set to 
-the same number of available physical cores.
+> The `threads` parameter is more or less constant, 
+> since it should be set to the same number of available physical cores.
 
 ### Structure
 
