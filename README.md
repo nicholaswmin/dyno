@@ -14,7 +14,6 @@
   + [Avoiding self-forking](#avoiding-self-forking)
     - [Using hooks](#using-hooks)
     - [Using a task file](#using-a-task-file)
-    - [Using an env. variable](#using-an-env-var)
 * [Tests](#tests)
 * [Misc.](#misc)
 * [Authors](#authors)
@@ -369,25 +368,6 @@ console.log('done')
 
 > This is the preferred method to use when 
 > running as part of a test suite. 
-
-#### Using an env var
-
-Finally, you can use a similar technique as `node:cluster`, 
-by using an `env. var` & a conditional to only run code if the 
-current process is the primary/main:
-
-```js
-// the main process does not have a `THREAD_INDEX` env. var.
-const isMain = typeof process.env.THREAD_INDEX === 'undefined'
-const result = await dyno(async function cycle() { 
-  // task code ...
-}, { threads: 3 })
-
-if (isMain) {
-  console.log('done')
-  // 'done'
-}
-```
 
 ## Tests
 
