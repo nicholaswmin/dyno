@@ -303,6 +303,10 @@ generate [Heroku-deployable][heroku] benchmark:
 npx init-cloud
 ```
 
+## Contributors
+
+Todos are available [here][todos]
+
 update `README.md` code snippets:
 
 ```bash
@@ -348,3 +352,4 @@ Nicholas Kyriakides, [@nicholaswmin][nicholaswmin]
 [console-plot]: https://github.com/nicholaswmin/console-plot
 [nicholaswmin]: https://github.com/nicholaswmin
 [license]: ./LICENSE
+[todos]: ./.github/TODO.md
