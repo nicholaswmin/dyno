@@ -416,7 +416,7 @@ update `README.md` code snippets:
 npm run examples:update
 ```
 
-> examples source is located in: [`/bin/examples`](./bin/examples)
+> source examples are located in: [`/bin/examples`](./bin/examples)
 
 ## Authors
 
