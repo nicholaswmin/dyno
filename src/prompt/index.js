@@ -1,4 +1,5 @@
-import { input } from './input.js'
+import { styleText } from 'node:util'
+import input from './input.js'
 
 const types = {
   'string': String,
@@ -27,23 +28,28 @@ export default async (parameters, { disabled = false, defaults = {} } = {}) => {
 
     const answer = disabled ? value : await input({
 
-      message: `Configure: "${key}"`,
+      message: `Enter ${styleText(['cyan'], key)}`,
 
       value: value,
 
       validate: answer => {
+        answer = typeof answer === 'string' ? answer.trim() : answer
+
+        if (typeof answer === 'undefined' || answer === '')
+          return 'must provide a value'
+        
         switch (typeof value) {
           case 'number':
             return Number.isInteger(+answer) && +answer > 0
-              ? true : `${key} must be a positive integer`
+              ? false : 'must be a positive, non-fractional number'
 
           case 'string':
             return typeof answer === 'string' && answer.length > 0
-              ? true : `${key} must be a string with length: > 0`
+              ? false : 'must be a string with some length'
 
           case 'boolean':
             return ['true', 'false', true, false].includes(answer) 
-              ? true : `${key} must be either "true" or "false"`
+              ? false : 'must be either "true" or "false"'
 
           default:
             throw new TypeError(`${key} has an invalid type: ${typeof value}`)

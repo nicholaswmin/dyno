@@ -1,109 +1,123 @@
 import test from 'node:test'
+
+import Writeline from './utils/writeline.js'
 import prompt from '../index.js'
 
 test('#prompt()', async t => {
-  let result
-  
-  t.beforeEach(async () => {
-    result = await prompt({ FOO: 30, BAR: 'BAR', BAZ: false }, {
-      disabled: true,
-      defaults: { BAX: 50 }
-    }) 
-  })
+  let res 
+  const writeline = new Writeline()
 
-  t.todo('asks for user input', async t => {
-    // @TODO 
-    // - Test actual user input
-    t.todo('parameter type: Number', () => {
-      t.todo('allows only whole numbers', () => {})
-      t.todo('allows only positive numbers ', () => {})
+  t.beforeEach(() => writeline.reset())
+  t.after(() => writeline.restore())
+
+  await t.test('prompts for input', { timeout: 250 }, async t => {
+    t.beforeEach(async () => {
+      res = await writeline.on(prompt({ FOO: 10 })).done()
     })
     
-    t.todo('parameter type: String', () => {
-      t.todo('allows only strings with some length', () => {})
+    await t.test('shows prompt', async t => {
+      t.assert.strictEqual(res.resolved, false)
     })
     
-    t.todo('parameter type: Boolean', () => {
-      t.todo('allows only "true" or "false" input', () => { }) 
+    await t.test('displays label', async t => {
+      t.assert.ok(res.stdout.includes('FOO'), 'no "FOO" in stdout')
+    })
+    
+    await t.test('displays default value', async t => {
+      t.assert.ok(res.stdout.includes('(10)'), 'no "(10)" in stdout')
     })
   })
   
-  await t.test('returns a parameters object', async t => {
-    await t.test('has the correct properties', async t => {
-      t.assert.deepStrictEqual(Object.keys(result).sort(), [
-        'BAR', 'BAX', 'BAZ', 'FOO'
-      ])
-    })
-    
-    await t.test('sets defaults', async t => {
-      t.assert.ok(Object.hasOwn(result, 'BAX'), 'BAX default not found')
-      t.assert.strictEqual(result.BAX, 50)
+  await t.test('pressing Enter without entering anything', async t => {
+    t.beforeEach(async () => {
+      res = await writeline.on(prompt({ FOO: 10 }))
+        .pressEnter().done()
     })
 
-    await t.test('type: Number', async t => {
-      await t.test('has expected value', async t => {
-        t.assert.strictEqual(result.FOO, 30)
-      })
-
-      await t.test('is a Number', async t => {
-        t.assert.strictEqual(typeof result.FOO, 'number')
-      })
-      
-      await t.test('is > 0', async t => {
-        t.assert.ok(
-          result.FOO > 0, 
-          `expected 'result.FOO' to be > 0, is: ${result.FOO}`
-        )
-      })
-      
-      await t.test('is an integer', async t => {
-        t.assert.ok(
-          Number.isInteger(result.FOO), 
-          `expected 'result.FOO' to be an Integer, is: ${result.FOO}`
-        )
-      })
+    await t.test('ends the prompt', async t => {
+      t.assert.strictEqual(res.resolved, true)
     })
-    
-    await t.test('type: String', async t => {
-      await t.test('has expected value', async t => {
-        t.assert.strictEqual(result.BAR, 'BAR')
-      })
 
-      await t.test('is a String', async t => {
-        t.assert.strictEqual(typeof result.BAR, 'string')
-      })
-      
-      await t.test('has length', async t => {
-        t.assert.ok(
-          result.BAR.length > 0,
-          `expected 'result.BAR' to have some length, has: ${result.BAR.length}`
-        )
-      })
-
-    })
-    
-    await t.test('type: Boolean', async t => {
-      await t.test('is a Boolean', async t => {
-        t.assert.strictEqual(typeof result.BAZ, 'boolean')
-      })
-      
-      await t.test('has expected value', async t => {
-        t.assert.strictEqual(result.BAZ, false)
-      })
+    await t.test('uses the default value', async t => {
+      t.assert.strictEqual(res.value.FOO, 10)
     })
   })
   
-  await t.test('returns an immutable result', async t => {
-    await t.test('does not allow property overwrites', async t => {
-      t.assert.throws(() => {
-        result.BAR = 3
-      }, {  name: 'TypeError' })
+  await t.test('entering an invalid value', { timeout: 250 }, async t => {
+    t.beforeEach(async() => {
+      res = await writeline.on(prompt({ FOO: 10, BAR: 20 }))
+        .type('non-numeric')
+        .pressEnter().done()
     })
     
-    await t.test('does not allow property deletions', async t => {
-      t.assert.throws(() => {
-        delete result.FOO
-      }, {  name: 'TypeError' })
+    await t.test('keeps the prompt open', async t => {
+      t.assert.strictEqual(res.resolved, false)
+    })
+    
+    await t.test('on the same question', async t => {
+      t.assert.ok(res.stdout.includes('FOO'), 'no "FOO" in stdout')
+    })
+
+    await t.test('displays validation error', async t => {
+      t.assert.ok(res.stderr.includes('invalid'), 'no "invalid" in stderr')
+    })
+  })
+
+  await t.test('entering valid after invalid', { timeout: 250 }, async t => {
+    await t.test('when its the only/last property', async t => {
+      t.beforeEach(async () => {
+        res = await writeline.on(prompt({ FOO: 20 }))
+          .type(15.5).pressEnter()
+          .type(25).pressEnter().done()
+      })
+      
+      await t.test('closes prompt', async t => {
+        t.assert.strictEqual(res.resolved, true)
+      })
+      
+      await t.test('sets the typed value', async t => {
+        t.assert.strictEqual(res.value.FOO, 25)
+      })
+    })
+    
+    await t.test('when it has a subsequent unconfigured property', async t => {
+      t.beforeEach(async () => {
+        res = await writeline.on(prompt({ FOO: 20, BAR: 30 }))
+          .type(15.5).pressEnter()
+          .type(25).pressEnter().done()
+      })
+      
+      await t.test('keeps prompt open', async t => {
+        t.assert.strictEqual(res.resolved, false)
+      })
+      
+      await t.test('proceeds to the next property', async t => {
+        t.assert.ok(res.stdout.includes('BAR'), 'no "BAR" in stdout')
+      })
+      
+      await t.test('if subsequent input is also valid', async t => {
+        t.beforeEach(async () => {
+          res = await writeline.on(prompt({ FOO: 20, BAR: 30 }))
+            .type(15.5).pressEnter()
+            .type(100).pressEnter()
+            .type(200).pressEnter().done()
+
+        })
+        
+        await t.test('closes the prompt', async t => {
+          t.assert.strictEqual(res.resolved, true)
+        })
+        
+        await t.test('returns both properties', async t => {
+          t.assert.ok(Object.hasOwn(res.value, 'FOO'), 'no prop. FOO in result')
+          t.assert.ok(Object.hasOwn(res.value, 'BAR'), 'no prop. FOO in result')
+          
+          await t.test('with their inputted values', async t => {
+            t.assert.strictEqual(res.value.FOO, 100)
+            t.assert.strictEqual(res.value.BAR, 200)
+          })
+        })
+      })
     })
   })
 })

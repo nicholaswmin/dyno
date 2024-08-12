@@ -1,1 +1,1 @@
-import '../../src/prompt/test/prompt.test.js'
+import '../../src/prompt/test/index.test.js'
