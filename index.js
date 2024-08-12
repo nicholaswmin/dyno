@@ -7,12 +7,19 @@ import threadpool from './src/threadpool/index.js'
 import Collector from './src/collector/index.js'
 import Scheduler from './src/scheduler/index.js'
 
-const dyno = async (taskFn, { parameters, onTick = () => {} }) => {
+const dyno = async (taskFn, { 
+  parameters, 
+  onTick = () => {},
+  before = async () => {},
+  after  = async () => {}
+}) => {
   const isPrimary = !Object.hasOwn(process.env, 'THREAD_INDEX')
 
   if (isPrimary) {  
+    await before(parameters)
+
     parameters = await prompt(parameters, {
-      disabled: ['TEST'].includes(process.env.NODE_ENV?.toUpperCase()),
+      disabled: ['test'].includes(process.env.NODE_ENV?.toLowerCase()),
       defaults: {
         cyclesPerSecond: 10,
         durationMs: 5000,
@@ -42,6 +49,8 @@ const dyno = async (taskFn, { parameters, onTick = () => {} }) => {
         timer.setTimeout(parameters.durationMs, null, abortctrl)
       ])
     } finally {
+      await after(parameters, collector.stats)
+
       abortctrl.abort()
       uptimer.stop()
       scheduler.stop()

@@ -14,7 +14,7 @@
   + [Avoiding self-forking](#avoiding-self-forking)
     - [Using hooks](#using-hooks)
     - [Using a task file](#using-a-task-file)
-    - [Using a task file](#using-an-env-var)
+    - [Using an env. variable](#using-an-env-var)
 * [Tests](#tests)
 * [Misc.](#misc)
 * [Authors](#authors)
@@ -22,9 +22,9 @@
 
 ## Overview
 
-It loops a *task* function, for a given *duration*, across multiple threads.
+Loops a *task* function, for a given *duration* - across multiple threads.
 
-A test is succesful if it ends without creating a *cycle backlog*.
+A test is deemed succesful if it ends without creating a *cycle backlog*.
 
 ```js
 // benchmark.js
@@ -87,9 +87,9 @@ npm i @nicholaswmin/dyno
 npx init
 ```
 
-creates a preconfigured sample `benchmark.js`.
+> creates a preconfigured sample `benchmark.js`.
 
-Run it with:
+Run it:
 
 ```bash
 node benchmark.js
@@ -142,8 +142,6 @@ await dyno(async function cycle() {
   onTick: ({ main, tasks, snapshots }) => {    
     // log any of the provided timings, 
     // or create custom ones (see below)
-    //
-    // this callback is run ~ 30 times per second 
   }
 })
 ```
@@ -279,15 +277,15 @@ which logs:
 
 ### Avoiding self-forking
 
-Single-file, multithreaded benchmarks suffer from a caveat where any 
-code that exists *outside* the `dyno` block is *also* run multiple times.
+Single-file, self-contained (yet multithreaded) benchmarks suffer a 
+caveat where any code that exists *outside* the `dyno` block 
+is *also* run in multiple threads, as if it were a task.
 
-This is not a problem when benchmarking but can create issues if you 
-need to do any work with the results when the `dyno()` resolves/ends.
+The benchmarker is not affected by this - but it can create issues if you 
+need to run code after the `dyno()` resolves/ends,
+or when running it as a part of an automated test suite.
 
-It's also known to create issues in automated test suites.
-
-In the following example, `'done'` is logged `3` times instead of `1`: 
+> In this example, `'done'` is logged `3` times instead of `1`: 
 
 ```js
 import { dyno } from '@nicholaswmin/dyno'
@@ -308,12 +306,33 @@ To work around this, the `before`/`after` hooks can be used for setup and
 teardown, like so:
 
 ```js
-// @TODO
+await dyno(async function cycle() { 
+  console.log('task')
+}, {
+  parameters: { durationMs: 5 * 1000, },
+
+  before: async parameters => {
+    console.log('before')
+  },
+
+  after: async (parameters, { main, tasks, snapshots }) => {
+    console.log('after')
+  }
+})
+
+// "before"
+// ...
+// "task"
+// "task"
+// "task"
+// "task"
+// ...  
+// "after"
 ```
 
 #### Using a task file
 
-Alternatively, the *task function* can be extracted into it's own file,
+Alternatively, the *task* function can be extracted into it's own file,
 like so:
 
 ```js
@@ -332,18 +351,19 @@ then referenced as a path in `benchmark.js`:
 
 ```js
 // benchmark.js
-import path from 'node:path'
+import { join } from 'node:path'
 import { dyno } from '@nicholaswmin/dyno'
 
-const result = await dyno(path.join(import.meta.dirname, './task.js'), { 
-  threads: 3
+const result = await dyno(join(import.meta.dirname, './task.js'), { 
+  threads: 5
 })
 
 console.log('done')
 // 'done'
 ```
 
-This method is actually what is used to test the module itself.
+> This is the preferred method to use when 
+> running as part of a test suite. 
 
 #### Using an env var
 
