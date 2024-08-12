@@ -101,7 +101,6 @@ a timeline of the `mean` durations.
 > Uses [`console.plot`][console-plot]
 
 ```bash 
-# install it
 npm i https://github.com/nicholaswmin/console-plot
 ```
 
