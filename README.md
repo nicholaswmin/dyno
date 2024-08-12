@@ -6,7 +6,7 @@
 
 * [Overview](#overview)
 * [Install](#install)
-* [Generate benchmark](#generate-benchmark)
+* [Generate benchmark](#generate-a-sample)
 * [Plottable benchmark](#plottable-benchmarks)
 * [Avoiding self-forking](#avoiding-self-forking)
   + [Using hooks](#using-hooks)
