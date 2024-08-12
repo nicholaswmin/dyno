@@ -1,4 +1,4 @@
-[![test-workflow][test-badge]][test-workflow] [![coverage-workflow][coverage-badge]][coverage-report] [![codeql-workflow][codeql-badge]][codeql-workflow]
+[![test-workflow][test-badge]][test-workflow] [![coverage-workflow][coverage-badge]][coverage-report] [![codeql-workflow][codeql-badge]][codeql-workflow] [![deps-report][deps-badge]][deps-report]
 
 # :stopwatch: dyno
 
@@ -8,8 +8,8 @@
 * [Install](#install)
 * [Generate benchmark](#generate-sample-benchmark)
 * [Avoiding self-forking](#avoiding-self-forking)
-  + [Task file workaround](#task-file-workaround)
-  + [Env. var workaround](#env-var-workaround)
+  + [Using a task file](#using-a-task-file)
+  + [Using an env. var](#using-an-env-var)
 * [Tests](#tests)
 * [Misc.](#misc)
 * [Authors](#authors)
@@ -61,14 +61,14 @@ cycle stats
 
 timings (average, in ms)
 
-┌─────────┬───────┬───────────┬──────────┐
-│ thread  │ cycle │ fibonacci │ evt_loop │
-├─────────┼───────┼───────────┼──────────┤
-│ '46781' │ 9.47  │ 9.42      │ 11.01    │
-│ '46782' │ 9.61  │ 9.30      │ 11.14    │ 
-│ '46783' │ 9.65  │ 9.55      │ 11.18    │
-│ '46784' │ 9.47  │ 9.32      │ 11.09    │
-└─────────┴───────┴───────────┴──────────┘
+┌─────────┬───────────┬────────┬───────────┐
+│ thread  │ evt_loop  │ cycle  │ fibonacci │
+├─────────┼───────────┼────────┼───────────┤
+│ '46781' │ 10.47     │ 10.42  │ 9.01      │
+│ '46782' │ 10.51     │ 10.30  │ 9.14      │ 
+│ '46783' │ 10.68     │ 10.55  │ 9.18      │
+│ '46784' │ 10.47     │ 10.32  │ 9.09      │
+└─────────┴───────────┴────────┴───────────┘
 ```
 
 ## Install
@@ -93,11 +93,10 @@ node benchmark.js
 
 ## Avoiding self-forking
 
-Because of how the [`fork` mechanism][cp-fork] works, 
-running single-file benchmarks causes any code *outside* the `dyno` blocks
-to *also* run in a separate thread.
+In order to allow single-file benchmarks, the benchmark self-forks itself.     
+This causes any code *outside* the `dyno` blocks to execute multiple times.
 
-In the following code, `'done'` is logged `3` times, instead of `1`: 
+In the following example, `'done'` is logged `3` times instead of `1`: 
 
 ```js
 import { dyno } from '@nicholaswmin/dyno'
@@ -112,20 +111,32 @@ console.log('done')
 // 'done'
 ```
 
-This can create issues when using this module as part of an automated test 
-suite and/or attempting to do anything with the test results.
+This can create issues when used as part of an automated test 
+suite and/or attempting to do any kind of work with the test results.
 
-### Task file workaround
+### Using `before`/`after` hooks
 
-To work around this, the *task function* can be extracted into it's own file,
+To work around this, the `before`/`after` hooks can be used for setup and
+teardown, like so:
+
+```js
+// @TODO
+```
+
+### Using a task file
+
+Alternatively, the *task function* can be extracted into it's own file,
 like so:
 
 ```js
 // task.js
 import { task } from '@nicholaswmin/dyno'
 
-task(async function task() {
+task(async function task(parameters) {
   // task code ...
+
+  // `benchmark.js` test parameters are
+  // available here.
 })
 ```
 
@@ -144,7 +155,7 @@ console.log('done')
 // 'done'
 ```
 
-### Env var workaround
+### Using an env var
 
 Alternatively, a check can be made against the `THREAD_INDEX` env. var.  
 since that environmental variable is only set on `task` processes.
@@ -153,7 +164,7 @@ since that environmental variable is only set on `task` processes.
 const isMain = typeof process.env.THREAD_INDEX === 'undefined'
 const result = await dyno(async function cycle() { 
   // task code ...
-}, { threads: 2 })
+}, { threads: 3 })
 
 if (isMain) {
   console.log('done')
@@ -228,6 +239,9 @@ Nicholas Kyriakides, [@nicholaswmin][nicholaswmin]
 
 [codeql-badge]: https://github.com/nicholaswmin/dyno/actions/workflows/codeql.yml/badge.svg
 [codeql-workflow]: https://github.com/nicholaswmin/dyno/actions/workflows/codeql.yml
+
+[deps-badge]: https://img.shields.io/badge/dependencies-0-b.svg
+[deps-report]: https://github.com/nicholaswmin/dyno/edit/main/README.md
 
 <!--- Content -->
 
