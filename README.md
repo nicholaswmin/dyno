@@ -93,9 +93,16 @@ Run it with:
 node benchmark.js
 ``` 
 
-## Plottable example
+## Plottable benchmarks
+
+The following example benchmarks an `async sleep` function and plots
+a timeline of the `mean` durations.
 
 > Uses [`console.plot`][console-plot]
+
+```bash 
+https://github.com/nicholaswmin/console-plot
+```
 
 ```js
 // plottable
