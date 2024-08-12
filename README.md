@@ -96,7 +96,7 @@ node benchmark.js
 ## Configuration
 
 ```js
-import { dyno } from '{{entrypath}}'
+import { dyno } from '@nicholaswmin/dyno'
 
 await dyno(async function cycle() { 
   // benchmarked code goes here
@@ -104,19 +104,27 @@ await dyno(async function cycle() {
 }, {
   parameters: { 
     // test parameters
-    // cyclesPerSecond
   },
   
-  onTick: ({ main, tasks }) => {    
+  onTick: ({ main, tasks, snapshots }) => {    
     // log render function
   }
 })
-
 ```
+
+### Configurable parameters
+
+| name            	| type     	| default  | description                   	|
+|-----------------  |----------	|--------- |------------------------------- |
+| `cyclesPerSecond` | `Number` 	| `20`       | global cycle issue rate     	|
+| `durationMs`      | `Number` 	| `10000`    | How long the dyno should run |
+| `threads`         | `Number` 	| `auto` 	   | Number of threads to utilise |
+
+> these parameters are user-configurable on test startup.
 
 ## Plottable benchmarks
 
-Benchmark two `sleep` functions & live plot their duration as an ASCII chart
+Benchmark two `sleep` functions & plot their timings in an ASCII plot
 
 > requires [`console.plot`][console-plot]
 
@@ -205,9 +213,13 @@ Timings
 
 ## Avoiding self-forking
 
-Single-file benchmarks are straightforward to setup but suffer from a caveat
-where any code that exists *outside* the `dyno` block is also 
-executed multiple times.
+Single-file, multithreaded benchmarks suffer from a caveat where any 
+code that exists *outside* the `dyno` block is *also* run multiple times.
+
+This is not a problem when benchmarking but can create issues if you 
+need to do any work with the results when the `dyno()` resolves/ends.
+
+It's also known to create issues in automated test suites.
 
 In the following example, `'done'` is logged `3` times instead of `1`: 
 
@@ -215,7 +227,7 @@ In the following example, `'done'` is logged `3` times instead of `1`:
 import { dyno } from '@nicholaswmin/dyno'
 
 const result = await dyno(async function cycle() { 
-  // task code ...
+  // task code, expected to run 3 times ...
 }, { threads: 3 })
 
 console.log('done')
@@ -224,8 +236,7 @@ console.log('done')
 // 'done'
 ```
 
-This can create issues when used as part of an automated test 
-suite and/or attempting to do any kind of work with the test results.
+
 
 ### Using hooks
 
@@ -272,9 +283,9 @@ This method is actually what is used to test the module itself.
 
 ### Using an env var
 
-Finally, you can use the same mechanism that `node:cluster` uses, 
-using an `env. var` & a conditional to only run code once,   
-as part of the `main` process.
+Finally, you can use a similar technique as `node:cluster`, 
+by using an `env. var` & a conditional to only run code if the 
+current process is the primary/main:
 
 ```js
 // the main process does not have a `THREAD_INDEX` env. var.
