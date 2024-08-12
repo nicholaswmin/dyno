@@ -96,7 +96,7 @@ Run it with:
 node benchmark.js
 ``` 
 
-## Configuration
+## How it works
 
 Internally, the benchmark spawns a *`primary`*/*`main`* process.   
 
@@ -115,28 +115,33 @@ As an example, a benchmark configured to use `threads: 4` & a rate
 of `cyclesPerSecond: 4`, would need to have it's benchmarked task 
 execute in `< 1 second` to avoid accumulating a backlog. 
 
+### Structure
+
 ```js
 import { dyno } from '@nicholaswmin/dyno'
 
 await dyno(async function cycle() { 
-  // benchmarked code goes here
+
+  // add benchmarked task
 
 }, {
   parameters: { 
-    // test parameters go here
+    // add test parameters
   },
   
   onTick: ({ main, tasks, snapshots }) => {    
-    // called every time a measurement is updated,
-    // ~30 times per second
+    // log any of the provided timings, 
+    // or create custom ones (see below)
+    //
+    // this callback is run ~ 30 times per second 
   }
 })
 ```
 
-### Configurable parameters
+### parameters
 
-| name            	| type     	| default  | description                   	|
-|-----------------  |----------	|--------- |------------------------------- |
+| name            	| type     	| default    | description                 	|
+|-----------------  |----------	|----------- |----------------------------- |
 | `cyclesPerSecond` | `Number` 	| `20`       | global cycle issue rate     	|
 | `durationMs`      | `Number` 	| `10000`    | How long the dyno should run |
 | `threads`         | `Number` 	| `auto` 	   | Number of spawned threads    |
@@ -145,9 +150,8 @@ await dyno(async function cycle() {
 
 ## Custom timings
 
-Use [`performance.timerify`][timerify] & [`performance.measure`][measure] 
-to capture custom timings, which can help in diagnosing which specific part of
-the task is slow:
+[`performance.timerify`][timerify] & [`performance.measure`][measure], both
+native `User Timing APIs`, can be used to capture custom timings:
 
 ```js
 // capturing custom timings
@@ -164,12 +168,13 @@ await dyno(async function cycle() {
 
 }, {
   parameters: { 
-    cyclesPerSecond: 20, 
-    durationMs: 4000,
-    threads: 4
+    cyclesPerSecond: 20
   },
   
-  onTick: ({ main, tasks }) => {    
+  onTick: ({ tasks, snapshots }) => {    
+    // custom timings are set 
+    // in both `tasks` & `snapshots` 
+
     console.clear()
     console.table(tasks)
   }
