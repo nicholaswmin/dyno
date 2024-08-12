@@ -8,7 +8,8 @@ await replaceTokensInFile({
   filepath: path.join(import.meta.dirname, '../README.md'),
   entrypath: '@nicholaswmin/dyno',
   tokens: [
-    { target: 'benchmark.js', start: '// example', end: '```' }
+    { target: 'benchmark.js', start: '// example', end: '```' },
+    { target: 'benchmark-plot.js', start: '// plottable', end: '```' }
   ]
 })
 

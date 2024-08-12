@@ -11,8 +11,10 @@ lerna-debug.log*
 benchmark/
 /benchmark.js
 
-# Constants
+# draft prototyping scratchfiles 
+scratch/
 
+# Constants
 constants.json
 
 # Diagnostic reports (https://nodejs.org/api/report.html)

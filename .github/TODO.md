@@ -2,8 +2,10 @@
 
 ## fix
 
+- [ ] ensure all emitters report in `ms` (i.e `evt_loop`) and stop doing 
+      unit-conversions in  `collector.js`.
 - [ ] add parameters getter, so that printing parameters is easy
-- [ ] add a simplified `snapshots` getter to make plotting with `asciichart` 
+- [x] add a simplified `snapshots` getter to make plotting with `asciichart` 
       easy
 - [x] simplify `onTick` arguments so the simple example can log easily 
       with a `console.table()`
@@ -15,7 +17,7 @@
 
 ## feat 
 
-- [ ] Add back the global `before/after` hooks
+- [ ] Reimplement the global `before/after` hooks
 - [ ] Implement progressive-rate
   - start at a given cycles-per-second and increase automatically. 
   - detect when a backlog is created and stop.
@@ -27,7 +29,8 @@
 - [x] `tasks:run` and `backlog` should ideally be tracked on the `runner`
   - now tracking `done` and `backlog` on the primary
 - [x] log test constants/parameters
-- [ ] log to file?
+- [x] ~~log to file?~~ 
+     - No, out of scope
 
 ## refactor 
 
@@ -46,7 +49,7 @@
 
 ## test
 
-- [ ] test new `prompt`
+- [x] test new `prompt`
 - [x] test `onTick` calls and arguments
 - [x] replace old tests with new tests on the rewrite
 - [x] split unit tests & integration tests
@@ -65,7 +68,7 @@
 
 - [x] document the "running using a taskfile" case
 - [ ] document the `onTick` callback arguments `main` & `tasks`s
-- [ ] document the `parameters`, inc. their defaults
+- [ ] document the `test` arguments`, inc. their defaults
 - [ ] document any `before/after` hooks
 - [x] fix `npx init` docs after publishing
 - [x] Check if possible to DRY up example code via an `npx` script. 

@@ -1,4 +1,10 @@
-// records a custom-value via `performance.timerify`
+// records a custom-value via: 
+// - `performance.timerify`
+// - `performance.measure`
+// 
+// both being timing functions of native PerformanceMeasurement APIs.
+// Read: https://nodejs.org/api/perf_hooks.html#performance-measurement-apis
+// 
 import { task } from '../../../../index.js'
 
 task(async function cycle() {

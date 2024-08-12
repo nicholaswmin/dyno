@@ -7,6 +7,7 @@
 * [Overview](#overview)
 * [Install](#install)
 * [Generate benchmark](#generate-sample-benchmark)
+* [Plottable benchmark](#plottable-benchmarks)
 * [Avoiding self-forking](#avoiding-self-forking)
   + [Using hooks](#using-hooks)
   + [Using a task file](#using-a-task-file)
@@ -91,6 +92,85 @@ Run it with:
 ```bash
 node benchmark.js
 ``` 
+
+## Plottable example
+
+> Uses [`console.plot`][console-plot]
+
+```js
+// plottable
+// requires `npm i https://github.com/nicholaswmin/console-plot`
+
+import { dyno } from '@nicholaswmin/dyno'
+import console from '@nicholaswmin/console-plot'
+
+await dyno(async function cycle() { 
+  // measure a 'sleep' random function
+  await performance.timerify(async function sleep() {
+    return new Promise(res => setTimeout(res, Math.random() * 20))
+  })()
+
+}, {
+  parameters: { 
+    cyclesPerSecond: 50, 
+    durationMs: 20 * 1000,
+    threads: 4
+  },
+  
+  onTick: ({ main, tasks, snapshots }) => {   
+    delete snapshots.evt_loop // discard this
+
+    console.clear()
+    console.table(main)
+    console.table(tasks)
+    console.plot(snapshots)
+  }
+})
+```
+
+which logs: 
+
+```js
+┌─────────┬────────┬────────┬───────────┬─────────┐
+│ (index) │ uptime │ issued │ completed │ backlog │
+├─────────┼────────┼────────┼───────────┼─────────┤
+│ 0       │ 20     │ 394    │ 394       │ 0       │
+└─────────┴────────┴────────┴───────────┴─────────┘
+
+Task Timings
+┌─────────┬─────────┬────┬──────────┐
+│ (index) │ thread  │ cycle │ sleep │
+├─────────┼─────────┼───────┼───────┤
+│ 0       │ '75657' │ 10.32 │ 10.29 │ 
+│ 1       │ '75658' │ 11.31 │ 11.22 │
+│ 2       │ '75659' │ 10.76 │ 10.73 │ 
+│ 3       │ '75660' │ 11.02 │ 10.98 │ 
+└─────────┴─────────┴───────┴───────┘
+
+  Timeline
+
+  -- cycle  -- sleep
+
+  11.11 ┤                              ╭╭╮╭╮                          ╭───╮ ╭╮   ╭╮                        
+  10.73 ┤             ╭╮╮╭╮        ╭─╮╭─╯╰╯╰──╮               ╭───────╯   ╰──────────────╮╮                
+  10.35 ┤           ╭╮│╰╮│╰╮╭╮╭────╯ ╰╯       ╰───────────────╯                          ╰──────────────── 
+   9.96 ┤        ╭╮ │╰╯ ╰╯ ╰╯╰╯                                                                            
+   9.58 ┤       ╭╭──╯                                                                                      
+   9.20 ┤       ╭╯                                                                                         
+   8.82 ┤     ╭─╯                                                                                          
+   8.44 ┤     │                                                                                            
+   8.05 ┤     │                                                                                            
+   7.67 ┤╭╮  ╭╯                                                                                            
+   7.29 ┤││  │                                                                                             
+   6.91 ┤╭╮  │                                                                                             
+   6.53 ┤│╰╮─│                                                                                             
+   6.15 ┼│ ╰─╯                                                                                             
+   5.76 ┤│                                                                                                 
+   5.38 ┤│                                                                                                 
+   5.00 ┼╯                                                                                                 
+
+  cycle durations, average, in ms
+```
 
 ## Avoiding self-forking
 
@@ -256,5 +336,6 @@ Nicholas Kyriakides, [@nicholaswmin][nicholaswmin]
 
 <!--- Basic -->
 
+[console-plot]: https://github.com/nicholaswmin/console-plot
 [nicholaswmin]: https://github.com/nicholaswmin
 [license]: ./LICENSE

@@ -1,7 +1,9 @@
+const { NODE_ENV } = process.env
+
 class RingBuffer extends Array {
   #size = 0
 
-  constructor({ size = 100 } = {}) {
+  constructor({ size = ['test'].includes(NODE_ENV) ? 25 : 200 } = {}) {
     super()
     this.#size = size
   }
