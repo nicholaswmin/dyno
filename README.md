@@ -6,9 +6,11 @@
 
 * [Overview](#overview)
 * [Install](#install)
-* [Generate benchmark](#generate-a-sample)
-* [Plottable benchmark](#plottable-benchmarks)
-* [Avoiding self-forking](#avoiding-self-forking)
+* [Generate benchmark](#generate-benchmark)
+* [Configuration](#configuration)
+* [Plotting](#plottable-benchmarks)
+* [Gotchas](#gotchas)
+  + [Avoiding self-forking](#avoiding-self-forking)
   + [Using hooks](#using-hooks)
   + [Using a task file](#using-a-task-file)
   + [Using an env. var](#using-an-env-var)
@@ -24,16 +26,17 @@ It loops a *task* function, for a given *duration*, across multiple threads.
 A test is succesful if it ends without creating a *cycle backlog*.
 
 ```js
-// example
+// benchmark.js
+
 import { dyno } from '@nicholaswmin/dyno'
 
 await dyno(async function cycle() { 
 
-  performance.timerify(function fibonacci(n) {
+  function fibonacci(n) {
     return n < 1 ? 0
       : n <= 2 ? 1
       : fibonacci(n - 1) + fibonacci(n - 2)
-  })(30)
+  }
 
 }, {
   parameters: { 
@@ -61,6 +64,121 @@ cycle stats
 │ 4       │ 100    │ 95        │ 5       │
 └─────────┴────────┴───────────┴─────────┘
 
+average timings/durations, in ms
+
+┌─────────┬───────────┬────────┐
+│ thread  │ evt_loop  │ cycle  │
+├─────────┼───────────┼────────┤
+│ '46781' │ 10.47     │ 10.42  │
+│ '46782' │ 10.51     │ 10.30  │
+│ '46783' │ 10.68     │ 10.55  │
+│ '46784' │ 10.47     │ 10.32  │
+└─────────┴───────────┴────────┘
+```
+
+## Install
+
+```bash
+npm i @nicholaswmin/dyno
+```
+
+## Generate benchmark
+
+```bash 
+npx init
+```
+
+creates a preconfigured sample `benchmark.js`.
+
+Run it with:
+
+```bash
+node benchmark.js
+``` 
+
+## Configuration
+
+Internally, the benchmark spawns a *`primary`*/*`main`* process.   
+
+The primary process then spawns & controls an *`x` number of threads*,
+each thread being an isolated Node.js process with it's own copy of the 
+benchmarked code, called the *task*.
+
+The primary then starts issuing `cycles`, in [round-robin scheduling][rr], 
+to each thread, at the pre-configured rate.
+
+The receiving thread is expected to execute it's benchmarked task faster
+than the time it takes for the next cycle command, otherwise it risks 
+accumulating issued but unexecuted cycles, called a *cycle backlog*.
+
+As an example, a benchmark configured to use `threads: 4` & a rate 
+of `cyclesPerSecond: 4`, would need to have it's benchmarked task 
+execute in `< 1 second` to avoid accumulating a backlog. 
+
+```js
+import { dyno } from '@nicholaswmin/dyno'
+
+await dyno(async function cycle() { 
+  // benchmarked code goes here
+
+}, {
+  parameters: { 
+    // test parameters go here
+  },
+  
+  onTick: ({ main, tasks, snapshots }) => {    
+    // called every time a measurement is updated,
+    // ~30 times per second
+  }
+})
+```
+
+### Configurable parameters
+
+| name            	| type     	| default  | description                   	|
+|-----------------  |----------	|--------- |------------------------------- |
+| `cyclesPerSecond` | `Number` 	| `20`       | global cycle issue rate     	|
+| `durationMs`      | `Number` 	| `10000`    | How long the dyno should run |
+| `threads`         | `Number` 	| `auto` 	   | Number of spawned threads    |
+
+> these parameters are user-configurable on test startup.
+
+## Custom timings
+
+Use [`performance.timerify`][timerify] & [`performance.measure`][measure] 
+to capture custom timings, which can help in diagnosing which specific part of
+the task is slow:
+
+```js
+// capturing custom timings
+
+import { dyno } from '@nicholaswmin/dyno'
+
+await dyno(async function cycle() { 
+
+  performance.timerify(function fibonacci(n) {
+    return n < 1 ? 0
+      : n <= 2 ? 1
+      : fibonacci(n - 1) + fibonacci(n - 2)
+  })(30)
+
+}, {
+  parameters: { 
+    cyclesPerSecond: 20, 
+    durationMs: 4000,
+    threads: 4
+  },
+  
+  onTick: ({ main, tasks }) => {    
+    console.clear()
+    console.table(tasks)
+  }
+})
+```
+
+which logs:
+
+```js
 timings (average, in ms)
 
 ┌─────────┬───────────┬────────┬───────────┐
@@ -73,68 +191,22 @@ timings (average, in ms)
 └─────────┴───────────┴────────┴───────────┘
 ```
 
-## Install
+## Plotting timings
 
-```bash
-npm i @nicholaswmin/dyno
-```
+The [`console.plot`][console-plot] module can be used to plot a timeline 
+of the timings rather than log their current value.
 
-## Generate sample benchmark
-
-```bash 
-npx init
-```
-
-creates a preconfigured `benchmark.js`.
-
-Run it with:
-
-```bash
-node benchmark.js
-``` 
-
-## Configuration
+The following example benchmarks 2 `sleep` functions & plots their 
+timings as an ASCII chart
 
 ```js
-import { dyno } from '@nicholaswmin/dyno'
+// run: `npm i --no-save @nicholaswmin/console-plot`
 
-await dyno(async function cycle() { 
-  // benchmarked code goes here
-
-}, {
-  parameters: { 
-    // test parameters
-  },
-  
-  onTick: ({ main, tasks, snapshots }) => {    
-    // log render function
-  }
-})
-```
-
-### Configurable parameters
-
-| name            	| type     	| default  | description                   	|
-|-----------------  |----------	|--------- |------------------------------- |
-| `cyclesPerSecond` | `Number` 	| `20`       | global cycle issue rate     	|
-| `durationMs`      | `Number` 	| `10000`    | How long the dyno should run |
-| `threads`         | `Number` 	| `auto` 	   | Number of threads to utilise |
-
-> these parameters are user-configurable on test startup.
-
-## Plottable benchmarks
-
-Benchmark two `sleep` functions & plot their timings in an ASCII plot
-
-> requires [`console.plot`][console-plot]
-
-```js
-// run: `npm i --no-save https://github.com/nicholaswmin/console-plot`
 import { dyno } from '@nicholaswmin/dyno'
 import console from '@nicholaswmin/console-plot'
 
 await dyno(async function cycle() { 
-  
+
   // sleep one
   await performance.timerify(async function sleepTwo() {
     return new Promise(res => setTimeout(res, Math.random() * 20))
@@ -146,15 +218,10 @@ await dyno(async function cycle() {
   })()
 
 }, {
-  parameters: { 
-    cyclesPerSecond: 50, 
-    durationMs: 20 * 1000
-  },
+  parameters: { cyclesPerSecond: 50, durationMs: 20 * 1000 },
   
-  onTick: ({ main, tasks, snapshots }) => {   
+  onTick: ({ snapshots }) => {   
     console.clear()
-    console.table(main)
-    console.table(tasks)
     console.plot(snapshots, {
       title: 'Timings timeline',
       subtitle: 'average durations, in ms',
@@ -165,26 +232,9 @@ await dyno(async function cycle() {
 })
 ```
 
-logs: 
+which logs: 
 
 ```js
-Cycles
-┌─────────┬────────┬───────────┬─────────┐
-│ uptime  │ issued │ completed │ backlog │
-├─────────┼────────┼───────────┼─────────┤
-│ 33      │ 615    │ 614       │ 1       │ 
-└─────────┴────────┴───────────┴─────────┘
-
-Timings
-┌─────────┬─────────┬──────────┬──────────┐
-│ thread  │ cycle   │ sleepOne │ sleepTwo │
-├─────────┼─────────┼──────────┼──────────┤
-│ '80538' │ 23.11   │ 10.21    │ 18.79    │
-│ '80539' │ 25.61   │ 10.16    │ 19.51    │
-│ '80540' │ 21.19   │ 10.17    │ 20.18    │ 
-│ '80541' │ 20.11   │ 11.68    │ 21.09    │
-└─────────┴─────────┴──────────┴──────────┘
-
   Timings timeline
 
   -- cycle  -- sleepOne  -- sleepTwo
@@ -211,7 +261,9 @@ Timings
   last: 100 items
 ```
 
-## Avoiding self-forking
+## Gotchas
+
+### Avoiding self-forking
 
 Single-file, multithreaded benchmarks suffer from a caveat where any 
 code that exists *outside* the `dyno` block is *also* run multiple times.
@@ -236,9 +288,7 @@ console.log('done')
 // 'done'
 ```
 
-
-
-### Using hooks
+#### Using hooks
 
 To work around this, the `before`/`after` hooks can be used for setup and
 teardown, like so:
@@ -247,7 +297,7 @@ teardown, like so:
 // @TODO
 ```
 
-### Using a task file
+#### Using a task file
 
 Alternatively, the *task function* can be extracted into it's own file,
 like so:
@@ -281,7 +331,7 @@ console.log('done')
 
 This method is actually what is used to test the module itself.
 
-### Using an env var
+#### Using an env var
 
 Finally, you can use a similar technique as `node:cluster`, 
 by using an `env. var` & a conditional to only run code if the 
@@ -379,6 +429,7 @@ Nicholas Kyriakides, [@nicholaswmin][nicholaswmin]
 <!--- Content -->
 
 [heroku]: https://heroku.com
+[rr]: https://en.wikipedia.org/wiki/Round-robin_scheduling
 [cp-fork]: https://nodejs.org/api/child_process.html#child_processforkmodulepath-args-options
 [perf-api]: https://nodejs.org/api/perf_hooks.html#performance-measurement-apis
 [timerify]: https://nodejs.org/api/perf_hooks.html#performancetimerifyfn-options
