@@ -98,10 +98,10 @@ node benchmark.js
 The following example benchmarks a couple of `async sleep` function,   
 and plots a timeline of their `mean/average` durations.
 
-> Uses [`console.plot`][console-plot]
+> requires [`console.plot`][console-plot]
 
 ```js
-// plottable
+// requires console-plot:
 // run: `npm i --no-save https://github.com/nicholaswmin/console-plot`
 
 import { dyno } from '@nicholaswmin/dyno'
