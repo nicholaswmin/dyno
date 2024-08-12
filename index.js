@@ -1,3 +1,4 @@
+import os from 'node:os'
 import timer from 'timers/promises'
 import task from './src/task/index.js'
 import prompt from './src/prompt/index.js'
@@ -11,7 +12,12 @@ const dyno = async (taskFn, { parameters, onTick = () => {} }) => {
 
   if (isPrimary) {  
     parameters = await prompt(parameters, {
-      skipUserInput: ['test'].includes(process.env.NODE_ENV)
+      disabled: ['TEST'].includes(process.env.NODE_ENV?.toUpperCase()),
+      defaults: {
+        cyclesPerSecond: 10,
+        durationMs: 5000,
+        threads: os.availableParallelism()
+      }
     })
 
     const abortctrl = new AbortController()

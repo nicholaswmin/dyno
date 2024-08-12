@@ -26,6 +26,22 @@ class Collector {
           uptime: stats.uptime
         }]
       },
+      
+      get snapshots() {
+        const thread = this.threads[
+          Object.keys(this.threads)
+          .filter(id => id !== pid)[0]
+        ]
+
+        return thread 
+          ? Object.keys(thread)
+            .reduce((acc, task) => ({
+              ...acc, 
+              [task]: thread[task].snapshots
+                .map(s => round(s.mean))
+            }), {}) 
+          : {}
+      },
 
       get tasks() {
         return Object.keys(this.threads)
@@ -37,7 +53,9 @@ class Collector {
                 ...acc, 
                 thread: pid, 
                 // @NOTE declare tasks that need `ns` -> `ms` conversion
-                // @REVIEW bad hack, the emitters must always emit in `ms`
+                // @REVIEW bad hack, this conversion is not the responsibility 
+                //         of the collector. The emitters must simply always
+                //         emit in `ms` instead.
                 [task]: ['evt_loop'].includes(task) 
                   ? nsToMs(this.threads[pid][task].mean)
                   : round(this.threads[pid][task].mean)

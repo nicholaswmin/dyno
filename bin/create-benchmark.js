@@ -11,4 +11,4 @@ await createExample({
   ]
 })
 
-console.log('done!')
+console.log('\x1b[32mbenchmark created!\x1b[0m')

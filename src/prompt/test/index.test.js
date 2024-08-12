@@ -1,0 +1,6 @@
+import './prompt.test.js'
+import './defaults.test.js'
+import './types.test.js'
+import './immutable.test.js'
+import './disable.test.js'
+import './e2e.test.js'
