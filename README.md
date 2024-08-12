@@ -420,7 +420,7 @@ npm run examples:update
 
 ## Authors
 
-Nicholas Kyriakides, [@nicholaswmin][nicholaswmin]
+[@nicholaswmin][nicholaswmin]
 
 ## License
 
