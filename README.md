@@ -180,7 +180,7 @@ Timeline
 cycle durations, average, in ms
 
 - last: 100 items
-
+```
 
 ## Avoiding self-forking
 
