@@ -41,9 +41,7 @@ await dyno(async function cycle() {
 
 }, {
   parameters: { 
-    cyclesPerSecond: 20, 
-    durationMs: 4000,
-    threads: 4
+    cyclesPerSecond: 100
   },
   
   onTick: ({ main, tasks }) => {    
