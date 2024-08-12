@@ -6,7 +6,7 @@
 
 * [Overview](#overview)
 * [Install](#install)
-* [Generate benchmark](#generate-sample-benchmark)
+* [Generate benchmark](#generate-sample)
 * [Plottable benchmark](#plottable-benchmarks)
 * [Avoiding self-forking](#avoiding-self-forking)
   + [Using hooks](#using-hooks)
@@ -288,7 +288,7 @@ npm run checks
 
 ## Misc
 
-generate sample benchmark:
+generate sample:
 
 ```bash
 npx init
