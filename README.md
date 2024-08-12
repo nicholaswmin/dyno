@@ -107,8 +107,6 @@ npm i https://github.com/nicholaswmin/console-plot
 
 ```js
 // plottable
-// requires `npm i https://github.com/nicholaswmin/console-plot`
-
 import { dyno } from '@nicholaswmin/dyno'
 import console from '@nicholaswmin/console-plot'
 
@@ -126,7 +124,7 @@ await dyno(async function cycle() {
   },
   
   onTick: ({ main, tasks, snapshots }) => {   
-    delete snapshots.evt_loop // discard this
+    delete snapshots.evt_loop // discard for now
 
     console.clear()
     console.table(main)
