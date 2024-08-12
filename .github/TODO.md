@@ -15,6 +15,7 @@
 
 ## feat 
 
+- [ ] Add back the global `before/after` hooks
 - [ ] Implement progressive-rate
   - start at a given cycles-per-second and increase automatically. 
   - detect when a backlog is created and stop.
