@@ -1,3 +1,5 @@
+// run: `npm i --no-save https://github.com/nicholaswmin/console-plot`
+
 import { dyno } from '{{entrypath}}'
 import console from '@nicholaswmin/console-plot'
 

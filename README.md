@@ -95,17 +95,19 @@ node benchmark.js
 
 ## Plottable benchmarks
 
-The following example benchmarks an `async sleep` function and plots
-a timeline of the `mean` durations.
+The following example benchmarks a couple of `async sleep` function,   
+and plots a timeline of their `mean/average` durations.
 
 > Uses [`console.plot`][console-plot]
 
 ```bash 
-npm i https://github.com/nicholaswmin/console-plot
+npm i https://github.com/nicholaswmin/console-plot --no-save
 ```
 
 ```js
 // plottable
+// run: `npm i --no-save https://github.com/nicholaswmin/console-plot`
+
 import { dyno } from '@nicholaswmin/dyno'
 import console from '@nicholaswmin/console-plot'
 
@@ -156,30 +158,33 @@ Task Timings
 │ 3       │ '75660' │ 11.02 │ 10.98 │ 
 └─────────┴─────────┴───────┴───────┘
 
-  Timeline
+Timeline
 
-  -- cycle  -- sleep
+-- cycle -- sleepOne  -- sleepTwo
 
-  11.11 ┤                              ╭╭╮╭╮                          ╭───╮ ╭╮   ╭╮                        
-  10.73 ┤             ╭╮╮╭╮        ╭─╮╭─╯╰╯╰──╮               ╭───────╯   ╰──────────────╮╮                
-  10.35 ┤           ╭╮│╰╮│╰╮╭╮╭────╯ ╰╯       ╰───────────────╯                          ╰──────────────── 
-   9.96 ┤        ╭╮ │╰╯ ╰╯ ╰╯╰╯                                                                            
-   9.58 ┤       ╭╭──╯                                                                                      
-   9.20 ┤       ╭╯                                                                                         
-   8.82 ┤     ╭─╯                                                                                          
-   8.44 ┤     │                                                                                            
-   8.05 ┤     │                                                                                            
-   7.67 ┤╭╮  ╭╯                                                                                            
-   7.29 ┤││  │                                                                                             
-   6.91 ┤╭╮  │                                                                                             
-   6.53 ┤│╰╮─│                                                                                             
-   6.15 ┼│ ╰─╯                                                                                             
-   5.76 ┤│                                                                                                 
-   5.38 ┤│                                                                                                 
-   5.00 ┼╯                                                                                                 
+ 4.00 ┼─╮                                                                                            
+ 3.87 ┤ │        ╭────╮                                                                              
+ 3.74 ┤ ╰╮      ╭╯    ╰──────╮      ╭╮                                                               
+ 3.62 ┤  │    ╭─╯            ╰──────╯╰──────╮       ╭─────────────────────────────────────────────── 
+ 3.49 ┤  ╰─╮ ╭╯                             ╰───────╯                                                
+ 3.36 ┤    │ │                                                                                       
+ 3.23 ┤    ╰─╯                                                                                       
+ 3.11 ┤                                                                                              
+ 2.98 ┤                                                                                              
+ 2.85 ┤                                                                                              
+ 2.72 ┤                                                                                              
+ 2.60 ┤╭╮       ╭─╮                                                                                  
+ 2.47 ┤││    ╭──╯ ╰───╮  ╭─╮╭───╮   ╭────╮            ╭╮                                             
+ 2.34 ┤│╰─╮  │   ╭╮╭─╯╰─────╮   ╰───╯    ╰────────────╯╰───────────────╭─╮────────────────────────── 
+ 2.21 ┤│  ╰──╯   │╰╯        ╰──────────────────────────────────────────╯ ╰────────────────────────── 
+ 2.09 ┼╯───╮ ╭───╯                                                                                   
+ 1.96 ┤    │╭╯                                                                                       
+ 1.83 ┤    ╰╯                                                                                        
 
-  cycle durations, average, in ms
-```
+cycle durations, average, in ms
+
+- last: 100 items
+
 
 ## Avoiding self-forking
 
