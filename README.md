@@ -129,7 +129,11 @@ await dyno(async function cycle() {
     console.clear()
     console.table(main)
     console.table(tasks)
-    console.plot(snapshots)
+    console.plot(snapshots, {
+      title: 'Timings timeline',
+      subtitle: 'average durations, in ms',
+      width: 100
+    })
   }
 })
 ```
