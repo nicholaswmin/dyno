@@ -151,8 +151,8 @@ await dyno(async function cycle() {
 | name            	| type     	| default    | description                 	|
 |-----------------  |----------	|----------- |----------------------------- |
 | `cyclesPerSecond` | `Number` 	| `20`       | global cycle issue rate     	|
-| `durationMs`      | `Number` 	| `10000`    | How long the dyno should run |
-| `threads`         | `Number` 	| `auto` 	   | Number of spawned threads    |
+| `durationMs`      | `Number` 	| `10000`    | how long the dyno should run |
+| `threads`         | `Number` 	| `auto` 	   | number of spawned threads    |
 
 > these parameters are user-configurable on test startup.
 
