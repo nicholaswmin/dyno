@@ -8,6 +8,7 @@
 * [Install](#install)
 * [Generate benchmark](#generate-sample-benchmark)
 * [Avoiding self-forking](#avoiding-self-forking)
+  + [Using hooks](#using-hooks)
   + [Using a task file](#using-a-task-file)
   + [Using an env. var](#using-an-env-var)
 * [Tests](#tests)
@@ -114,7 +115,7 @@ console.log('done')
 This can create issues when used as part of an automated test 
 suite and/or attempting to do any kind of work with the test results.
 
-### Using `before`/`after` hooks
+### Using hooks
 
 To work around this, the `before`/`after` hooks can be used for setup and
 teardown, like so:

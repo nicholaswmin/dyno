@@ -27,10 +27,6 @@ test('#prompt() set 2 values and a default, back to back', async t => {
       .pressEnter()
       .done()
     })
-    
-    t.diagnostic('Asks for default BAZ first, type: 20, presses Enter')
-    t.diagnostic('Asks for FOO, presses Enter, no typing, presses Enter')
-    t.diagnostic('Asks for BAR then, types "true", presses Enter')
 
     await t.test('closes prompt', async t => {
       t.assert.strictEqual(res.resolved, true)
