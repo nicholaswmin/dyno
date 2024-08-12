@@ -6,14 +6,15 @@
 
 * [Overview](#overview)
 * [Install](#install)
-* [Generate benchmark](#generate-benchmark)
-* [Configuration](#configuration)
-* [Plotting](#plottable-benchmarks)
+* [Quickstart](#generate-benchmark)
+* [How it works](#how-it-works)
+  + [Test parameters](#test-parameters)
+* [Plotting](#plotting)
 * [Gotchas](#gotchas)
   + [Avoiding self-forking](#avoiding-self-forking)
-  + [Using hooks](#using-hooks)
-  + [Using a task file](#using-a-task-file)
-  + [Using an env. var](#using-an-env-var)
+    - [Using hooks](#using-hooks)
+    - [Using a task file](#using-a-task-file)
+    - [Using a task file](#using-an-env-var)
 * [Tests](#tests)
 * [Misc.](#misc)
 * [Authors](#authors)
@@ -98,22 +99,33 @@ node benchmark.js
 
 ## How it works
 
-Internally, the benchmark spawns a *`primary`*/*`main`* process.   
+Internally, the benchmark spawns a *`primary`* or *`main`* process.   
 
-The primary process then spawns & controls an *`x` number of threads*,
-each thread being an isolated Node.js process with it's own copy of the 
-benchmarked code, called the *task*.
+The primary process then spawns & controls an `x` amount of 
+concurrently-running *`tasks`* each having their own copy of the
+benchmarked code, running in it's own thread.
 
-The primary then starts issuing `cycles`, in [round-robin scheduling][rr], 
-to each thread, at the pre-configured rate.
+The primary then starts issuing `cycles`, using [round-robin scheduling][rr], 
+to each thread, at a pre-configured rate.   
+A cycle command tells a thread to execute it's code and report it's duration.
 
-The receiving thread is expected to execute it's benchmarked task faster
-than the time it takes for the next cycle command, otherwise it risks 
-accumulating issued but unexecuted cycles, called a *cycle backlog*.
+A thread is expected to execute it's benchmarked task faster
+than the time it takes for it's next cycle command to come through, 
+otherwise it risks accumulating a *`cycle backlog`*.
 
-As an example, a benchmark configured to use `threads: 4` & a rate 
-of `cyclesPerSecond: 4`, would need to have it's benchmarked task 
-execute in `< 1 second` to avoid accumulating a backlog. 
+As an example, a benchmark configured to 
+use `threads: 4` & `cyclesPerSecond: 4`, would need to have it's benchmarked 
+task execute in `< 1 second` to avoid accumulating a backlog. 
+
+The `cyclesPerSecond` rate at which a backlog is created is deemed
+to be the absolute breaking point of that piece of code. 
+
+Realistically speaking, it should be considerably lower than that, since 
+this benchmark runs everything locally with no network in-between to contribute
+to latency.
+
+The `threads` parameter is more or less constant, since it should be set to 
+the same number of available physical cores.
 
 ### Structure
 
@@ -138,7 +150,7 @@ await dyno(async function cycle() {
 })
 ```
 
-### parameters
+### Test parameters
 
 | name            	| type     	| default    | description                 	|
 |-----------------  |----------	|----------- |----------------------------- |
@@ -154,7 +166,7 @@ await dyno(async function cycle() {
 native `User Timing APIs`, can be used to capture custom timings:
 
 ```js
-// capturing custom timings
+// timing a recursive fibonacci function
 
 import { dyno } from '@nicholaswmin/dyno'
 
@@ -172,9 +184,8 @@ await dyno(async function cycle() {
   },
   
   onTick: ({ tasks, snapshots }) => {    
-    // custom timings are set 
-    // in both `tasks` & `snapshots` 
-
+    // custom timings are set in both 
+    // `tasks` & `snapshots` as Histograms
     console.clear()
     console.table(tasks)
   }
@@ -196,10 +207,10 @@ timings (average, in ms)
 └─────────┴───────────┴────────┴───────────┘
 ```
 
-## Plotting timings
+## Plotting
 
-The [`console.plot`][console-plot] module can be used to plot a timeline 
-of the timings rather than log their current value.
+The [`console.plot`][console-plot] module can be used to plot a *timeline*, 
+using the collected `snapshots`.
 
 The following example benchmarks 2 `sleep` functions & plots their 
 timings as an ASCII chart
