@@ -5,10 +5,10 @@
 > test code against a certain *rate* of production traffic
 
 * [Overview](#overview)
-* [Install](#install)
-* [Quickstart](#generate-benchmark)
-* [How it works](#how-it-works)
-  + [Test parameters](#test-parameters)
+* [Quickstart](#install)
+  + [Parameters](#test-parameters)
+* [The Process Model](#the-process-model)
+* [Measurements](#the-measurements-systems)
 * [Plotting](#plotting)
 * [Gotchas](#gotchas)
   + [Avoiding self-forking](#avoiding-self-forking)
@@ -27,22 +27,26 @@ A test is deemed succesful if it ends without creating a *cycle backlog*.
 
 ```js
 // benchmark.js
-
 import { dyno } from '@nicholaswmin/dyno'
 
 await dyno(async function cycle() { 
+  // <benchmarked-code>
 
   function fibonacci(n) {
     return n < 1 ? 0
-      : n <= 2 ? 1
-      : fibonacci(n - 1) + fibonacci(n - 2)
+    : n <= 2 ? 1 : fibonacci(n - 1) + fibonacci(n - 2)
   }
 
+  fibonacci(35)
+
+  // </benchmarked-code>
 }, {
+  // test parameters
   parameters: { 
-    cyclesPerSecond: 100
+    cyclesPerSecond: 100, threads: 4, durationMs: 5 * 1000
   },
   
+  // log live stats
   onTick: ({ main, tasks }) => {    
     console.clear()
     console.table(main)
@@ -51,7 +55,13 @@ await dyno(async function cycle() {
 })
 ```
 
-which logs: 
+run it: 
+
+```bash
+node benchmark.js
+```
+
+logs:
 
 ```js
 cycle stats
@@ -94,41 +104,6 @@ Run it:
 node benchmark.js
 ``` 
 
-## How it works
-
-Internally, the benchmark spawns a *`primary`* or *`main`* process.   
-
-The primary process then spawns & controls an `x` amount of 
-concurrently-running *`tasks`* each having their own copy of the
-benchmarked code, running in it's own thread.
-
-The primary then starts issuing `cycles`, using [round-robin scheduling][rr], 
-to each thread, at a pre-configured rate.   
-A cycle command tells a thread to execute it's code and report it's duration.
-
-### Backlogs
-
-A thread is expected to execute it's benchmarked task faster
-than the time it takes for it's next cycle command to come through, 
-otherwise it risks accumulating a *`cycle backlog`*.
-
-As an example, a benchmark configured to 
-use `threads: 4` & `cyclesPerSecond: 4`, would need to have it's benchmarked 
-task execute in `< 1 second` to avoid accumulating a backlog. 
-
-### Scoring
-
-The `cyclesPerSecond` rate at which a backlog is created is deemed
-to be the absolute breaking point of that piece of code and the current
-*score*.
-
-Realistically speaking, it's operational limits are considerably lower 
-than that, since this benchmark runs locally, with no network in-between 
-to contribute to latency.
-
-> The `threads` parameter is more or less constant, 
-> since it should be set to the same number of available physical cores.
-
 ### Structure
 
 ```js
@@ -160,54 +135,120 @@ await dyno(async function cycle() {
 
 > these parameters are user-configurable on test startup.
 
-## Custom timings
+## The process model
 
-[`performance.timerify`][timerify] & [`performance.measure`][measure], both
-native `User Timing APIs`, can be used to capture custom timings:
+The benchmarker runs everything in multiple, concurrently-running 
+*`threads`*.
+
+There's always:
+
+- a single `primary thread` 
+- a number of `task threads`, spawned & controlled by the primary.
+
+The `primary thread` spawns the benchmarked code, the `task`,
+in its own isolated `task thread`.
+
+The primary then starts issuing `cycles` to each task thread, 
+using [round-robin scheduling][rr] at a pre-configured cycle-per-second rate.   
+A cycle command simply tells a thread to execute it's code and report 
+it's duration.
+
+This is how it would look, if sketched out.
+
+> assume `fib()` is the code-under-test, a usual fibonacci function
 
 ```js
-// timing a recursive fibonacci function
+Primary (cycles sent: 100, cycles done: 93)
+├── Thread 1
+│   └── function fib(n) {
+│       ├── return n < 1 ? 0
+│       └── : n <= 2 ? 1 : fib(n - 1) + fib(n - 2)}
+├── Thread 2
+│   └── function fib(n) {
+│       ├── return n < 1 ? 0
+│       └── : n <= 2 ? 1 : fib(n - 1) + fib(n - 2)}
+└── Thread 3
+    └── function fib(n) {
+        ├── return n < 1 ? 0
+        └── : n <= 2 ? 1 : fib(n - 1) + fib(n - 2)}
+```
 
-import { dyno } from '@nicholaswmin/dyno'
+### The test
 
+Threads should execute their task faster than the time it takes for the next 
+cycle command to come through, otherwise they start accumulating 
+a `cycle backlog`.
+
+When that happens, the test stops; & the configured cycle rate is 
+deemed as the current *breaking point* of that code.
+
+As an example, a benchmark configured to 
+use `threads: 4` & `cyclesPerSecond: 4`, would need to have it's benchmarked 
+task execute in `< 1 second` to avoid accumulating a backlog. 
+
+## The measurements system
+
+Some values are recorded by default, while others can be self-recorded within 
+a task-thread.
+
+these are tracked by default:
+
+- task cycle timings,
+- issued cycles, 
+- *completed cycles* etc...
+
+You can use either [`performance.timerify`][timerify],
+or [`performance.measure`][measure] to record custom values.
+
+Every value is internally tracked as a `[Histogram][hgram]`, 
+so every recorded value has tracked `min`, `mean(avg)`, `max` properties.
+
+Each thread contains a single `HistogramsList` which groups the multiple 
+`Histograms` a thread is currently tracking.
+
+```js
+Primary:HistogramsList
+├── Histogram: cycless
+├── Histogram: uptime 
+├── Thread 1:HistogramsList
+│   ├── Histogram: cycle_duration
+│   ├── Histogram: event_loop_delay
+│   └── Histogram: custom-user-value
+└── Thread 2:HistogramsList
+    ├── Histogram: cycle_duration
+    ├── Histogram: event_loop_delay
+    └── Histogram: custom-user-value
+```
+
+The `HistogramsList` is passed over in the `onTick` argument at about ~30 FPS
+
+### Custom timings
+
+> example: `performance.timerify` is used to wrap a 
+> function named `fibonacci`, which automatically creates
+> a new `Histogram` with the same name.
+
+```js
 await dyno(async function cycle() { 
-
   performance.timerify(function fibonacci(n) {
     return n < 1 ? 0
       : n <= 2 ? 1
       : fibonacci(n - 1) + fibonacci(n - 2)
   })(30)
-
 }, {
-  parameters: { 
-    cyclesPerSecond: 20
-  },
-  
-  onTick: ({ tasks, snapshots }) => {    
-    // custom timings are set in both 
-    // `tasks` & `snapshots` as Histograms
-    console.clear()
-    console.table(tasks)
+  onTick: ({ means }) => {    
+    console.log(means)
   }
 })
+
+// logs 
+// { thread: '90353', cycle: 12, fibonacci: 8 },
+// { thread: '90354', cycle: 11, fibonacci: 8 },
+// { thread: '90355', cycle: 10, fibonacci: 9 },
+....
 ```
 
-which logs:
-
-```js
-timings (average, in ms)
-
-┌─────────┬───────────┬────────┬───────────┐
-│ thread  │ evt_loop  │ cycle  │ fibonacci │
-├─────────┼───────────┼────────┼───────────┤
-│ '46781' │ 10.47     │ 10.42  │ 9.01      │
-│ '46782' │ 10.51     │ 10.30  │ 9.14      │ 
-│ '46783' │ 10.68     │ 10.55  │ 9.18      │
-│ '46784' │ 10.47     │ 10.32  │ 9.09      │
-└─────────┴───────────┴────────┴───────────┘
-```
-
-## Plotting
+### Plotting timings
 
 The [`console.plot`][console-plot] module can be used to plot a *timeline*, 
 using the collected `snapshots`.
@@ -216,13 +257,15 @@ The following example benchmarks 2 `sleep` functions & plots their
 timings as an ASCII chart
 
 ```js
-// run: `npm i --no-save @nicholaswmin/console-plot`
+// plotting the timings
+// Requires: 
+// `npm i @nicholaswmin/console-plot --no-save`
 
 import { dyno } from '@nicholaswmin/dyno'
 import console from '@nicholaswmin/console-plot'
 
 await dyno(async function cycle() { 
-
+  
   // sleep one
   await performance.timerify(async function sleepTwo() {
     return new Promise(res => setTimeout(res, Math.random() * 20))
@@ -234,10 +277,15 @@ await dyno(async function cycle() {
   })()
 
 }, {
-  parameters: { cyclesPerSecond: 50, durationMs: 20 * 1000 },
+  parameters: { 
+    cyclesPerSecond: 50, 
+    durationMs: 20 * 1000
+  },
   
-  onTick: ({ snapshots }) => {   
+  onTick: ({ main, tasks, snapshots }) => {   
     console.clear()
+    console.table(main)
+    console.table(tasks)
     console.plot(snapshots, {
       title: 'Timings timeline',
       subtitle: 'average durations, in ms',
@@ -279,15 +327,15 @@ which logs:
 
 ## Gotchas
 
-### Avoiding self-forking
+### Avoid self-forking
 
-Single-file, self-contained (yet multithreaded) benchmarks suffer a 
+Single-file, self-contained, yet multithreaded benchmarks suffer a 
 caveat where any code that exists *outside* the `dyno` block 
 is *also* run in multiple threads, as if it were a task.
 
-The benchmarker is not affected by this - but it can create issues if you 
-need to run code after the `dyno()` resolves/ends,
-or when running it as a part of an automated test suite.
+The benchmarker is not affected by this, in fact it's designed around it,  
+however it can create issues if you need to run code after the `dyno()` 
+resolves/ends - or when running it as a part of an automated test suite.
 
 > In this example, `'done'` is logged `3` times instead of `1`: 
 
@@ -336,8 +384,7 @@ await dyno(async function cycle() {
 
 #### Using a task file
 
-Alternatively, the *task* function can be extracted into it's own file,
-like so:
+Alternatively, the *task* function can be extracted to it's own file.
 
 ```js
 // task.js
@@ -355,6 +402,7 @@ then referenced as a path in `benchmark.js`:
 
 ```js
 // benchmark.js
+
 import { join } from 'node:path'
 import { dyno } from '@nicholaswmin/dyno'
 
@@ -366,8 +414,7 @@ console.log('done')
 // 'done'
 ```
 
-> This is the preferred method to use when 
-> running as part of a test suite. 
+> This is the preferred method when running this as part of a test suite. 
 
 ## Tests
 
@@ -450,11 +497,16 @@ npm run examples:update
 [heroku]: https://heroku.com
 [rr]: https://en.wikipedia.org/wiki/Round-robin_scheduling
 [cp-fork]: https://nodejs.org/api/child_process.html#child_processforkmodulepath-args-options
+[opt-chain]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Optional_chaining
 [perf-api]: https://nodejs.org/api/perf_hooks.html#performance-measurement-apis
+[hgram]: https://en.wikipedia.org/wiki/Histogram
+[hgrams]: https://nodejs.org/api/perf_hooks.html#class-histogram
 [timerify]: https://nodejs.org/api/perf_hooks.html#performancetimerifyfn-options
 [measure]: https://nodejs.org/api/perf_hooks.html#class-performancemeasure
 [fib]: https://en.wikipedia.org/wiki/Fibonacci_sequence
 [v8]: https://v8.dev/
+
+[mean]: https://en.wikipedia.org/wiki/Mean
 
 <!--- Basic -->
 

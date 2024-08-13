@@ -1,3 +1,5 @@
+// Requires: 
+// `npm i @nicholaswmin/console-plot --no-save`
 
 import { dyno } from '{{entrypath}}'
 import console from '@nicholaswmin/console-plot'

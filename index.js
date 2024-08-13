@@ -49,7 +49,7 @@ const dyno = async (taskFn, {
         timer.setTimeout(parameters.durationMs, null, abortctrl)
       ])
     } finally {
-      await after(parameters, collector.stats)
+      await after(parameters, collector.histogramsLists)
 
       abortctrl.abort()
       uptimer.stop()
@@ -59,7 +59,7 @@ const dyno = async (taskFn, {
       await threadpool.disconnect(threads)
     }
   
-    return collector.stats
+    return collector.histogramsLists
   }
   
   return task(taskFn)

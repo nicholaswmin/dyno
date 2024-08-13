@@ -1,14 +1,17 @@
 import { createHistogram } from 'node:perf_hooks'
 import RingBuffer from '../ring-buffer/index.js'
 
-class ProcessStat {
-  constructor({ name, value }) {
+const round = num => (Math.round((num + Number.EPSILON) * 100) / 100) || 'n/a'
+
+class HistogramsList {
+  constructor({ pid, name, value }) {
+    this.pid = pid
     this.createTimeseriesHistogram({ name, value })
   }
   
   createTimeseriesHistogram({ name, value }) {
     Object.defineProperty(this, name, {
-      value: new TimeseriesHistogram({ initialValue: value }),
+      value: new TimeseriesHistogram({ name, initialValue: value }),
       configurable: false,
       enumerable: true,
       writable: false
@@ -46,8 +49,15 @@ class RecordableHistogram  {
 }
 
 class TimeseriesHistogram extends RecordableHistogram {
-  constructor({ initialValue = 1 }) {
+  constructor({ name, initialValue = 1 }) {
     super()
+    
+    Object.defineProperty(this, 'name', { 
+      value: name,
+      enumerable: true,
+      configurable: false, 
+      writable: true
+    })
 
     Object.defineProperty(this, 'last', { 
       value: 1,
@@ -80,4 +90,4 @@ class TimeseriesHistogram extends RecordableHistogram {
   }
 }
 
-export { ProcessStat }
+export default HistogramsList
