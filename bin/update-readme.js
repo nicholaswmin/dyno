@@ -11,7 +11,7 @@ await replaceTokensInFile({
     { target: 'benchmark.js', start: '// benchmark.js', end: '```' },
     { 
       target: 'timerified.js', 
-      start: '// timing a fibonacci fn', 
+      start: '// performance.timerify example', 
       end: '```' },
     { 
       target: 'plottable.js', 

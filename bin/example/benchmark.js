@@ -12,15 +12,14 @@ await dyno(async function cycle() {
 
   // </benchmarked-code>
 }, {
-  // test parameters
   parameters: { 
     cyclesPerSecond: 100, threads: 4, durationMs: 5 * 1000
   },
   
   // log live stats
-  onTick: ({ main, tasks }) => {    
+  onTick: ({ primary, threads }) => {    
     console.clear()
-    console.table(main)
-    console.table(tasks)
+    console.table(primary.toUnit('mean'))
+    console.table(threads.toUnit('mean'))
   }
 })

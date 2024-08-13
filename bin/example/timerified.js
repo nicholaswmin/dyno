@@ -14,11 +14,9 @@ await dyno(async function cycle() {
     cyclesPerSecond: 20
   },
   
-  onTick: ({ tasks, snapshots }) => {    
-    // custom timings are set 
-    // in both `tasks` & `snapshots` 
-
+  onTick: ({ primary, threads }) => {    
     console.clear()
-    console.table(tasks)
+    console.table(primary.toUnit('mean'))
+    console.table(threads.toUnit('mean'))
   }
 })

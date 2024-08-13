@@ -17,16 +17,15 @@ await dyno(async function cycle() {
   })()
 
 }, {
-  parameters: { 
-    cyclesPerSecond: 50, 
+  parameters: {
+    cyclesPerSecond: 50,
     durationMs: 20 * 1000
   },
-  
-  onTick: ({ main, tasks, snapshots }) => {   
+
+  onTick: ({ threads, primary }) => {
     console.clear()
-    console.table(main)
-    console.table(tasks)
-    console.plot(snapshots, {
+    console.table(threads.toUnit('mean'))
+    console.plot(threads.first()?.toSnapshotUnit('mean'), {
       title: 'Timings timeline',
       subtitle: 'average durations, in ms',
       height: 15,

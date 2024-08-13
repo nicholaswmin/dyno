@@ -41,16 +41,15 @@ await dyno(async function cycle() {
 
   // </benchmarked-code>
 }, {
-  // test parameters
   parameters: { 
     cyclesPerSecond: 100, threads: 4, durationMs: 5 * 1000
   },
   
   // log live stats
-  onTick: ({ main, tasks }) => {    
+  onTick: ({ primary, threads }) => {    
     console.clear()
-    console.table(main)
-    console.table(tasks)
+    console.table(primary.toUnit('mean'))
+    console.table(threads.toUnit('mean'))
   }
 })
 ```
@@ -136,26 +135,36 @@ await dyno(async function cycle() {
 
 ## The process model
 
-The benchmarker runs everything in multiple, concurrently-running 
-*`threads`*.
+Glosssary
 
-There's always:
+#### `primary thread`
 
-- a single `primary thread` 
-- a number of `task threads`, spawned & controlled by the primary.
+the main process.   
+It orchestrates the test by spawning and controlling a number of `task threads`.
 
-The `primary thread` spawns the benchmarked code, the `task`,
-in its own isolated `task thread`.
+#### `task threads`
 
-The primary then starts issuing `cycles` to each task thread, 
-using [round-robin scheduling][rr] at a pre-configured cycle-per-second rate.
+a process running in a separate, isolated thread.   
+Each has a copy of the benchmarked code.   
 
-A cycle command simply tells a thread to execute it's code and report 
-it's duration.
+Receives `cycle` commands from the primary, executes it's code 
+and reports back the `cycle` duration.
 
-This is how the process model would look, if sketched out.
+#### `cycle`
 
-> assume `fib()` is the code-under-test, a usual fibonacci function
+A command that tells a thread to execute it's code & report it's duration.
+
+#### `cycle per second`
+
+The rate at which the primary sends `cycle` commands to the `task threads`
+
+#### `cycle backlog`
+
+The number of issued `cycle` commands that have been issued/sent but not 
+executed yet.   
+
+This is how the model would look, if sketched out.  
+> assume `fib()` is the code-under-test
 
 ```js
 Primary 0: cycles issued: 100, finished: 93, backlog: 7
@@ -203,12 +212,6 @@ onTick: ({ primary, threads }) => {
   
 }
 ```
-
-Every value, default or custom, is tracked as a [Histogram][hgram], 
-so every recorded value has tracked `min`, `mean(avg)`, `max` properties.
-
-Some measurements are recorded by default, while others can be 
-self-recorded.
 
 ### `primary`  
 > contains primary stats about the test itself
@@ -264,6 +267,12 @@ Threads
         └── `min`, `mean`, `max` ...
 ```
 
+Every value, default or custom, is tracked as a [Histogram][hgram], 
+so every recorded value has tracked `min`, `mean(avg)`, `max` properties.
+
+Some measurements are recorded by default, while others can be 
+self-recorded.
+
 ### Custom timings
 
 > In the following example, `performance.timerify` is used to wrap a 
@@ -272,23 +281,29 @@ Threads
 > then records the timings values.
 
 ```js
+// performance.timerify example
+
+import { dyno } from '@nicholaswmin/dyno'
+
 await dyno(async function cycle() { 
+
   performance.timerify(function fibonacci(n) {
     return n < 1 ? 0
       : n <= 2 ? 1
       : fibonacci(n - 1) + fibonacci(n - 2)
   })(30)
+
 }, {
+  parameters: { 
+    cyclesPerSecond: 20
+  },
+  
   onTick: ({ primary, threads }) => {    
-    console.log(threads.first()?.toList())
+    console.clear()
+    console.table(primary.toUnit('mean'))
+    console.table(threads.toUnit('mean'))
   }
 })
-
-// logs 
-// { name: 'fibonacci', count: 4, min: 3, max: 7, mean: 4, snapshots: [] }
-// { name: 'cycle', count: 5, min: 4, max: 8, mean: 6, snapshots: [] }
-// ...
-....
 ```
 
 > There's no need to setup anything, like a `PerformanceObserver`, 
@@ -323,16 +338,15 @@ await dyno(async function cycle() {
   })()
 
 }, {
-  parameters: { 
-    cyclesPerSecond: 50, 
+  parameters: {
+    cyclesPerSecond: 50,
     durationMs: 20 * 1000
   },
-  
-  onTick: ({ main, tasks, snapshots }) => {   
+
+  onTick: ({ threads, primary }) => {
     console.clear()
-    console.table(main)
-    console.table(tasks)
-    console.plot(snapshots, {
+    console.table(threads.toUnit('mean'))
+    console.plot(threads.first()?.toSnapshotUnit('mean'), {
       title: 'Timings timeline',
       subtitle: 'average durations, in ms',
       height: 15,
