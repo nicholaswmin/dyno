@@ -203,11 +203,11 @@ task execute in `< 1 second` to avoid accumulating a backlog.
 
 ## The measurements system
 
-The benchmarker comes with a measurement system which aids in diagnosing
-bottlenecks.
+The benchmarker comes with a statistical measurement system  
+which aids in diagnosing bottlenecks.
 
-Some measurements are recorded by default; others can be recorded by
-the user within the task thread itself.
+Some measurements are recorded by default;   
+others can be recorded by the user within a task thread.
 
 Collected measurements are continuously provided as arguments   
 to the `onTick` callback.
@@ -335,12 +335,37 @@ await dyno(async function cycle() {
 // ....
 ```
 
+### Measurement extractor methods
+
+There's a couple of utilities for extracting measurements, however, 
+these are badly designed and only meant to help in creating 
+concise README examples.
+
+#### `threads.first()`
+
+return the first task thread.
+
+#### `threads.toUnit(unit)`
+
+reduce to a list of histogram names and one specific histogram `unit`. 
+
+i.e: `threads.toUnit('max')` returns a list of the max recorded durations 
+for all histograms, across all threads.  
+
+#### `primary.toUnit(unit)` 
+
+same as above but for the `primary`.
+
+#### `threads.toSnapshotUnit(unit)` 
+
+instead of a value, it returns the snapshots of values for that `unit`.
+
 ### Plotting timings
 
 The tracked histograms contain *snapshots* of their past values. 
 
-This allows plotting a timeline of the measurements, using the 
-[`console.plot`][console-plot] module.
+This allows plotting a timeline of the measurements, 
+using the [`console.plot`][console-plot] module.
 
 > The following example benchmarks 2 `sleep` functions 
 > & plots their timings as an ASCII chart
@@ -494,7 +519,8 @@ console.log('done')
 // 'done'
 ```
 
-> This is the preferred method when running this as part of a test suite. 
+> This should be the preferred method when running this as part 
+> of a test suite. 
 
 ## Tests
 
