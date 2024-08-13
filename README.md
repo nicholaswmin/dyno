@@ -12,6 +12,7 @@
 * [Plotting](#plotting)
 * [Gotchas](#gotchas)
   + [`onTick` returns `undefined`](#ontick-returning-undefined)
+  + [`missing custom measurements`](#missing-custom-measurements`)
   + [self-forking files](#avoiding-self-forking)
     - [Use hooks](#using-hooks)
     - [Use a task file](#using-a-task-file)
