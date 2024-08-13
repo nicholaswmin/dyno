@@ -141,29 +141,30 @@ await dyno(async function cycle() {
 
 #### `primary thread`
 
-the main process.   
-It orchestrates the test by spawning and controlling a number of `task threads`.
+The main process. Orchestrates the test and the spawned `task threads`.
 
-#### `task threads`
+#### `task thread`
 
-a process running in a separate, isolated thread, each having a copy of 
-the benchmarked code.   
+The benchmarked code, running in its own separate process.
 
-Receives `cycle` commands from the primary, executes it's code 
-and records its timings.
+Receives `cycle` commands from the primary, executes it's code and records 
+its timings.
 
 #### `cycle`
 
-A command that signals a `task thread` to execute it's code.   
-Issued by the `primary`.
+A command that signals a `task thread` to execute it's code. 
 
 #### `cycle rate`
 
 The rate at which the primary sends `cycle` commands to the `task threads`
 
+#### `cycle timing`
+
+Amount of time it takes a `task thread` to execute it's own code
+
 #### `cycle backlog`
 
-The number of issued `cycle` commands that have been issued/sent but not 
+Count of issued `cycle` commands that have been issued/sent but not 
 executed yet.   
 
 This is how the process model would look, if sketched out.  
@@ -193,15 +194,18 @@ Primary 0: cycles issued: 100, finished: 93, backlog: 7
 ### The test
 
 Task threads must execute their task faster than the time it takes for 
-the next  cycle command to come through, otherwise they start accumulating 
-a `cycle backlog`.
+the next cycle command to come through, otherwise they will 
+start accumulating a `cycle backlog`.
 
 When that happens, the test stops; & the configured `cycle rate` is 
 deemed as the current *breaking point* of that code.
 
-As an example, a benchmark configured to 
-use `threads: 4` & `cyclesPerSecond: 4`, would need to have it's benchmarked 
-task execute in `< 1 second` to avoid accumulating a backlog. 
+An example:
+
+> A benchmark configured to use `threads: 4` & `cyclesPerSecond: 4`. 
+
+Each `task thread` must execute its own code in `< 1 second` since this 
+is the rate at which it receives `cycle` commands.
 
 ## Measurements
 
@@ -572,6 +576,21 @@ console.log('done')
 > This should be the preferred method when running this as part 
 > of a test suite. 
 
+### Not a load-testing tool
+
+This is not a stress-testing tool.    
+Stress-tests are far more complex and require a near-perfect 
+replication of an actual production environment.
+
+This is a prototyping tool that helps testing whether some prototype idea is 
+worth proceeding with or if it has unworkable performance issues. 
+
+It's original purpose was for benchmarking a module prototype that 
+heavily interacts with `Redis`. 
+
+It's not meant for side-to-side benchmarking of synchronous code either,
+[Google's Tachometer][tachometer] might be a better fit there.
+
 ## Tests
 
 install deps:
@@ -663,7 +682,7 @@ npm run examples:update
 [v8]: https://v8.dev/
 [opt]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Optional_chaining
 [mean]: https://en.wikipedia.org/wiki/Mean
-
+[tachometer]: https://github.com/google/tachometer?tab=readme-ov-file
 <!--- Basic -->
 
 [console-plot]: https://github.com/nicholaswmin/console-plot
