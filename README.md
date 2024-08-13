@@ -144,17 +144,18 @@ It orchestrates the test by spawning and controlling a number of `task threads`.
 
 #### `task threads`
 
-a process running in a separate, isolated thread.   
-Each has a copy of the benchmarked code.   
+a process running in a separate, isolated thread, each having a copy of 
+the benchmarked code.   
 
 Receives `cycle` commands from the primary, executes it's code 
-and reports back the `cycle` duration.
+and records its timings.
 
 #### `cycle`
 
-A command that tells a thread to execute it's code & report it's duration.
+A command that signals a `task thread` to execute it's code.   
+Issued by the `primary`.
 
-#### `cycle per second`
+#### `cycle rate`
 
 The rate at which the primary sends `cycle` commands to the `task threads`
 
@@ -163,10 +164,11 @@ The rate at which the primary sends `cycle` commands to the `task threads`
 The number of issued `cycle` commands that have been issued/sent but not 
 executed yet.   
 
-This is how the model would look, if sketched out.  
-> assume `fib()` is the code-under-test
+This is how the process model would look, if sketched out.  
 
 ```js
+// assume `fib()` is the benchmarked code
+
 Primary 0: cycles issued: 100, finished: 93, backlog: 7
 │
 │
@@ -188,11 +190,11 @@ Primary 0: cycles issued: 100, finished: 93, backlog: 7
 
 ### The test
 
-Threads should execute their task faster than the time it takes for the next 
-cycle command to come through, otherwise they start accumulating 
+Task threads must execute their task faster than the time it takes for 
+the next  cycle command to come through, otherwise they start accumulating 
 a `cycle backlog`.
 
-When that happens, the test stops; & the configured cycle rate is 
+When that happens, the test stops; & the configured `cycle rate` is 
 deemed as the current *breaking point* of that code.
 
 As an example, a benchmark configured to 
@@ -204,20 +206,24 @@ task execute in `< 1 second` to avoid accumulating a backlog.
 The benchmarker comes with a flexible measurement system which can help
 in diagonsing bottlenecks. 
 
-The measurements are provided as arguments to the `onTick` callback.
+Some measurements are recorded by default; others can be recorded by
+the user, within the task thread itself.
+
+Collected measurements are continuously provided as arguments   
+to the `onTick` callback.
 
 ```js
 // ...
 onTick: ({ primary, threads }) => {    
-  
+  console.log('measurement updated!')
 }
 ```
 
 ### `primary`  
+
 > contains primary stats about the test itself
 
 By default, it records the following:
-
 
 | name        | description               |
 |-------------|---------------------------|
@@ -226,10 +232,11 @@ By default, it records the following:
 | `uptime`    | seconds since startup     |
 
 ### `threads`  
-> contains the `task threads` 
 
-> lists the task threads, with each thread having it's own 
-> list of histograms.
+> contains each `task thread`, with each having
+> it's own list of `Histograms`.
+
+> User-defined measurements will appear here.
 
 By default, it records the following:
 
@@ -239,7 +246,7 @@ By default, it records the following:
 | `evt_loop`         | event loop lag/timings    |
 | *anything custom*  | anything user-defined     |
 
-The measurements argument structure looks like so:
+The measurements data structure looks like this:
 
 ```js
 Primary
@@ -270,15 +277,33 @@ Threads
 Every value, default or custom, is tracked as a [Histogram][hgram], 
 so every recorded value has tracked `min`, `mean(avg)`, `max` properties.
 
+The most important histogram property is the `mean` since it tracks
+a denoised and normalised measurement of runtime durations.
+
 Some measurements are recorded by default, while others can be 
 self-recorded.
 
 ### Custom timings
 
-> In the following example, `performance.timerify` is used to wrap a 
-> function named `fibonacci`.  
-> This automatically creates a new `Histogram` with the same name 
-> then records the timings values.
+Custom measurements can be recorded with either:
+
+- [`performance.timerify`][timerify]
+- [`performanc.measure`][measure]
+
+both of them are native extensions of the [User Timing APIs][perf-api],
+available in Node.js since `v17`.
+
+They do not require any setup other than using them to record a value.
+
+The stats collector knows when a measurement is taken and automatically
+tracks it's value in a Histogram, which is then attached to it's 
+corresponding `task thread`.
+
+> In the following example, `performance.timerify` is used to 
+> instrument a function named `fibonacci`.  
+>
+> This automatically creates a new `Histogram` with the same name, 
+> & made available for logging via the `threads` property of `onTick`.
 
 ```js
 // performance.timerify example

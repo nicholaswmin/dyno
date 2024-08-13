@@ -14,9 +14,13 @@ await dyno(async function cycle() {
     cyclesPerSecond: 20
   },
   
-  onTick: ({ primary, threads }) => {    
-    console.clear()
-    console.table(primary.toUnit('mean'))
-    console.table(threads.toUnit('mean'))
+  onTick: ({ threads }) => {    
+    console.log(threads.first()?.toList())
   }
 })
+
+// logs 
+
+// { name: 'cycle', min: 6, max: 12, mean: 8, stddev: 2, snapshots: [...] },
+// { name: 'fibonacci', min: 3, max: 6, mean: 4, stddev: 1, snapshots: [...] },
+// ....

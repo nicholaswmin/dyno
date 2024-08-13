@@ -159,6 +159,7 @@ class TimeseriesHistogram extends RecordableHistogram {
   
   toJSON() {
     return {
+      ... { name: this.name },
       ... { last: this.last },
       ...super.toJSON()
     }
