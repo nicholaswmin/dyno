@@ -201,7 +201,7 @@ As an example, a benchmark configured to
 use `threads: 4` & `cyclesPerSecond: 4`, would need to have it's benchmarked 
 task execute in `< 1 second` to avoid accumulating a backlog. 
 
-## The measurements system
+## Measurements
 
 The benchmarker comes with a statistical measurement system  
 which aids in diagnosing bottlenecks.
@@ -229,12 +229,13 @@ By default, it records the following:
 |-------------|---------------------------|
 | `issued`    | count of issued cycles    |
 | `completed` | count of completed cycles |
-| `uptime`    | seconds since startup     |
+| `backlog`   | size of cycles backlog    |
+| `uptime`    | seconds since test start  |
 
 ### `threads`  
 
-> contains each `task thread`, with each having
-> it's own list of `Histograms`.
+> contains all `task threads`, 
+> each having it's own list of `Histograms`.
 
 > User-defined measurements will appear here.
 
@@ -244,7 +245,6 @@ By default, it records the following:
 |--------------------|---------------------------|
 | `cycles`           | cycle timings             |
 | `evt_loop`         | event loop lag/timings    |
-| *anything custom*  | anything user-defined     |
 
 The measurements data structure looks like this:
 
@@ -275,13 +275,11 @@ Threads
 ```
 
 Every value, default or custom, is tracked as a [Histogram][hgram], 
-so every recorded value has tracked `min`, `mean(avg)`, `max` properties.
+so every recorded value has tracked `min`, `mean(avg)`, `max` etc properties.
 
-The most important histogram property is the `mean` since it tracks
-a denoised and normalised measurement of runtime durations.
-
-Some measurements are recorded by default, while others can be 
-self-recorded.
+This is necessary because the [`statistical mean`][mean] is required to 
+make decent approximations about runtime performance, since it provides a 
+de-noised and normalised measurement of runtime performance.
 
 ### Custom timings
 
@@ -430,6 +428,56 @@ which logs:
 ```
 
 ## Gotchas
+
+### `onTick` callback crashes with `undefined`
+
+Threads and their histograms aren't synchronously available.  
+They spin up and become available as the runner spins up.
+
+Use [optional chaining][opt] to avoid `ReferenceError`s.
+
+change this:
+
+```js
+onTick: ({ threads }) => {    
+  console.log(threads.first().toList())
+}
+```
+
+to this:
+
+```js
+onTick: ({ threads }) => { 
+  console.log(threads.first()?.toList())
+}
+```
+
+### missing custom measurements
+
+Using anonymous lambdas/arrow functions means the stats collector 
+has no function name to use for the measurement.
+
+By their own definition, they are anonymous;
+
+Change this:
+
+```js
+const foo = () => {
+  // test code
+}
+
+performance.timerify(foo)()
+```
+
+to this:
+
+```js
+function foo() {
+  // test code
+}
+
+performance.timerify(foo)()
+```
 
 ### self-forking files
 
@@ -611,7 +659,7 @@ npm run examples:update
 [measure]: https://nodejs.org/api/perf_hooks.html#class-performancemeasure
 [fib]: https://en.wikipedia.org/wiki/Fibonacci_sequence
 [v8]: https://v8.dev/
-
+[opt]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Optional_chaining
 [mean]: https://en.wikipedia.org/wiki/Mean
 
 <!--- Basic -->
