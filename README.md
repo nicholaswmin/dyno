@@ -157,7 +157,8 @@ This is how it would look, if sketched out.
 > assume `fib()` is the code-under-test, a usual fibonacci function
 
 ```js
-Primary (cycles sent: 100, cycles done: 93)
+Primary 0: cycles issued: 100, finished: 93, backlog: 7
+│
 ├── Thread 1
 │   └── function fib(n) {
 │       ├── return n < 1 ? 0
