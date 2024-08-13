@@ -159,14 +159,17 @@ This is how it would look, if sketched out.
 ```js
 Primary 0: cycles issued: 100, finished: 93, backlog: 7
 │
+│
 ├── Thread 1
 │   └── function fib(n) {
 │       ├── return n < 1 ? 0
 │       └── : n <= 2 ? 1 : fib(n - 1) + fib(n - 2)}
+│
 ├── Thread 2
 │   └── function fib(n) {
 │       ├── return n < 1 ? 0
 │       └── : n <= 2 ? 1 : fib(n - 1) + fib(n - 2)}
+│
 └── Thread 3
     └── function fib(n) {
         ├── return n < 1 ? 0
