@@ -15,7 +15,7 @@ await replaceTokensInFile({
       end: '```' },
     { 
       target: 'plottable.js', 
-      start: 'plotting the timings', 
+      start: '// Requires: ', 
       end: '```' 
     }
   ]

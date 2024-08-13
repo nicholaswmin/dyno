@@ -11,9 +11,9 @@
 * [Measurements](#the-measurements-systems)
 * [Plotting](#plotting)
 * [Gotchas](#gotchas)
-  + [Avoiding self-forking](#avoiding-self-forking)
-    - [Using hooks](#using-hooks)
-    - [Using a task file](#using-a-task-file)
+  + [self-forking files](#avoiding-self-forking)
+    - [Use hooks](#using-hooks)
+    - [Use a task file](#using-a-task-file)
 * [Tests](#tests)
 * [Misc.](#misc)
 * [Authors](#authors)
@@ -203,11 +203,11 @@ task execute in `< 1 second` to avoid accumulating a backlog.
 
 ## The measurements system
 
-The benchmarker comes with a flexible measurement system which can help
-in diagonsing bottlenecks. 
+The benchmarker comes with a measurement system which aids in diagnosing
+bottlenecks.
 
 Some measurements are recorded by default; others can be recorded by
-the user, within the task thread itself.
+the user within the task thread itself.
 
 Collected measurements are continuously provided as arguments   
 to the `onTick` callback.
@@ -295,15 +295,15 @@ available in Node.js since `v17`.
 
 They do not require any setup other than using them to record a value.
 
-The stats collector knows when a measurement is taken and automatically
-tracks it's value in a Histogram, which is then attached to it's 
-corresponding `task thread`.
+The stats collector listens for usage of the above APIs and automatically 
+records the values in a Histogram, which is then attached to it's 
+corresponding `task thread`. 
+
+The histogram is made available for logging 
+via the `threads` property of `onTick`.
 
 > In the following example, `performance.timerify` is used to 
 > instrument a function named `fibonacci`.  
->
-> This automatically creates a new `Histogram` with the same name, 
-> & made available for logging via the `threads` property of `onTick`.
 
 ```js
 // performance.timerify example
@@ -323,27 +323,29 @@ await dyno(async function cycle() {
     cyclesPerSecond: 20
   },
   
-  onTick: ({ primary, threads }) => {    
-    console.clear()
-    console.table(primary.toUnit('mean'))
-    console.table(threads.toUnit('mean'))
+  onTick: ({ threads }) => {    
+    console.log(threads.first()?.toList())
   }
 })
-```
 
-> There's no need to setup anything, like a `PerformanceObserver`, 
-> for listening to `performance,timerify` updates. This is done internally.
+// logs 
+
+// { name: 'cycle', min: 6, max: 12, mean: 8, stddev: 2, snapshots: [...] },
+// { name: 'fibonacci', min: 3, max: 6, mean: 4, stddev: 1, snapshots: [...] },
+// ....
+```
 
 ### Plotting timings
 
-The [`console.plot`][console-plot] module can be used to plot a *timeline*, 
-using the collected `snapshots`.
+The tracked histograms contain *snapshots* of their past values. 
 
-The following example benchmarks 2 `sleep` functions & plots their 
-timings as an ASCII chart
+This allows plotting a timeline of the measurements, using the 
+[`console.plot`][console-plot] module.
+
+> The following example benchmarks 2 `sleep` functions 
+> & plots their timings as an ASCII chart
 
 ```js
-// plotting the timings
 // Requires: 
 // `npm i @nicholaswmin/console-plot --no-save`
 
@@ -351,7 +353,6 @@ import { dyno } from '@nicholaswmin/dyno'
 import console from '@nicholaswmin/console-plot'
 
 await dyno(async function cycle() { 
-  
   // sleep one
   await performance.timerify(async function sleepTwo() {
     return new Promise(res => setTimeout(res, Math.random() * 20))
@@ -361,21 +362,14 @@ await dyno(async function cycle() {
   await performance.timerify(async function sleepOne() {
     return new Promise(res => setTimeout(res, Math.random() * 20))
   })()
-
 }, {
-  parameters: {
-    cyclesPerSecond: 50,
-    durationMs: 20 * 1000
-  },
+  parameters: { cyclesPerSecond: 50, durationMs: 20 * 1000 },
 
-  onTick: ({ threads, primary }) => {
+  onTick: ({ threads }) => {
     console.clear()
-    console.table(threads.toUnit('mean'))
     console.plot(threads.first()?.toSnapshotUnit('mean'), {
-      title: 'Timings timeline',
-      subtitle: 'average durations, in ms',
-      height: 15,
-      width: 100
+      title: 'Timings timeline', subtitle: 'average durations, in ms',
+      height: 15, width: 100
     })
   }
 })
@@ -412,15 +406,16 @@ which logs:
 
 ## Gotchas
 
-### Avoid self-forking
+### self-forking files
 
 Single-file, self-contained, yet multithreaded benchmarks suffer a 
 caveat where any code that exists *outside* the `dyno` block 
 is *also* run in multiple threads, as if it were a task.
 
-The benchmarker is not affected by this, in fact it's designed around it,  
-however it can create issues if you need to run code after the `dyno()` 
-resolves/ends - or when running it as a part of an automated test suite.
+The benchmarker is not affected by this, in fact it's designed around it.
+
+However it can create issues if you need to run code after the `dyno()` 
+resolves/ends; or when running it as a part of an automated test suite.
 
 > In this example, `'done'` is logged `3` times instead of `1`: 
 
