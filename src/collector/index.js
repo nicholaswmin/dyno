@@ -9,6 +9,9 @@ class Collector {
   }
   
   start(threads, cb) {
+    this.#createStat(process)
+    Object.values(threads).forEach(this.#createStat.bind(this))
+
     this.bus.start()
     this.bus.listen(threads, stat => {
       return this.on ? (() => {
@@ -23,12 +26,11 @@ class Collector {
     this.bus.stop()
   }
   
-  #record({ pid, name, value }) {
-    if (!this.stats[pid])
-      return this.stats[pid] = new HistogramsList({ 
-        pid, name, value 
-      })
-    
+  #createStat({ pid }) {
+    this.stats[pid] = new HistogramsList({ pid: pid.toString() })
+  }
+  
+  #record({ pid, name, value }) {    
     if (!this.stats[pid][name])
       return this.stats[pid].createTimeseriesHistogram({ 
         name, value 

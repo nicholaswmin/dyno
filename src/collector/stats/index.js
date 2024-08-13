@@ -44,9 +44,8 @@ class Stats {
 }
 
 class HistogramsList {
-  constructor({ pid, name, value }) {
+  constructor({ pid }) {
     this.pid = pid
-    this.createTimeseriesHistogram({ name, value })
   }
   
   createTimeseriesHistogram({ name, value }) {
