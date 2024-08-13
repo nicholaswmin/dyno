@@ -215,8 +215,15 @@ which aids in diagnosing bottlenecks.
 Some measurements are recorded by default;   
 others can be recorded by the user within a task thread.
 
-Collected measurements are continuously provided as arguments   
-to the `onTick` callback.
+Every value, default or custom, is tracked as a [Histogram][hgram], 
+so every recorded value has tracked `min`, `mean(avg)`, `max` etc properties.
+
+This is necessary because only a [`statistical method`][nd] can
+shield your test results from uncontrollable environmental events that might
+skew your test results.
+
+Collected measurements are continuously provided as arguments to 
+the `onTick` callback.
 
 ```js
 // ...
@@ -279,13 +286,6 @@ Threads
     └── Histogram: custom-user-value
         └── `min`, `mean`, `max` ...
 ```
-
-Every value, default or custom, is tracked as a [Histogram][hgram], 
-so every recorded value has tracked `min`, `mean(avg)`, `max` etc properties.
-
-This is necessary because the [`statistical mean`][mean] is required to 
-make decent approximations about runtime performance, since it provides a 
-de-noised and normalised measurement of runtime performance.
 
 ### Custom timings
 
@@ -688,6 +688,7 @@ npm run examples:update
 [v8]: https://v8.dev/
 [opt]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Optional_chaining
 [mean]: https://en.wikipedia.org/wiki/Mean
+[nd]: https://en.wikipedia.org/wiki/Normal_distribution#Standard_normal_distribution
 [tachometer]: https://github.com/google/tachometer?tab=readme-ov-file
 <!--- Basic -->
 
