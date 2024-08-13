@@ -148,11 +148,12 @@ The `primary thread` spawns the benchmarked code, the `task`,
 in its own isolated `task thread`.
 
 The primary then starts issuing `cycles` to each task thread, 
-using [round-robin scheduling][rr] at a pre-configured cycle-per-second rate.   
+using [round-robin scheduling][rr] at a pre-configured cycle-per-second rate.
+
 A cycle command simply tells a thread to execute it's code and report 
 it's duration.
 
-This is how it would look, if sketched out.
+This is how the process model would look, if sketched out.
 
 > assume `fib()` is the code-under-test, a usual fibonacci function
 
