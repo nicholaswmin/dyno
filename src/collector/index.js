@@ -1,14 +1,11 @@
 import { Bus } from '../bus/index.js'
-import HistogramsList from './histograms-list/index.js'
-
-const round = num => (Math.round((num + Number.EPSILON) * 100) / 100) || 'n/a'
-const pid = process.pid.toString()
+import { Stats, HistogramsList } from './stats/index.js'
 
 class Collector {
   constructor() {
     this.on = true  
     this.bus = Bus()  
-    this.histogramsLists = {}
+    this.stats = new Stats()
   }
   
   start(threads, cb) {
@@ -16,7 +13,7 @@ class Collector {
     this.bus.listen(threads, stat => {
       return this.on ? (() => {
         this.#record(stat)
-        cb(Object.values(this.histogramsLists)) 
+        cb(this.stats) 
       })() : null
     })
   }
@@ -27,17 +24,17 @@ class Collector {
   }
   
   #record({ pid, name, value }) {
-    if (!this.histogramsLists[pid])
-      return this.histogramsLists[pid] = new HistogramsList({ 
+    if (!this.stats[pid])
+      return this.stats[pid] = new HistogramsList({ 
         pid, name, value 
       })
     
-    if (!this.histogramsLists[pid][name])
-      return this.histogramsLists[pid].createTimeseriesHistogram({ 
+    if (!this.stats[pid][name])
+      return this.stats[pid].createTimeseriesHistogram({ 
         name, value 
       })
 
-    this.histogramsLists[pid][name].record(value)
+    this.stats[pid][name].record(value)
   }
 }
 

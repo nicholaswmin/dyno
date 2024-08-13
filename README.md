@@ -118,9 +118,8 @@ await dyno(async function cycle() {
     // add test parameters
   },
   
-  onTick: ({ main, tasks, snapshots }) => {    
-    // log any of the provided timings, 
-    // or create custom ones (see below)
+  onTick: ({ primary, threads }) => {    
+    // build logging from the provided measurements
   }
 })
 ```
@@ -188,45 +187,72 @@ task execute in `< 1 second` to avoid accumulating a backlog.
 
 ## The measurements system
 
-Some values are recorded by default, while others can be self-recorded within 
-a task-thread.
+The benchmarker comes with a flexible measurement system which can help
+in diagonsing bottlenecks. 
 
-these are tracked by default:
-
-- task cycle timings,
-- issued cycles, 
-- *completed cycles* etc...
-
-You can use either [`performance.timerify`][timerify],
-or [`performance.measure`][measure] to record custom values.
-
-Every value is internally tracked as a `[Histogram][hgram]`, 
-so every recorded value has tracked `min`, `mean(avg)`, `max` properties.
-
-Each thread contains a single `HistogramsList` which groups the multiple 
-`Histograms` a thread is currently tracking.
+The measurements are provided as arguments to the `onTick` callback.
 
 ```js
-Primary:HistogramsList
-├── Histogram: cycless
-├── Histogram: uptime 
-├── Thread 1:HistogramsList
-│   ├── Histogram: cycle_duration
-│   ├── Histogram: event_loop_delay
-│   └── Histogram: custom-user-value
-└── Thread 2:HistogramsList
-    ├── Histogram: cycle_duration
-    ├── Histogram: event_loop_delay
-    └── Histogram: custom-user-value
+// ...
+onTick: ({ primary, threads }) => {    
+  
+}
 ```
 
-The `HistogramsList` is passed over in the `onTick` argument at about ~30 FPS
+Every value, default or custom, is tracked as a `[Histogram][hgram]`, 
+so every recorded value has tracked `min`, `mean(avg)`, `max` properties.
+
+Some measurements are recorded by default, while others can be 
+self-recorded.
+
+### `primary`
+> contains primary stats about the test itself
+
+| name        | description               |
+|-------------|---------------------------|
+| `issued`    | count of issued cycles    |
+| `completed` | count of completed cycles |
+| `uptime`    | seconds since startup     |
+
+### `threads`:
+> contains timing stats
+
+lists the task threads, with each thread having it's own 
+list of histograms.
+
+By default, the following measurements are included:
+
+| name             | description               |
+|------------------|---------------------------|
+| `cycles`         | cycle timings             |
+| `evt_loop`       | event loop lag/timings    |
+| anything custom  | anything user-defined     |
+
+The measurements data structure looks like so:
+
+```js
+Primary
+├── Thread 0: HistogramsList
+├── Histogram cycles issued
+└── Histogram cycles finished
+
+Threads
+├── Thread 1: HistogramsList
+│   ├── Histogram cycles
+│   ├── Histogram evt_loop
+│   └── Histogram ?
+│
+└── Thread 2: HistogramsList
+    ├── Histogram cycles
+    └── Histogram loop timings
+```
 
 ### Custom timings
 
-> example: `performance.timerify` is used to wrap a 
-> function named `fibonacci`, which automatically creates
-> a new `Histogram` with the same name.
+> In the following example, `performance.timerify` is used to wrap a 
+> function named `fibonacci`.  
+> This automatically creates a new `Histogram` with the same name 
+> then records the timings values.
 
 ```js
 await dyno(async function cycle() { 
@@ -236,17 +262,20 @@ await dyno(async function cycle() {
       : fibonacci(n - 1) + fibonacci(n - 2)
   })(30)
 }, {
-  onTick: ({ means }) => {    
-    console.log(means)
+  onTick: ({ primary, threads }) => {    
+    console.log(threads.first()?.toList())
   }
 })
 
 // logs 
-// { thread: '90353', cycle: 12, fibonacci: 8 },
-// { thread: '90354', cycle: 11, fibonacci: 8 },
-// { thread: '90355', cycle: 10, fibonacci: 9 },
+// { name: 'fibonacci', count: 4, min: 3, max: 7, mean: 4, snapshots: [] }
+// { name: 'cycle', count: 5, min: 4, max: 8, mean: 6, snapshots: [] }
+// ...
 ....
 ```
+
+> There's no need to setup anything, like a `PerformanceObserver`, 
+> for listening to `performance,timerify` updates. This is done internally.
 
 ### Plotting timings
 

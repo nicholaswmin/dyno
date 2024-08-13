@@ -59,7 +59,7 @@ const dyno = async (taskFn, {
       await threadpool.disconnect(threads)
     }
   
-    return collector.histogramsLists
+    return collector.stats
   }
   
   return task(taskFn)
