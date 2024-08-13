@@ -8,7 +8,7 @@
 * [Quickstart](#install)
   + [Parameters](#test-parameters)
 * [The Process Model](#the-process-model)
-* [Measurements](#the-measurements-systems)
+* [Measurements](#measurements)
 * [Plotting](#plotting)
 * [Gotchas](#gotchas)
   + [`onTick` returns `undefined`](#ontick-returning-undefined)
