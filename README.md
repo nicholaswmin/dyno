@@ -15,7 +15,7 @@
   + [`missing custom measurements`](#missing-custom-measurements`)
   + [self-forking files](#avoiding-self-forking)
     - [Use hooks](#using-hooks)
-    - [Use a task file](#using-a-task-file)
+    - [Use a task file](#fallback-to-using-a-task-file)
 * [Tests](#tests)
 * [Misc.](#misc)
 * [Authors](#authors)
@@ -487,14 +487,16 @@ performance.timerify(foo)()
 
 ### self-forking files
 
-Single-file, self-contained, yet multithreaded benchmarks suffer a 
-caveat where any code that exists *outside* the `dyno` block 
-is *also* run in multiple threads, as if it were a task.
+The benchmark file self-forks itself. 👀 
 
-The benchmarker is not affected by this, in fact it's designed around it.
+This means that any code that exists *outside* the `dyno` block will *also* 
+run in multiple threads.
 
-However it can create issues if you need to run code after the `dyno()` 
-resolves/ends; or when running it as a part of an automated test suite.
+This is a design tradeoff, made to provide the ability to create simple, 
+single-file benchmarks.
+
+This can create issues if you intent to run code after the `dyno()` 
+resolves/ends; or when running this as part of an automated test suite.
 
 > In this example, `'done'` is logged `3` times instead of `1`: 
 
@@ -541,7 +543,7 @@ await dyno(async function cycle() {
 // "after"
 ```
 
-#### Using a task file
+#### Fallback to using a task file
 
 Alternatively, the *task* function can be extracted to it's own file.
 
