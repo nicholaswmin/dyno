@@ -137,7 +137,7 @@ await dyno(async function cycle() {
 
 ## The process model
 
-Glosssary
+### Glosssary
 
 #### `primary thread`
 
