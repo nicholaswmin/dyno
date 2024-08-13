@@ -585,13 +585,17 @@ Stress-tests are far more complex and require a near-perfect
 replication of an actual production environment.
 
 This is a prototyping tool that helps testing whether some prototype idea is 
-worth proceeding with or if it has unworkable performance issues. 
+worth proceeding with or whether it has unworkable scalability issues. 
+
+It's multithreading nature is meant to mimic the execution model of 
+horizontally-scalable, shared-nothing, cloud-deployed parallel-services that 
+live behind a load balancer.
 
 It's original purpose was for benchmarking a module prototype that 
 heavily interacts with `Redis`. 
 
-It's not meant for side-to-side benchmarking of synchronous code either,
-[Google's Tachometer][tachometer] might be a better fit there.
+It's not meant for side-to-side benchmarking of synchronous code,
+[Google's Tachometer][tachometer] being a much better fit.
 
 ## Tests
 
