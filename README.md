@@ -200,14 +200,17 @@ onTick: ({ primary, threads }) => {
 }
 ```
 
-Every value, default or custom, is tracked as a `[Histogram][hgram]`, 
+Every value, default or custom, is tracked as a [Histogram][hgram], 
 so every recorded value has tracked `min`, `mean(avg)`, `max` properties.
 
 Some measurements are recorded by default, while others can be 
 self-recorded.
 
-### `primary`
+### `primary`  
 > contains primary stats about the test itself
+
+By default, it records the following:
+
 
 | name        | description               |
 |-------------|---------------------------|
@@ -215,37 +218,46 @@ self-recorded.
 | `completed` | count of completed cycles |
 | `uptime`    | seconds since startup     |
 
-### `threads`:
-> contains timing stats
+### `threads`  
+> contains the `task threads` 
 
-lists the task threads, with each thread having it's own 
-list of histograms.
+> lists the task threads, with each thread having it's own 
+> list of histograms.
 
-By default, the following measurements are included:
+By default, it records the following:
 
-| name             | description               |
-|------------------|---------------------------|
-| `cycles`         | cycle timings             |
-| `evt_loop`       | event loop lag/timings    |
-| anything custom  | anything user-defined     |
+| name               | description               |
+|--------------------|---------------------------|
+| `cycles`           | cycle timings             |
+| `evt_loop`         | event loop lag/timings    |
+| *anything custom*  | anything user-defined     |
 
-The measurements data structure looks like so:
+The measurements argument structure looks like so:
 
 ```js
 Primary
-├── Thread 0: HistogramsList
-├── Histogram cycles issued
-└── Histogram cycles finished
+├── Histogram: cycle stats
+│   └── `min`, `mean`, `max` ...
+└── Histogram: uptime 
+    └── `min`, `mean`, `max` ...
 
 Threads
-├── Thread 1: HistogramsList
-│   ├── Histogram cycles
-│   ├── Histogram evt_loop
-│   └── Histogram ?
 │
-└── Thread 2: HistogramsList
-    ├── Histogram cycles
-    └── Histogram loop timings
+├── Thread 1
+│   ├── Histogram: cycle
+│   │  └── `min`, `mean`, `max` ...
+│   ├── Histogram: evt_loop
+│   │  └── `min`, `mean`, `max` ...
+│   └── Histogram: custom-user-value
+│       └── `min`, `mean`, `max` ...
+│
+└── Thread 2
+    ├── Histogram: cycle
+    │   └── `min`, `mean`, `max` ...
+    ├── Histogram: evt_loop
+    │   └── `min`, `mean`, `max` ...
+    └── Histogram: custom-user-value
+        └── `min`, `mean`, `max` ...
 ```
 
 ### Custom timings
