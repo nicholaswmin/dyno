@@ -11,6 +11,7 @@
 * [Measurements](#the-measurements-systems)
 * [Plotting](#plotting)
 * [Gotchas](#gotchas)
+  + [`onTick` returns `undefined`](#ontick-returning-undefined)
   + [self-forking files](#avoiding-self-forking)
     - [Use hooks](#using-hooks)
     - [Use a task file](#using-a-task-file)
@@ -429,7 +430,7 @@ which logs:
 
 ## Gotchas
 
-### `onTick` callback crashes with `undefined`
+### `onTick` returning undefined
 
 Threads and their histograms aren't synchronously available.  
 They spin up and become available as the runner spins up.
