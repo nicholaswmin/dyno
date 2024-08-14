@@ -1,7 +1,8 @@
 import { Bus } from '../bus/index.js'
-import { MetricsGroup } from './metrics/index.js'
+import { MetricsGroup } from './classes/index.js'
+import { metric } from './emitter/index.js'
 
-class Collector {
+class MetricsCollector {
   constructor() {
     this.on = true  
     this.bus = Bus()  
@@ -45,4 +46,4 @@ class Collector {
   }
 }
 
-export default Collector
+export { MetricsCollector, metric }

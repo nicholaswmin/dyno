@@ -1,7 +1,7 @@
-import { Bus } from '../bus/index.js'
+import { Bus } from '../../bus/index.js'
 import Measurement from './measurement/index.js'
 
-const histogram = name => {
+const metric = name => {
   const bus = Bus()
   const record = ({ name, value }) => 
     bus.emit(new Measurement({ name, value }))
@@ -12,4 +12,4 @@ const histogram = name => {
   }
 }
 
-export default histogram
+export { metric }
