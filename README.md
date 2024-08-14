@@ -137,6 +137,28 @@ await dyno(async function cycle() {
 >
 > these parameters are user-configurable on test startup.
 
+
+## The test process
+
+The `primary` spawns the benchmarked code as `task threads`.
+
+Then, it starts issuing `cycle` commands to each one, in [round-robin][rr],
+at a set rate, for a set duration.
+
+The `task threads` must execute their tasks faster than the time it takes for 
+their next `cycle` command to come through, otherwise the test will start 
+accumulating a `cycle backlog`.
+
+When that happens, the test stops; the configured `cycle rate` is deemed as 
+the current *breaking point* of the benchmarked code.
+
+An example:
+
+> A benchmark configured to use `threads: 4` & `cyclesPerSecond: 4`. 
+
+Each `task thread` must execute its own code in `< 1 second` since this 
+is the rate at which it receives `cycle` commands.
+
 ## Glossary
 
 #### `primary`
@@ -196,27 +218,6 @@ Primary 0: cycles issued: 100, finished: 93, backlog: 7
         ├── return n < 1 ? 0
         └── : n <= 2 ? 1 : fib(n - 1) + fib(n - 2)}
 ```
-
-## The test process
-
-The `primary` spawns the benchmarked code as `task threads`.
-
-Then, it starts issuing `cycle` commands to each one, in [round-robin][rr],
-at a set rate, for a set duration.
-
-The `task threads` must execute their tasks faster than the time it takes for 
-their next `cycle` command to come through, otherwise the test will start 
-accumulating a `cycle backlog`.
-
-When that happens, the test stops; the configured `cycle rate` is deemed as 
-the current *breaking point* of the benchmarked code.
-
-An example:
-
-> A benchmark configured to use `threads: 4` & `cyclesPerSecond: 4`. 
-
-Each `task thread` must execute its own code in `< 1 second` since this 
-is the rate at which it receives `cycle` commands.
 
 ## Metrics
 
