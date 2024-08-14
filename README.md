@@ -223,7 +223,8 @@ This is necessary because only a [statistical method][nd] can shield the test
 results from uncontrollable environmental events. Otherwise each test 
 run would produce vastly different results.
 
-Collected metrics can be queried in the `onTick` callback.
+The metrics can be queried from the `log` function provided in the 
+`onTick` callback.
 
 ```js
 // ...
