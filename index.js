@@ -22,7 +22,7 @@ const dyno = async (taskFn, {
       disabled: ['test'].includes(process.env.NODE_ENV?.toLowerCase()),
       defaults: {
         cyclesPerSecond: 50,
-        durationMs: 5000,
+        durationMs: 5 * 1000,
         threads: os.availableParallelism()
       }
     })
