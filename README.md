@@ -270,16 +270,19 @@ these methods:
 
 #### `log.primary()`
 
-all metrics for the primary/main
+log all metrics of the primary/main. 
+
+> note: even though the primary records its values as a histogram, 
+> it doesn't actually record timings, only counts.
+> // @TODO fix, log timings
 
 #### `log.threads()`
 
-all metrics for the task threads
+log all metrics of all task threads
 
 #### `.pick()` 
 
-log a specific histogram unit for the chosen metrics,  
-instead of the entire histogram.
+log a specific unit instead of the entire histogram.
 
 ```js
 const averages = log().threads().pick('mean')
@@ -292,26 +295,26 @@ const maxes = log().primary().pick('snapshots')
 // log only the 'snapshots' of the primary
 ```
 
-> available: `'min'`, `'mean'`, `'max'`, `'stdev'`, `'snapshots'`, `'count'`
-
+> available: `min`, `mean`, `max`, `stdev`, `snapshots`, `count`, `last`
 
 #### `.of()` 
 
 Reduce a `pick`-ed array to a single value.    
-Only makes sense if it comes after `.pick('snapshots')`:
 
 ```js
 const snapshotsMax = log().primary().pick('snapshots').of('max')
 // logs a 1-D array of the last 50 'maxes' of the primary
 ```
 
+> note: only makes sense if it comes after `.pick('snapshots')`:
+
 #### `.metrics()`
 
-log only the specified metric
+log specific metric(s) 
 
 ```js
 const loopMetrics = log().threads().metrics('evt_loop').pick('max')
-// log only the 'max' event loop delay of threads
+// log only the 'max' event loop delay for each threads
 ```
 
 #### `.sortBy()`
@@ -323,6 +326,8 @@ const sorted = log().threads().pick('min').sort('cycle', 'desc')
 // sort results by descending min 'cycle' durations
 ```
 
+> available: `desc`, `asc`
+
 #### `.group()`
 
 return result as an object instead of an array
@@ -331,9 +336,9 @@ return result as an object instead of an array
 const obj = log().threads().pick('snapshots').of('mean').group()
 ```
 
-### Custom timings
+### Custom metrics
 
-Custom measurements can be recorded with either:
+Custom metrics can be recorded with either:
 
 - [`performance.timerify`][timerify]
 - [`performanc.measure`][measure]
@@ -341,7 +346,7 @@ Custom measurements can be recorded with either:
 both of them are native extensions of the [User Timing APIs][perf-api],
 available in Node.js since `v17`.
 
-They do not require any setup other than using them to record a value.
+They do not require any additional setup.
 
 The stats collector listens for usage of the above APIs and automatically 
 records the values in a Histogram, which is then attached to it's 
