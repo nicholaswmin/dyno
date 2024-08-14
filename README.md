@@ -355,7 +355,7 @@ Custom metrics can be recorded with either:
 - [`performance.timerify`][timerify]
 - [`performance.measure`][measure]
 
-both of them are native extensions of the [User Timing APIs][perf-api].
+both being native functions, of the [Performance Measurement APIs][perf-api].
 
 The benchmarker automatically records their timings and attaches the
 tracked `Metric` histogram to its corresponding `task thread`. 
@@ -721,7 +721,7 @@ npm run examples:update
 
 [heroku]: https://heroku.com
 [rr]: https://en.wikipedia.org/wiki/Round-robin_scheduling
-[perf-api]: https://w3c.github.io/perf-timing-primer/
+[perf-api]: https://nodejs.org/api/perf_hooks.html#performancemeasurename-startmarkoroptions-endmark
 [hgram]: https://en.wikipedia.org/wiki/Histogram
 [hgrams]: https://nodejs.org/api/perf_hooks.html#class-histogram
 [timerify]: https://nodejs.org/api/perf_hooks.html#performancetimerifyfn-options
