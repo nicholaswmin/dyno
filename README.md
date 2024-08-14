@@ -8,7 +8,7 @@
 * [quickstart](#install)
   + [parameters](#test-parameters)
 * [test process](#the-test-process)
-  - [process model](#the-process-model)
+  - [process model](#process-model)
   - [glossary](#glossary)
 * [metrics](#metrics)
   - [querying metrics](#querying-metrics)
@@ -161,7 +161,7 @@ An example:
 Each `task thread` must execute its own code in `< 1 second` since this 
 is the rate at which it receives `cycle` commands.
 
-## The process model
+### process model
 
 This is how the process model would look, if sketched out.  
 
