@@ -146,7 +146,7 @@ at a set `cycle rate`, for a set `test duration`.
 A cycle command causes a `task thread` to execute it's own `task`, 
 the benchmarked code and then report it's timing.
 
-The `task threads` must collectively execute their tasks faster than 
+The task threads must collectively execute their tasks faster than 
 the time it takes for their next `cycle` command to come through,
 otherwise the entire test will start accumulating a `cycle backlog`.
 
@@ -211,11 +211,7 @@ A signal, telling a `task thread` to execute it's task.
 
 The rate at which the primary sends `cycle` commands to the `task threads`
 
-#### `cycle timing`
-
-Amount of time it takes a `task thread` to execute it's own code
-
-#### `cycle backlog`
+#### `backlog`
 
 Count of issued `cycle` commands that have been issued/sent but not 
 executed yet.   
