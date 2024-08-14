@@ -349,13 +349,10 @@ Custom metrics can be recorded with either:
 - [`performanc.measure`][measure]
 
 both of them are native extensions of the [User Timing APIs][perf-api],
-available in Node.js since `v17`.
+available in Node.js since `v17` and do not require any setup.
 
-They do not require any additional setup.
-
-The stats collector listens for usage of the above APIs and automatically 
-records the values in a Histogram, which is then attached to it's 
-corresponding `task thread`. 
+The metrics collector detects when they are used and records their timings
+as a Histogram, which is then attached to it's corresponding `task thread`. 
 
 > In the following example, `performance.timerify` is used to 
 > instrument a function named `fibonacci`.  
