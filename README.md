@@ -105,7 +105,7 @@ Run it:
 node benchmark.js
 ``` 
 
-### Structure
+### Configuration
 
 ```js
 import { dyno } from '@nicholaswmin/dyno'
