@@ -242,7 +242,7 @@ onTick: logs => {
 
 log all metrics of the primary/main. 
 
-> **note:** most primary metrics are not *timing* metrics - they are *counters*, 
+> **note:** most primary metrics are not *timing* metrics; they are *counters*, 
 > so logging anything other than their `.count` property doesnt make any sense.
 
 
