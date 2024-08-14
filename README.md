@@ -355,7 +355,7 @@ Custom metrics can be recorded with either:
 - [`performance.timerify`][timerify]
 - [`performance.measure`][measure]
 
-both path of the native [Performance Measurement APIs][perf-api].
+both are part of the native [Performance Measurement APIs][perf-api].
 
 The benchmarker automatically records their timings and attaches the
 tracked `Metric` histogram to its corresponding `task thread`. 
