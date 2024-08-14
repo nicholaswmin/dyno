@@ -268,7 +268,7 @@ By default, it records the following:
 The `log` function provided in the `onTick` callback can be queried with
 these methods:
 
-#### `log.primary()`
+#### `.primary()`
 
 log all metrics of the primary/main. 
 
@@ -276,7 +276,7 @@ log all metrics of the primary/main.
 > it doesn't actually record timings, only counts.
 > // @TODO fix, log timings
 
-#### `log.threads()`
+#### `.threads()`
 
 log all metrics of all task threads
 
