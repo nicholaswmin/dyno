@@ -540,7 +540,7 @@ single-file benchmarks but it can create issues if you intent to run code
 after the `dyno()` resolves/ends; 
 or when running this as part of an automated test suite.
 
-> In this example, `'done'` is logged `3` times instead of `1`: 
+> **example**: `'done'` is logged `3` times instead of `1`: 
 
 ```js
 import { dyno } from '@nicholaswmin/dyno'
