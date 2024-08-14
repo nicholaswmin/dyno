@@ -124,13 +124,13 @@ await dyno(async function cycle() {
 
 ### Test parameters
 
-| name            	| type     	| default    | description                 	|
-|-----------------  |----------	|----------- |----------------------------- |
-| `cyclesPerSecond` | `Number` 	| `50`       | global cycle issue rate     	|
-| `durationMs`      | `Number` 	| `5000`     | how long the test should run |
-| `threads`         | `Number` 	| `auto` 	   | number of spawned threads    |
+| name            	| type     	| default    | description                     |
+|-----------------  |----------	|----------- |-------------------------------- |
+| `cyclesPerSecond` | `Number` 	| `50`       | cycle issue rate, per `second`  |
+| `durationMs`      | `Number` 	| `5000`     | total test duration, in `ms`    |
+| `threads`         | `Number` 	| `auto` 	   | number of spawned threads       |
 
-> `auto` means it detects the available cores but can be overriden
+> `auto`: attempts to prefill with count of available cores, can be overriden
 >
 > these parameters are user-configurable on test startup.
 
