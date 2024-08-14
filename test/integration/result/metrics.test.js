@@ -49,9 +49,10 @@ test('#onTick() metrics result', async t => {
       const metric = result[1].cycle, props = Object.keys(metric || {})
 
       t.assert.ok(props.includes('min'), 'metric has no "min"')
+      t.assert.ok(props.includes('mean'), 'metric has no "mean"')
       t.assert.ok(props.includes('max'), 'metric has no "max"')
       
-      t.assert.ok(metric.min > 0, 'metric.min is 0')
+      t.assert.ok(metric.mean > 0, 'metric.mean is 0')
       t.assert.ok(metric.max > 0, 'metric.max is 0')
     })
     
