@@ -393,6 +393,10 @@ await dyno(async function cycle() {
 // })
 ```
 
+> **note:** the metrics collector uses the *function name* as the metric name,
+> so it's best to avoid using arrow-functions. 
+> Read [this](#missing-custom-metrics) for more details.
+
 another example, this time using `perfomance.measure:`
 
 ```js
@@ -424,10 +428,6 @@ await dyno(async function cycle() {
 //  { cycle: 161.3, 'sleep': 131.2 }
 // })
 ```
-
-> **note:** the metrics collector uses the *function name* as the metric name,
-> so it's best to avoid using arrow-functions. 
-> Read [this](#missing-custom-metrics) for more details.
 
 ### Plotting
 
