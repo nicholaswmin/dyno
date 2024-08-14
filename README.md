@@ -602,7 +602,7 @@ horizontally-scalable, share-nothing services.
 It's original purpose was for benchmarking a module prototype that 
 heavily interacts with a data store over a network. 
 
-It's not meant for side-to-side benchmarking of synchronous code,
+It's not meant for side-by-side benchmarking of synchronous code,
 [Google's Tachometer][tachometer] being a much better fit.
 
 ## Tests
