@@ -146,7 +146,7 @@ at a set rate, for a set duration.
 A cycle command causes a `task thread` to execute it's own task, 
 the benchmarked code and then report it's timing.
 
-The `task threads` must (collectively) execute their tasks faster than 
+The `task threads` must collectively execute their tasks faster than 
 the time it takes for their next `cycle` command to come through,
 otherwise the entire test will start accumulating a `cycle backlog`.
 
