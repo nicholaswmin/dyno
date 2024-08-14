@@ -276,7 +276,7 @@ all metrics for the primary/main
 
 all metrics for the task threads
 
-#### `pick` 
+#### `.pick()` 
 
 log a specific histogram unit for the chosen metrics,  
 instead of the entire histogram.
@@ -295,7 +295,7 @@ const maxes = log().primary().pick('snapshots')
 > available: `'min'`, `'mean'`, `'max'`, `'stdev'`, `'snapshots'`, `'count'`
 
 
-#### `log.of()` 
+#### `.of()` 
 
 Reduce a `pick`-ed array to a single value.    
 Only makes sense if it comes after `.pick('snapshots')`:
@@ -305,7 +305,7 @@ const snapshotsMax = log().primary().pick('snapshots').of('max')
 // logs a 1-D array of the last 50 'maxes' of the primary
 ```
 
-#### `log.metrics()`
+#### `.metrics()`
 
 log only the specified metric
 
@@ -314,7 +314,7 @@ const loopMetrics = log().threads().metrics('evt_loop').pick('max')
 // log only the 'max' event loop delay of threads
 ```
 
-#### `log.sortBy()`
+#### `.sortBy()`
 
 sort by specific metric
 
@@ -323,7 +323,7 @@ const sorted = log().threads().pick('min').sort('cycle', 'desc')
 // sort results by descending min 'cycle' durations
 ```
 
-#### `log.group()`
+#### `.group()`
 
 return result as an object instead of an array
 
