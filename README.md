@@ -225,7 +225,7 @@ Some metrics are recorded by default; others can be recorded by the user
 within a task thread.
 
 Every recorded value is tracked as a `Metric`, represented as a 
-[histogram][hgram] with `min`, `mean`, `max` properties.
+[histogram][hgram] with statistically relevant properties.
 
 ### Histogram 
 
