@@ -357,7 +357,7 @@ The following metrics are collected by default:
 
 > any user-defined metrics will appear here.
 
-### Recording custom metrics
+## Recording custom metrics
 
 Custom metrics can be recorded with either:
 
