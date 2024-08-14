@@ -231,7 +231,6 @@ Metrics can be queried from the `log` function provided in the
 ```js
 // ...
 onTick: logs => {    
-  console.log('measurement updated!')
   console.log(log().primary()) // primary metrics
   console.log(log().threads()) // task thread metrics 
 }
