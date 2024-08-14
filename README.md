@@ -9,7 +9,7 @@
   + [Parameters](#test-parameters)
 * [The Process Model](#the-process-model)
 * [Metrics](#metrics)
-  - [Querying metrics](#metrics-querying)
+  - [Querying metrics](#querying-metrics)
   - [Custom metrics](#custom-metrics)
 * [Plotting](#plotting)
 * [Gotchas](#gotchas)
@@ -215,14 +215,14 @@ The benchmarker comes with a statistical measurement system.
 Some metrics are recorded by default;   
 others can be recorded by the user within a task thread.
 
-Every recorded value is tracked as a [Histogram][hgram], 
-therefore it has `min`, `mean(avg)`, `max` etc properties.
+Every recorded value is tracked as a `Metric` represented as 
+a [histogram][hgram], so it has `min`, `mean(avg)`, `max`  properties.
 
 This is necessary because only a [statistical method][nd] can shield the test 
-results from uncontrollable environmental events. Otherwise each test 
-run would produce vastly different results.
+results from uncontrollable environmental events.   
+Otherwise each test run would produce vastly different results.
 
-The metrics can be queried from the `log` function provided in the 
+Metrics can be queried from the `log` function provided in the 
 `onTick` callback.
 
 ```js
@@ -236,7 +236,7 @@ onTick: logs => {
 
 ### `primary`  
 
-> contains primary stats about the test itself
+> contains primary metrics
 
 By default, it records the following:
 
@@ -252,17 +252,17 @@ By default, it records the following:
 > contains all `task threads`, 
 > each having it's own list of `Histograms`.
 
-> User-defined measurements will appear here.
+> User-defined metrics will appear here.
 
 By default, it records the following:
 
 | name               | description         |
 |--------------------|---------------------|
 | `cycles`           | cycle timings       |
-| `evt_loop`         | event loop delay    |
+| `evt_loop`         | event loop timings  |
 
 
-### Measurement querying
+### Querying metrics
 
 The `log` function provided in the `onTick` callback can be queried with
 these methods:
