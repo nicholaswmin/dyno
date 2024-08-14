@@ -10,8 +10,12 @@ await replaceTokensInFile({
   tokens: [
     { target: 'benchmark.js', start: '// benchmark.js', end: '```' },
     { 
-      target: 'timerified.js', 
-      start: '// performance.timerify example', 
+      target: 'timerify.js', 
+      start: '// performance.timerify() example', 
+      end: '```' },
+    { 
+      target: 'measure.js', 
+      start: '// performance.measure() example', 
       end: '```' },
     { 
       target: 'plottable.js', 

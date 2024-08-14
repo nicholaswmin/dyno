@@ -362,7 +362,7 @@ histogram to its corresponding `task thread`.
 > **example:** log the average running time of a recursive `fibonacci`
 
 ```js
-// performance.timerify example
+// performance.timerify() example
 
 import { dyno } from '@nicholaswmin/dyno'
 
@@ -382,14 +382,46 @@ await dyno(async function cycle() {
   }
 })
 
-// logs 
-// ┌─────────┬───────────┐
-// │ cycle   │ fibonacci │
-// ├─────────┼───────────┤
-// │ 7       │ 7         │
-// │ 11      │ 5         │
-// │ 11      │ 5         │
-// └─────────┴───────────┘
+// Logs: 
+// 
+// MetricsList(4) [
+//  { cycle: 148.9, 'fibonacci': 101.4 },
+//  { cycle: 173.4, 'fibonacci': 135.2 },
+//  { cycle: 184.6, 'fibonacci': 145.8 },
+//  { cycle: 145.3, 'fibonacci': 121.9 }
+// })
+```
+
+another example, this time using `perfomance.measure:`
+
+```js
+// performance.measure() example
+
+import { dyno } from '@nicholaswmin/dyno'
+
+await dyno(async function cycle() { 
+  
+  performance.mark('start')
+  await new Promise(r => setTimeout(r, Math.random() * 500))
+  performance.mark('end')
+  performance.measure('sleep-timing', 'start', 'end')
+
+}, {
+  parameters: { cyclesPerSecond: 20 },
+  
+  onTick: list => {    
+    console.log(list().threads().metrics().pick('mean'))
+  }
+})
+
+// Logs: 
+// 
+// MetricsList(4) [
+//  { cycle: 155.1, 'fibonacci': 123.6 },
+//  { cycle: 146.2, 'fibonacci': 111.5 },
+//  { cycle: 153.6, 'fibonacci': 120.1 },
+//  { cycle: 161.3, 'fibonacci': 131.2 }
+// })
 ```
 
 > **note:** the metrics collector uses the *function name* as the metric name,
