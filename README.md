@@ -240,10 +240,8 @@ onTick: logs => {
 metrics of the primary/main.
 
 ```js
-const metrics = log().primary()
-
 // log the cycle backlog
-console.log(metrics.backlog)
+console.log(log().primary().backlog)
 ```
 
 > **note:** most primary metrics are not *timing* metrics; they are *counters*, 
@@ -254,10 +252,8 @@ console.log(metrics.backlog)
 metrics of the task threads
 
 ```js
-const metrics = log().threads()
-
 // log every metric of every task thread
-console.log(metrics)
+console.log(log().threads())
 ```
 
 #### `.pick()` 
@@ -265,13 +261,13 @@ console.log(metrics)
 get a specific unit, instead of entire histograms.
 
 ```js
-const averages = log().threads().pick('mean')
-// get only the 'mean'/average for each thread metric
+const avgs = log().threads().pick('mean')
+// get only the average for each thread metric
 
 const maxes = log().primary().pick('max')
 // get only the 'max' for each primary metric
 
-const maxes = log().primary().pick('snapshots')
+const snaps = log().primary().pick('snapshots')
 // get only the 'snapshots' of the primary
 ```
 
