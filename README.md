@@ -137,14 +137,18 @@ await dyno(async function cycle() {
 
 ## The test process
 
-The `primary` spawns the benchmarked code as `task threads`.
+The `primary` spawns the benchmarked code in separate, concurrently-running 
+threads.
 
 Then, it starts issuing `cycle` commands to each one, in [round-robin][rr],
 at a set rate, for a set duration.
 
-The `task threads` must execute their tasks faster than the time it takes for 
-their next `cycle` command to come through, otherwise the test will start 
-accumulating a `cycle backlog`.
+A cycle command causes a `task thread` to execute it's own task, 
+the benchmarked code and then report it's timing.
+
+The `task threads` must (collectively) execute their tasks faster than 
+the time it takes for their next `cycle` command to come through,
+otherwise the entire test will start accumulating a `cycle backlog`.
 
 When that happens, the test stops; the configured `cycle rate` is deemed as 
 the current *breaking point* of the benchmarked code.
