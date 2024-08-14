@@ -348,8 +348,7 @@ Custom metrics can be recorded with either:
 - [`performance.timerify`][timerify]
 - [`performanc.measure`][measure]
 
-both of them are native extensions of the [User Timing APIs][perf-api],
-available in Node.js since `v17` and do not require any setup.
+both of them are native extensions of the [User Timing APIs][perf-api].
 
 The metrics collector automatically records their timings as histograms, 
 which is then attached to it's corresponding `task thread`. 
