@@ -22,7 +22,7 @@
 
 ## Overview
 
-Loops a function, at a given *rate*, for a given *duration*, in `n`` threads.
+Loops a function, at a given *rate*, for a given *duration*, in `n` x threads.
 
 A test is deemed succesful if it ends without creating a *cycle backlog*.
 
