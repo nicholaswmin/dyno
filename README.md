@@ -26,7 +26,7 @@ Loops a *task* function, for a given *duration*, across multiple threads.
 
 A test is deemed succesful if it ends without creating a *cycle backlog*.
 
-> **example:** benchmark a recursive fibonacci function across 4 threads
+> **example:** benchmark a recursive `fibonacci` function
 
 ```js
 // benchmark.js
@@ -56,7 +56,7 @@ await dyno(async function cycle() {
 })
 ```
 
-run it: 
+run: 
 
 ```bash
 node benchmark.js
