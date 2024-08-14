@@ -342,8 +342,8 @@ Custom metrics can be recorded with either:
 
 both of them are native extensions of the [User Timing APIs][perf-api].
 
-The metrics collector automatically records their timings as histograms, 
-which are then attached to their corresponding `task thread`. 
+The metrics collector records their timings and attaches tracked `Metric` 
+histogram to its corresponding `task thread`. 
 
 > In the following example, `performance.timerify` is used to 
 > instrument a function named `fibonacci`.  
