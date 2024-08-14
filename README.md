@@ -309,7 +309,7 @@ list().primary().pick('snapshots').of('max')
 get specific metric(s) instead of all of them
 
 ```js
-const loopMetrics = list().threads().metrics('evt_loop', 'fibonacci')
+list().threads().metrics('evt_loop', 'fibonacci')
 // only the `evt_loop` and `fibonacci` metrics
 ```
 
@@ -318,8 +318,8 @@ const loopMetrics = list().threads().metrics('evt_loop', 'fibonacci')
 sort by specific metric
 
 ```js
-const sorted = list().threads().pick('min').sort('cycle', 'desc')
-// sort by descending min 'cycle' durations
+list().threads().pick('min').sort('cycle', 'desc')
+// sort by descending 'cycle' min timing
 ```
 
 > `direction` can be: `asc`, `desc`
