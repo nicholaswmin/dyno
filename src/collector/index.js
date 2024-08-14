@@ -1,22 +1,23 @@
 import { Bus } from '../bus/index.js'
-import { Stats, HistogramsList } from './stats/index.js'
+import { MetricsGroup } from './metrics/index.js'
 
 class Collector {
   constructor() {
     this.on = true  
     this.bus = Bus()  
-    this.stats = new Stats()
+    this.metricsGroup = new MetricsGroup()
   }
   
   start(threads, cb) {
-    this.#createStat(process)
-    Object.values(threads).forEach(this.#createStat.bind(this))
+    this.#createTrackedMetricsForThread(process)
+    Object.values(threads)
+      .forEach(this.#createTrackedMetricsForThread.bind(this))
 
     this.bus.start()
-    this.bus.listen(threads, stat => {
+    this.bus.listen(threads, metric => {
       return this.on ? (() => {
-        this.#record(stat)
-        cb(this.stats) 
+        this.#record(metric)
+        cb(this.metricsGroup.log.bind(this.metricsGroup)) 
       })() : null
     })
   }
@@ -26,17 +27,21 @@ class Collector {
     this.bus.stop()
   }
   
-  #createStat({ pid }) {
-    this.stats[pid] = new HistogramsList({ pid: pid.toString() })
+  result() {
+    return this.metricsGroup
   }
   
-  #record({ pid, name, value }) {    
-    if (!this.stats[pid][name])
-      return this.stats[pid].createTimeseriesHistogram({ 
-        name, value 
-      })
+  #createTrackedMetricsForThread({ pid }) {
+    this.metricsGroup.trackMetricsForThread({ pid })
+  }
+  
+  #record({ pid, name, value }) {
+    const metrics = this.metricsGroup.getMetricsOfThread({ pid })
+    const metric = metrics.getMetric({ name })
 
-    this.stats[pid][name].record(value)
+    return metric 
+      ? metric.record(value)
+      : metrics.addMetric({ pid, name, value })
   }
 }
 

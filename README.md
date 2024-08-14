@@ -8,7 +8,9 @@
 * [Quickstart](#install)
   + [Parameters](#test-parameters)
 * [The Process Model](#the-process-model)
-* [Measurements](#measurements)
+* [Metrics](#metrics)
+  - [Querying metrics](#metrics-querying)
+  - [Custom metrics](#custom-metrics)
 * [Plotting](#plotting)
 * [Gotchas](#gotchas)
   + [`onTick` returns `undefined`](#ontick-returning-undefined)
@@ -48,10 +50,10 @@ await dyno(async function cycle() {
   },
   
   // log live stats
-  onTick: ({ primary, threads }) => {    
+  onTick: log => {    
     console.clear()
-    console.table(primary.toUnit('mean'))
-    console.table(threads.toUnit('mean'))
+    console.table(log().primary().pick('count'))
+    console.table(log().threads().pick('mean'))
   }
 })
 ```
@@ -207,12 +209,12 @@ An example:
 Each `task thread` must execute its own code in `< 1 second` since this 
 is the rate at which it receives `cycle` commands.
 
-## Measurements
+## Metrics
 
 The benchmarker comes with a statistical measurement system  
 which aids in diagnosing bottlenecks.
 
-Some measurements are recorded by default;   
+Some metrics are recorded by default;   
 others can be recorded by the user within a task thread.
 
 Every value, default or custom, is tracked as a [Histogram][hgram], 
@@ -222,13 +224,14 @@ This is necessary because only a [`statistical method`][nd] can
 shield your test results from uncontrollable environmental events that might
 skew your test results.
 
-Collected measurements are continuously provided as arguments to 
-the `onTick` callback.
+Collected metrics can be queried in the `onTick` callback.
 
 ```js
 // ...
-onTick: ({ primary, threads }) => {    
+onTick: logs => {    
   console.log('measurement updated!')
+  console.log(log().primary()) // primary metrics
+ console.log(log().threads()) // task thread metrics 
 }
 ```
 
@@ -254,37 +257,78 @@ By default, it records the following:
 
 By default, it records the following:
 
-| name               | description               |
-|--------------------|---------------------------|
-| `cycles`           | cycle timings             |
-| `evt_loop`         | event loop lag/timings    |
+| name               | description         |
+|--------------------|---------------------|
+| `cycles`           | cycle timings       |
+| `evt_loop`         | event loop delay    |
 
-The measurements data structure looks like this:
+
+### Measurement querying
+
+The `log` function provided in the `onTick` callback can be queried with
+these methods:
+
+#### `log.primary()`
+
+all metrics for the primary/main
+
+#### `log.threads()`
+
+all metrics for the task threads
+
+#### `pick` 
+
+log a specific histogram unit for the chosen metrics,  
+instead of the entire histogram.
 
 ```js
-Primary
-├── Histogram: cycle stats
-│   └── `min`, `mean`, `max` ...
-└── Histogram: uptime 
-    └── `min`, `mean`, `max` ...
+const averages = log().threads().pick('mean')
+// log only the 'mean'/average for each thread metric
 
-Threads
-│
-├── Thread 1
-│   ├── Histogram: cycle
-│   │  └── `min`, `mean`, `max` ...
-│   ├── Histogram: evt_loop
-│   │  └── `min`, `mean`, `max` ...
-│   └── Histogram: custom-user-value
-│       └── `min`, `mean`, `max` ...
-│
-└── Thread 2
-    ├── Histogram: cycle
-    │   └── `min`, `mean`, `max` ...
-    ├── Histogram: evt_loop
-    │   └── `min`, `mean`, `max` ...
-    └── Histogram: custom-user-value
-        └── `min`, `mean`, `max` ...
+const maxes = log().primary().pick('max')
+// log only the 'max' for each primary metric
+
+const maxes = log().primary().pick('snapshots')
+// log only the 'snapshots' of the primary
+```
+
+> available: `'min'`, `'mean'`, `'max'`, `'stdev'`, `'snapshots'`, `'count'`
+
+
+#### `log.of()` 
+
+Reduce a `pick`-ed array to a single value.    
+Only makes sense if it comes after `.pick('snapshots')`:
+
+```js
+const snapshotsMax = log().primary().pick('snapshots').of('max')
+// logs a 1-D array of the last 50 'maxes' of the primary
+```
+
+#### `log.metrics()`
+
+log only the specified metric
+
+```js
+const loopMetrics = log().threads().metrics('evt_loop').pick('max')
+// log only the 'max' event loop delay of threads
+```
+
+#### `log.sortBy()`
+
+sort by specific metric
+
+```js
+const sorted = log().threads().pick('min').sort('cycle', 'desc')
+// sort results by descending min 'cycle' durations
+```
+
+#### `log.group()`
+
+return result as an object instead of an array
+
+```js
+const obj = log().threads().pick('snapshots').of('mean').group()
 ```
 
 ### Custom timings
@@ -302,9 +346,6 @@ They do not require any setup other than using them to record a value.
 The stats collector listens for usage of the above APIs and automatically 
 records the values in a Histogram, which is then attached to it's 
 corresponding `task thread`. 
-
-The histogram is made available for logging 
-via the `threads` property of `onTick`.
 
 > In the following example, `performance.timerify` is used to 
 > instrument a function named `fibonacci`.  
@@ -327,44 +368,22 @@ await dyno(async function cycle() {
     cyclesPerSecond: 20
   },
   
-  onTick: ({ threads }) => {    
-    console.log(threads.first()?.toList())
+  onTick: log => {    
+    console.log(log().threads().metrics())
   }
 })
 
 // logs 
-
-// { name: 'cycle', min: 6, max: 12, mean: 8, stddev: 2, snapshots: [...] },
-// { name: 'fibonacci', min: 3, max: 6, mean: 4, stddev: 1, snapshots: [...] },
-// ....
+// ┌─────────┬───────────┐
+// │ cycle   │ fibonacci │
+// ├─────────┼───────────┤
+// │ 7       │ 7         │
+// │ 11      │ 5         │
+// │ 11      │ 5         │
+// └─────────┴───────────┘
 ```
 
-### Measurement extractor methods
-
-There's a couple of utilities for extracting measurements, however, 
-these are badly designed and only meant to help in creating 
-concise README examples.
-
-#### `threads.first()`
-
-return the first task thread.
-
-#### `threads.toUnit(unit)`
-
-reduce to a list of histogram names and one specific histogram `unit`. 
-
-i.e: `threads.toUnit('max')` returns a list of the max recorded durations 
-for all histograms, across all threads.  
-
-#### `primary.toUnit(unit)` 
-
-same as above but for the `primary`.
-
-#### `threads.toSnapshotUnit(unit)` 
-
-instead of a value, it returns the snapshots of values for that `unit`.
-
-### Plotting timings
+### Plotting
 
 The tracked histograms contain *snapshots* of their past values. 
 
@@ -382,23 +401,22 @@ import { dyno } from '@nicholaswmin/dyno'
 import console from '@nicholaswmin/console-plot'
 
 await dyno(async function cycle() { 
-  // sleep one
-  await performance.timerify(async function sleepTwo() {
-    return new Promise(res => setTimeout(res, Math.random() * 20))
-  })()
-  
-  // sleep two
-  await performance.timerify(async function sleepOne() {
-    return new Promise(res => setTimeout(res, Math.random() * 20))
-  })()
-}, {
-  parameters: { cyclesPerSecond: 50, durationMs: 20 * 1000 },
 
-  onTick: ({ threads }) => {
+  await performance.timerify(function sleepRandom1(ms) {
+    return new Promise(r => setTimeout(r, Math.random() * ms))
+  })(Math.random() * 20)
+  
+  await performance.timerify(function sleepRandom2(ms) {
+    return new Promise(r => setTimeout(r, Math.random() * ms))
+  })(Math.random() * 20)
+  
+}, {
+  parameters: { cyclesPerSecond: 15, durationMs: 20 * 1000 },
+  onTick: log => {  
     console.clear()
-    console.plot(threads.first()?.toSnapshotUnit('mean'), {
-      title: 'Timings timeline', subtitle: 'average durations, in ms',
-      height: 15, width: 100
+    console.plot(log().threads().pick('snapshots').of('mean').group(), {
+      title: 'Plot',
+      subtitle: 'mean durations (ms)'
     })
   }
 })
@@ -407,30 +425,32 @@ await dyno(async function cycle() {
 which logs: 
 
 ```js
-  Timings timeline
 
-  -- cycle  -- sleepOne  -- sleepTwo
+Plot
 
-  21.57 ┤     ╭╮                                                                     
-  20.33 ┤  ╭──╯╰─────╮                                                               
-  19.09 ┤ ╭╯         ╰──╮ ╭╮╭──╮╭──╮         ╭╮╭───╮╭────────────────────────── 
-  17.86 ┤ │             ╰─╯╰╯  ╰╯  ╰─────────╯╰╯   ╰╯                                
-  16.62 ┤ │                                                                          
-  15.38 ┤ │                                                                          
-  14.14 ┤ │                                                                          
-  12.90 ┤ │╭╮ ╭╮╭╮╭──╮                                                               
-  11.67 ┤╭╯│╰─╯╰╯╰╯  ╰─╮                                     ╭╮                      
-  10.43 ┤│╭╯╭╮╭╮       ╰───╮╭─────╮        ╭─────────────────╯╰────────────────
-   9.19 ┤││││╰╯╰╮╭───╮╭────╰╯─────╰──────────────────────────────────────────── 
-   7.95 ┼╯│╰╯   ╰╯   ╰╯                                                              
-   6.71 ┤││                                                                          
-   5.48 ┼─╯                                                                          
-   4.24 ┤│                                                                           
-   3.00 ┼╯                                                                           
+-- sleepRandom1  -- cycle  -- sleepRandom2  -- evt_loop
 
-  average durations, in ms
-  
-  last: 100 items
+11.75 ┤╭╮                                                                                                   
+11.28 ┼─────────────────────────────────────────────────────────────────────╮                               
+10.82 ┤│╰───╮    ╭╯ ╰╮   │╰╮  ╭─────────╯╰──────────╮ ╭─────────────────╯   ╰───────────╮╭─╮    ╭────────── 
+10.35 ┼╯    ╰╮╭╮╭╯   ╰───╯ ╰──╯                     ╰─╯                                 ╰╯ ╰────╯           
+ 9.88 ┤      ╰╯╰╯                                                                                           
+ 9.42 ┤                                                                                                     
+ 8.95 ┤                                                                                                     
+ 8.49 ┤                                                                                                     
+ 8.02 ┤                                                                                                     
+ 7.55 ┤                                                                                                     
+ 7.09 ┤╭╮                                                                                                   
+ 6.62 ┼╯╰───╮    ╭─────────╮   ╭──╮                                                                         
+ 6.16 ┤     ╰╮╭──╯         ╰───╯  ╰───────────────────────╮       ╭─────────────────────╮╭───╮   ╭───────── 
+ 5.69 ┤╭╮    ╰╯                                        ╭───────────╮  ╭╮╭──────╮        ╰╯   ╰──╭╮╭─╮╭───── 
+ 5.22 ┤│╰╮╭─╮   ╭──╮     ╭───╮╭─╮ ╭────────────────────╯           ╰──╯╰╯      ╰────────────────╯╰╯ ╰╯      
+ 4.76 ┤│ ╰╯ ╰───╯  ╰─────╯   ╰╯ ╰─╯                                                                         
+ 4.29 ┼╯                                                                                                    
+
+mean durations (ms)
+
+- last: 100 items
 ```
 
 ## Gotchas

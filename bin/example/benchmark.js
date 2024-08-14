@@ -17,9 +17,9 @@ await dyno(async function cycle() {
   },
   
   // log live stats
-  onTick: ({ primary, threads }) => {    
+  onTick: log => {    
     console.clear()
-    console.table(primary.toUnit('mean'))
-    console.table(threads.toUnit('mean'))
+    console.table(log().primary().pick('count'))
+    console.table(log().threads().pick('mean'))
   }
 })
