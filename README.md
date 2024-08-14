@@ -243,7 +243,7 @@ metrics of the primary/main.
 console.log(log().primary())
 ```
 
-> **note:** most primary metrics are not *timing* metrics; they are *counters*, 
+> **note:** most primary metrics are not *timings*; they are *counters*, 
 > so logging anything other than their `.count` property doesnt make any sense.
 
 #### `.threads()`
