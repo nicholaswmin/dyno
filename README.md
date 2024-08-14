@@ -228,8 +228,8 @@ a statistical method is the only way one can get
 would produce wildly inconsistent timings.
 
 The measurement system is based on a `Metric` type, which is a 
-[histogram][hgram]  of a recorded *value*, as it's being repeatedly 
-recorded over time.
+[histogram][hgram]  of a recorded *value*, calculated as the value is 
+being repeatedly recorded over time.
 
 Both the primary and each task thread record their own metrics.   
 Some metrics are provided by default; others can be recorded by the user 
