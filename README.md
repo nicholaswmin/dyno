@@ -237,7 +237,7 @@ as part of the benchmarked code.
 
 ### Metric structure 
 
-A `Metric` is represented as a histogram with the following properties:
+`Metric` properties:
 
 | name        | description                                 |
 |-------------|---------------------------------------------|
@@ -249,7 +249,9 @@ A `Metric` is represented as a histogram with the following properties:
 | `last`      | last value                                  |
 | `snapshots` | last 50 states                              |
 
-> **note:** timing metrics are collected in *milliseconds*. 
+> **note:** timing metrics are collected in *milliseconds*.   
+> **note:** each time a value is recorded, a snapshot of the current state 
+> of the metric is captured & saved in it's `snapshots` property. 
 
 ### Querying metrics
 
