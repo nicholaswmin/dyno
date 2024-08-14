@@ -114,6 +114,7 @@ import { dyno } from '@nicholaswmin/dyno'
 await dyno(async function cycle() { 
 
   // add benchmarked task
+  // code in this block runs in its own thread
 
 }, {
   parameters: { 
