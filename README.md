@@ -242,9 +242,8 @@ onTick: logs => {
 
 log all metrics of the primary/main. 
 
-> **note:** Some primary metrics such as `primary.backlog` are not duration 
-> metrics - they are counters, so logging anything other than 
-> their `.count` property doesnt make any sense.
+> **note:** most primary metrics are not *timing* metrics - they are *counters*, 
+> so logging anything other than their `.count` property doesnt make any sense.
 
 
 #### `.threads()`
