@@ -191,7 +191,7 @@ Primary 0: cycles issued: 100, finished: 93, backlog: 7
         └── : n <= 2 ? 1 : fib(n - 1) + fib(n - 2)}
 ```
 
-### The test process
+## The test process
 
 The `primary` spawns the benchmarked code as `task threads`.
 
