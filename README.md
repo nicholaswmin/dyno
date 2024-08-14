@@ -471,8 +471,8 @@ mean durations (ms)
 
 ### Missing custom metrics
 
-Using lambdas/arrow functions means the metrics collector has no function 
-name to use for the metric. By their own definition, they are anonymous.
+Using anonymous lambdas means the metrics collector has no function name to
+as a metric name. By their own definition, they are anonymous.
 
 Change this:
 
