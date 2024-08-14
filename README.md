@@ -245,7 +245,7 @@ as part of the benchmarked code.
 | `max`       | maximum value                               |
 | `stddev`    | [standard deviation][stdev] between values  |
 | `last`      | last value                                  |
-| `snapshots` | last 50 states                              |
+| `snapshots` | past states                    mm           |
 
 > **note:** timing metrics are collected in *milliseconds*.   
 > **note:** each time a value is recorded, a snapshot of the current state 
@@ -440,7 +440,7 @@ await dyno(async function cycle() {
 
 ### Plotting
 
-Each metric contains up to 50 *snapshots* of its past states.
+Each metric contains *snapshots* of its past states.
 
 This allows plotting them as a *timeline*, using the 
 [`console.plot`][console-plot] module.
