@@ -7,7 +7,7 @@
 * [overview](#overview)
 * [quickstart](#install)
   + [parameters](#test-parameters)
-* [the Process Model](#the-process-model)
+* [the process model](#the-process-model)
 * [metrics](#metrics)
   - [querying metrics](#querying-metrics)
   - [default metrics](#default-metrics)
