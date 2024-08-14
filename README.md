@@ -342,7 +342,7 @@ Custom metrics can be recorded with either:
 
 both of them are native extensions of the [User Timing APIs][perf-api].
 
-The metrics collector records their timings and attaches tracked `Metric` 
+The metrics collector records their timings and attaches the tracked `Metric` 
 histogram to its corresponding `task thread`. 
 
 > In the following example, `performance.timerify` is used to 
