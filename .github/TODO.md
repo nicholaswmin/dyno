@@ -37,7 +37,7 @@
 
 ## refactor 
 
-- [ ] `histogram` emitter should always log in `ms`. 
+- [x] `histogram` emitter should always log in `ms`. 
       Ditch `eloop` etc matchings in `collector` for specifying which props 
       need `ns` -> `ms` conversions.
 - [x] `dyno` hooks before/after are unnecessary, ditch them.
@@ -70,8 +70,7 @@
 ## docs
 
 - [x] document the "running using a taskfile" case
-- [ ] document the `onTick` callback arguments `main` & `tasks`s
-- [ ] document the `test` arguments`, inc. their defaults
+- [x] document the `test` arguments`, inc. their defaults
 - [x] document any `before/after` hooks
 - [x] fix `npx init` docs after publishing
 - [x] Check if possible to DRY up example code via an `npx` script. 
