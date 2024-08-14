@@ -216,8 +216,8 @@ The benchmarker comes with a statistical measurement system.
 Some metrics are recorded by default;   
 others can be recorded by the user within a task thread.
 
-Every value, default or custom, is tracked as a [Histogram][hgram], 
-so every recorded value has tracked `min`, `mean(avg)`, `max` etc properties.
+Every recorded value is tracked as a [Histogram][hgram], 
+therefore it has `min`, `mean(avg)`, `max` etc properties.
 
 This is necessary because only a [statistical method][nd] can shield the test 
 results from uncontrollable environmental events that might skew your 
