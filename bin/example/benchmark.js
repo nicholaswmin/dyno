@@ -1,24 +1,24 @@
-
 import { dyno } from '{{entrypath}}'
 
 await dyno(async function cycle() { 
+  // <benchmarked-code>
 
   function fibonacci(n) {
     return n < 1 ? 0
-      : n <= 2 ? 1
-      : fibonacci(n - 1) + fibonacci(n - 2)
+    : n <= 2 ? 1 : fibonacci(n - 1) + fibonacci(n - 2)
   }
 
+  fibonacci(35)
+
+  // </benchmarked-code>
 }, {
-  parameters: { 
-    cyclesPerSecond: 20, 
-    durationMs: 4000,
-    threads: 4
-  },
+  // test parameters
+  parameters: { cyclesPerSecond: 100, threads: 4, durationMs: 5 * 1000 },
   
-  onTick: ({ main, tasks }) => {    
+  // log live stats
+  onTick: list => {    
     console.clear()
-    console.table(main)
-    console.table(tasks)
+    console.table(list().primary().pick('count'))
+    console.table(list().threads().pick('mean'))
   }
 })

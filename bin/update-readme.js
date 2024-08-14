@@ -11,11 +11,11 @@ await replaceTokensInFile({
     { target: 'benchmark.js', start: '// benchmark.js', end: '```' },
     { 
       target: 'timerified.js', 
-      start: '// timing a recursive fibonacci function', 
+      start: '// performance.timerify example', 
       end: '```' },
     { 
       target: 'plottable.js', 
-      start: '// run: `npm i --no-save https://github.com/nicholaswmin/console-plot`', 
+      start: '// Requires: ', 
       end: '```' 
     }
   ]

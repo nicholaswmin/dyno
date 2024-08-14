@@ -1,34 +1,27 @@
+// `npm i @nicholaswmin/console-plot --no-save`
 
 import { dyno } from '{{entrypath}}'
 import console from '@nicholaswmin/console-plot'
 
 await dyno(async function cycle() { 
-  
-  // sleep one
-  await performance.timerify(async function sleepTwo() {
-    return new Promise(res => setTimeout(res, Math.random() * 20))
-  })()
-  
-  // sleep two
-  await performance.timerify(async function sleepOne() {
-    return new Promise(res => setTimeout(res, Math.random() * 20))
-  })()
 
-}, {
-  parameters: { 
-    cyclesPerSecond: 50, 
-    durationMs: 20 * 1000
-  },
+  await performance.timerify(function sleepRandom1(ms) {
+    return new Promise(r => setTimeout(r, Math.random() * ms))
+  })(Math.random() * 20)
   
-  onTick: ({ main, tasks, snapshots }) => {   
+  await performance.timerify(function sleepRandom2(ms) {
+    return new Promise(r => setTimeout(r, Math.random() * ms))
+  })(Math.random() * 20)
+  
+}, {
+
+  parameters: { cyclesPerSecond: 15, durationMs: 20 * 1000 },
+
+  onTick: list => {  
     console.clear()
-    console.table(main)
-    console.table(tasks)
-    console.plot(snapshots, {
-      title: 'Timings timeline',
-      subtitle: 'average durations, in ms',
-      height: 15,
-      width: 100
+    console.plot(list().threads().pick('snapshots').of('mean').group(), {
+      title: 'Plot',
+      subtitle: 'mean durations (ms)'
     })
   }
 })

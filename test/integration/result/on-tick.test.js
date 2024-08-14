@@ -11,11 +11,11 @@ test('#onTick() callback', async t => {
     onTick: onTick
   }))
 
-  await t.test('is called', t => {
+  await t.test('is called at least once', t => {
     t.assert.ok(onTick.mock.calls.length > 0, '"onTick" was not called')
   })
   
-  await t.test('is called many times', t => {
+  await t.test('is called more than once', t => {
     t.assert.ok(
       onTick.mock.calls.length > 50, 
       `"onTick" was called: ${onTick.mock.calls.length} times, expected: > 50`

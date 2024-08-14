@@ -15,7 +15,7 @@
     "examples:update": "bin/update-readme.js"
   },
   "engines": {
-    "node": ">=22.5.1"
+    "node": ">=22.6"
   },
   "keywords": [
     "test",

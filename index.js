@@ -21,8 +21,8 @@ const dyno = async (taskFn, {
     parameters = await prompt(parameters, {
       disabled: ['test'].includes(process.env.NODE_ENV?.toLowerCase()),
       defaults: {
-        cyclesPerSecond: 10,
-        durationMs: 5000,
+        cyclesPerSecond: 50,
+        durationMs: 5 * 1000,
         threads: os.availableParallelism()
       }
     })
@@ -39,27 +39,27 @@ const dyno = async (taskFn, {
     })
     
     process.start()
-    collector.start(threads, onTick.bind(this))
     scheduler.start(threads)
     uptimer.start()
-  
+    collector.start(threads, onTick.bind(this))
+
     try {
       await Promise.race([
         threadpool.watch(threads, abortctrl),
         timer.setTimeout(parameters.durationMs, null, abortctrl)
       ])
     } finally {
-      await after(parameters, collector.stats)
+      await after(parameters, collector.result())
 
       abortctrl.abort()
+      collector.stop()
       uptimer.stop()
       scheduler.stop()
-      collector.stop()
   
       await threadpool.disconnect(threads)
     }
   
-    return collector.stats
+    return collector.result()
   }
   
   return task(taskFn)

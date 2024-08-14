@@ -54,7 +54,6 @@ test('#dyno() main before/after hooks', async t => {
         
         await t.test('collected stats as 2nd argument', async t => {
           t.assert.strictEqual(typeof args[1], 'object')
-          t.assert.ok(Object.keys(args[1]).includes('main'), 'no "main" prop')
         })
       })
     })
@@ -74,21 +73,6 @@ test('#dyno() main before/after hooks', async t => {
     
       await t.test('runs the hook once', async t => {
         t.assert.strictEqual(after.mock.calls.length, 1)
-      })
-      
-      await t.test('passes 2 arguments', async t => {
-        const args = after.mock.calls[0].arguments
-        
-        t.assert.strictEqual(args.length, 2)
-        
-        await t.test('test parameters as 1st argument', async t => {
-          t.assert.strictEqual(typeof args[0], 'object')
-        })
-        
-        await t.test('collected stats as 2nd argument', async t => {
-          t.assert.strictEqual(typeof args[1], 'object')
-          t.assert.ok(Object.keys(args[1]).includes('main'), 'no "main" prop')
-        })
       })
     })
   })

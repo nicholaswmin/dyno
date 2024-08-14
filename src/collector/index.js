@@ -1,93 +1,47 @@
 import { Bus } from '../bus/index.js'
-import { ProcessStat } from './process-stat/index.js'
-
-const round = num => (Math.round((num + Number.EPSILON) * 100) / 100) || 'n/a'
-const pid = process.pid.toString()
+import { MetricsGroup } from './metrics/index.js'
 
 class Collector {
   constructor() {
     this.on = true  
     this.bus = Bus()  
-    
-    this.stats = {
-      threads: {},
-
-      get main() {
-        const stats = Object.keys(this.threads[pid])
-          .reduce((acc, key) => ({
-            ...acc,
-            [key]: this.threads[pid][key]?.count
-          }), {})
-        
-        return [{
-          ...stats,
-          backlog: stats.issued - stats.completed,
-          uptime: stats.uptime
-        }]
-      },
-      
-      get snapshots() {
-        const thread = this.threads[
-          Object.keys(this.threads)
-          .filter(id => id !== pid)[0]]
-
-        return thread 
-          ? Object.keys(thread)
-            .reduce((acc, task) => ({
-              ...acc, 
-              [task]: thread[task].snapshots
-                .map(s => round(s.mean))
-            }), {}) 
-          : {}
-      },
-
-      get tasks() {
-        return Object.keys(this.threads)
-          .filter(_pid => _pid !== pid)
-          .reduce((acc, pid) => ([ 
-            ...acc, 
-            Object.keys(this.threads[pid])
-              .reduce((acc, task) => ({
-                ...acc, 
-                thread: pid, 
-                [task]: round(this.threads[pid][task].mean)
-              }), {})
-          ]), [])
-      }
-    }
+    this.metricsGroup = new MetricsGroup()
   }
   
   start(threads, cb) {
+    this.#createTrackedMetricsForThread(process)
+    Object.values(threads)
+      .forEach(this.#createTrackedMetricsForThread.bind(this))
+
     this.bus.start()
-    this.bus.listen(threads, stat => {
+    this.bus.listen(threads, metric => {
       return this.on ? (() => {
-        this.#record(stat)
-        cb(this.stats) 
+        this.#record(metric)
+        cb(this.metricsGroup.list.bind(this.metricsGroup)) 
       })() : null
     })
   }
   
-  stop() {
-    const json = JSON.stringify(this.stats)
-    
+  stop() {    
     this.on = false
     this.bus.stop()
-    
-    return json
+  }
+  
+  result() {
+    return this.metricsGroup.list()
+  }
+  
+  #createTrackedMetricsForThread({ pid }) {
+    this.metricsGroup.trackMetricsForThread({ pid })
   }
   
   #record({ pid, name, value }) {
-    if (!this.stats.threads[pid])
-      return this.stats.threads[pid] = new ProcessStat({ 
-        name, value 
-      })
-    
-    if (!this.stats.threads[pid][name])
-      return this.stats.threads[pid].createTimeseriesHistogram({ 
-        name, value 
-      })
+    const metrics = this.metricsGroup.getMetricsOfThread({ pid })
+    const metric = metrics.getMetric({ name })
 
-    this.stats.threads[pid][name].record(value)
+    return metric 
+      ? metric.record(value)
+      : metrics.addMetric({ pid, name, value })
   }
 }
 

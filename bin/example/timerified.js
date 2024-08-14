@@ -10,15 +10,18 @@ await dyno(async function cycle() {
   })(30)
 
 }, {
-  parameters: { 
-    cyclesPerSecond: 20
-  },
+  parameters: { cyclesPerSecond: 20 },
   
-  onTick: ({ tasks, snapshots }) => {    
-    // custom timings are set 
-    // in both `tasks` & `snapshots` 
-
-    console.clear()
-    console.table(tasks)
+  onTick: list => {    
+    console.log(list().threads().metrics().pick('mean'))
   }
 })
+
+// logs 
+// ┌─────────┬───────────┐
+// │ cycle   │ fibonacci │
+// ├─────────┼───────────┤
+// │ 7       │ 7         │
+// │ 11      │ 5         │
+// │ 11      │ 5         │
+// └─────────┴───────────┘
