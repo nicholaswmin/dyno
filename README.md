@@ -44,10 +44,10 @@ await dyno(async function cycle() {
 }, {
   parameters: { cyclesPerSecond: 100, threads: 4, durationMs: 5 * 1000 },
   
-  onTick: list => {    
+  onTick: metrics => {    
     console.clear()
-    console.table(list().primary().pick('count'))
-    console.table(list().threads().pick('mean'))
+    console.table(metrics().primary().pick('count'))
+    console.table(metrics().threads().pick('mean'))
   }
 })
 ```
@@ -116,7 +116,7 @@ await dyno(async function cycle() {
     // add test parameters
   },
   
-  onTick: list => {    
+  onTick: metrics => {    
     // build logging from the provided measurements
   }
 })
@@ -253,16 +253,17 @@ as part of the benchmarked code.
 
 ### Querying metrics
 
-Metrics can be queried from the `list` argument of the `onTick` callback.
+Metrics can be queried using a `metrics` function, provided as an argument 
+to the `onTick` callback.
 
 ```js
 // ...
-onTick: list => {    
+onTick: metrics => {    
   // primary metrics
-  console.log(list().primary())
+  console.log(metrics().primary())
 
   // task thread metrics
-  console.log(list().threads()) 
+  console.log(metrics().threads()) 
 }
 ```
 
@@ -272,7 +273,7 @@ get all primary/main metrics
 
 ```js
 // log all primary metrics
-console.log(list().primary())
+console.log(metrics().primary())
 ```
 
 #### `.threads()`
@@ -281,7 +282,7 @@ get all metrics, for each task thread
 
 ```js
 // log all metric of every task-thread
-console.log(list().threads())
+console.log(metrics().threads())
 ```
 
 #### `.pick()` 
@@ -289,7 +290,7 @@ console.log(list().threads())
 reduce all metrics to a single histogram property
 
 ```js
-list().threads().pick('min')
+metrics().threads().pick('min')
 
 // from this: { cycle: [{ min: 4, max: 5 }, evt_loop: { min: 2, max: 8 } ... 
 // to this  : { cycle: 4, evt_loop: 2 ...
@@ -301,18 +302,18 @@ reduce all metrics that have been `pick`-ed to an array of histograms,
 to an array of single histogram values.
 
 ```js
-list().primary().pick('snapshots').of('max')
+metrics().primary().pick('snapshots').of('max')
 // [{ cycle: [5, 3, 2 ... ], evt_loop: [10, 12, 13, ...] } ...
 ```
 
 > note: only makes sense if it comes after `.pick('snapshots')` 
 
-#### `.metrics()`
+#### `.only()`
 
-only get specific metric(s)
+get specific metric(s)
 
 ```js
-list().threads().metrics('evt_loop', 'fibonacci')
+metrics().threads().only('evt_loop', 'fibonacci')
 // only the `evt_loop` and `fibonacci` metrics
 ```
 
@@ -321,7 +322,7 @@ list().threads().metrics('evt_loop', 'fibonacci')
 sort by specific metric
 
 ```js
-list().threads().pick('min').sort('cycle', 'desc')
+metrics().threads().pick('min').sort('cycle', 'desc')
 ```
 
 > `direction` can be: `asc`, `desc`
@@ -331,7 +332,7 @@ list().threads().pick('min').sort('cycle', 'desc')
 get result as an `Object` with each metric as a property
 
 ```js
-list().threads().pick('snapshots').of('mean').group()
+metrics().threads().pick('snapshots').of('mean').group()
 
 // { cycle: [5, 13, 2, 6 ....], evt_loop: [11, 12, 16 ...],  ...
 ```
@@ -387,8 +388,8 @@ await dyno(async function cycle() {
 }, {
   parameters: { threads: 4 },
   
-  onTick: list => {    
-    console.log(list().threads().pick('mean'))
+  onTick: metrics => {    
+    console.log(metrics().threads().pick('mean'))
   }
 })
 
@@ -423,8 +424,8 @@ await dyno(async function cycle() {
 }, {
   parameters: { threads: 4 },
   
-  onTick: list => {    
-    console.log(list().threads().pick('mean'))
+  onTick: metrics => {    
+    console.log(metrics().threads().pick('mean'))
   }
 })
 
@@ -468,9 +469,9 @@ await dyno(async function cycle() {
 
   parameters: { cyclesPerSecond: 15, durationMs: 20 * 1000 },
 
-  onTick: list => {  
+  onTick: metrics => {  
     console.clear()
-    console.plot(list().threads().pick('snapshots').of('mean').group(), {
+    console.plot(metrics().threads().pick('snapshots').of('mean').group(), {
       title: 'Plot',
       subtitle: 'mean durations (ms)'
     })

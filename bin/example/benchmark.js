@@ -7,14 +7,14 @@ await dyno(async function cycle() {
     : n <= 2 ? 1 : fibonacci(n - 1) + fibonacci(n - 2)
   }
 
-  fibonacci(35)
+  fibonacci(24)
 
 }, {
   parameters: { cyclesPerSecond: 100, threads: 4, durationMs: 5 * 1000 },
   
-  onTick: list => {    
+  onTick: metrics => {    
     console.clear()
-    console.table(list().primary().pick('count'))
-    console.table(list().threads().pick('mean'))
+    console.table(metrics().primary().pick('count'))
+    console.table(metrics().threads().pick('mean'))
   }
 })

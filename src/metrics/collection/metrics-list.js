@@ -1,5 +1,4 @@
-// fuunctions as a View, provides a fluent API for 
-// picking measurements.
+// Provides a fluent API for querying metrics.
 // 
 // i.e `console.table(foo.tasks().metrics().pick('mean'))`
 
@@ -18,7 +17,7 @@ const throwOnMissingUnit = unit => {
 
 class MetricsList extends Array {
   #ppid = process.pid.toString() 
-  #only = []
+  #_only = []
   
   constructor(...args) {
     super(...args)
@@ -34,8 +33,8 @@ class MetricsList extends Array {
       .filter(metrics => metrics.pid !== this.#ppid)
   }
   
-  metrics(...args) {
-    this.#only = args
+  only(...args) {
+    this.#_only = args
     
     return this
   }
@@ -63,7 +62,7 @@ class MetricsList extends Array {
 
     return this.map((metrics, i) => Object.keys(metrics)
         .filter(key => metrics[key] instanceof Metric)
-        .filter(key => this.#only.length ? this.#only.includes(key) : true)
+        .filter(key => this.#_only.length ? this.#_only.includes(key) : true)
         .reduce((acc, key) => ({
         ...acc, 
         [key]: typeof metrics[key][unit] == 'number' 
