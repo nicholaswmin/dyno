@@ -306,7 +306,7 @@ list().primary().pick('snapshots').of('max')
 
 #### `.metrics()`
 
-get specific metric(s) instead of all of them
+only get specific metric(s)
 
 ```js
 list().threads().metrics('evt_loop', 'fibonacci')
@@ -319,15 +319,13 @@ sort by specific metric
 
 ```js
 list().threads().pick('min').sort('cycle', 'desc')
-// sort by descending 'cycle' min timing
 ```
 
 > `direction` can be: `asc`, `desc`
 
 #### `.group()`
 
-get result as an `Object`, like [`Object.groupBy][obj-group-by] 
-with the metric name used as the key.
+get result as an `Object` with each metric as a property
 
 ```js
 const obj = list().threads().pick('snapshots').of('mean').group()
