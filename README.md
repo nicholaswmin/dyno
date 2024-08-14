@@ -205,7 +205,7 @@ The benchmarked code
 
 #### `cycle`
 
-A command that signals a `task thread` to execute it's code. 
+A signals telling a `task thread` to execute it's task. 
 
 #### `cycle rate`
 
