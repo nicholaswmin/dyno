@@ -150,8 +150,8 @@ The `task threads` must collectively execute their tasks faster than
 the time it takes for their next `cycle` command to come through,
 otherwise the entire test will start accumulating a `cycle backlog`.
 
-When that happens, the test stops; the configured `cycle rate` is deemed as 
-the current *breaking point* of the benchmarked code.
+When the `backlog threshold` is reached, the test stops; the configured 
+`cycle rate` is deemed as the current *breaking point*  of that code.
 
 An example:
 
