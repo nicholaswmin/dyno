@@ -357,8 +357,8 @@ Custom metrics can be recorded with either:
 
 both of them are native extensions of the [User Timing APIs][perf-api].
 
-The metrics collector records their timings and attaches the tracked `Metric` 
-histogram to its corresponding `task thread`. 
+The benchmarker automatically records their timings and attaches the
+tracked `Metric` histogram to its corresponding `task thread`. 
 
 > **example:** log the average running time of a recursive `fibonacci`
 
