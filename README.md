@@ -193,7 +193,8 @@ Primary 0: cycles issued: 100, finished: 93, backlog: 7
 
 The `primary` spawns the benchmarked code as `task threads`.
 
-Then, it starts issuing `cycle` commands to each one, in [round-robin][rr].
+Then, it starts issuing `cycle` commands to each one, in [round-robin][rr],
+at a set rate, for a set duration.
 
 A `task thread` must execute it's task faster than the time it takes for 
 its next `cycle` command to come through, otherwise it will start accumulating 
