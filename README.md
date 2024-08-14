@@ -397,7 +397,7 @@ await dyno(async function cycle() {
 > so it's best to avoid using arrow-functions. 
 > Read [this](#missing-custom-metrics) for more details.
 
-another example, this time using `perfomance.measure:`
+another example, using `perfomance.measure():`
 
 ```js
 // performance.measure() example
