@@ -223,6 +223,8 @@ This is necessary because only a [statistical method][nd] can shield the test
 results from uncontrollable environmental events, otherwise each test run 
 would produce vastly different results.
 
+All metrics are collected in *milliseconds*. 
+
 ### Querying metrics
 
 Metrics can be queried from the `log` function provided in the 
@@ -240,9 +242,10 @@ onTick: logs => {
 
 log all metrics of the primary/main. 
 
-> note: even though the primary records its values as a histogram, 
-> it doesn't actually record timings, only counts.
-> // @TODO fix, log timings
+> **note:** Some primary metrics such as `primary.backlog` are not duration 
+> metrics - they are counters, so logging anything other than 
+> their `.count` property doesnt make any sense.
+
 
 #### `.threads()`
 
