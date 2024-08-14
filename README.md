@@ -13,8 +13,7 @@
   - [Custom metrics](#custom-metrics)
 * [Plotting](#plotting)
 * [Gotchas](#gotchas)
-  + [`onTick` returns `undefined`](#ontick-returning-undefined)
-  + [`missing custom measurements`](#missing-custom-measurements`)
+  + [`missing custom metrics`](#missing-custom-metrics`)
   + [self-forking files](#avoiding-self-forking)
     - [Use hooks](#using-hooks)
     - [Use a task file](#fallback-to-using-a-task-file)
@@ -121,7 +120,7 @@ await dyno(async function cycle() {
     // add test parameters
   },
   
-  onTick: ({ primary, threads }) => {    
+  onTick: log => {    
     // build logging from the provided measurements
   }
 })
@@ -460,10 +459,10 @@ mean durations (ms)
 
 ## Gotchas
 
-### missing custom measurements
+### Missing custom metrics
 
-Using anonymous lambdas/arrow functions means the stats collector 
-has no function name to use for the measurement.  
+Using anonymous lambdas/arrow functions means the metrics collector 
+has no function name to use for the metric.  
 By their own definition, they are anonymous;
 
 Change this:
