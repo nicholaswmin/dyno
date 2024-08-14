@@ -240,19 +240,32 @@ onTick: logs => {
 
 #### `.primary()`
 
-log all metrics of the primary/main. 
+metrics of the primary/main.
+
+```js
+const metrics = log().primary()
+
+// log the cycle backlog
+console.log(metrics.backlog)
+```
 
 > **note:** most primary metrics are not *timing* metrics; they are *counters*, 
 > so logging anything other than their `.count` property doesnt make any sense.
 
-
 #### `.threads()`
 
-log all metrics of all task threads
+metrics of the task threads
+
+```js
+const metrics = log().threads()
+
+// log every metric of every task thread
+console.log(metrics)
+```
 
 #### `.pick()` 
 
-log a specific unit instead of the entire histogram.
+get a specific unit, instead of entire histograms.
 
 ```js
 const averages = log().threads().pick('mean')
@@ -269,7 +282,7 @@ const maxes = log().primary().pick('snapshots')
 
 #### `.of()` 
 
-Reduce a `pick`-ed array to a single value.    
+reduce a `pick`-ed array to a single value.    
 
 ```js
 const snapshotsMax = log().primary().pick('snapshots').of('max')
@@ -280,7 +293,7 @@ const snapshotsMax = log().primary().pick('snapshots').of('max')
 
 #### `.metrics()`
 
-log specific metric(s) 
+get only specific metric(s) 
 
 ```js
 const loopMetrics = log().threads().metrics('evt_loop', 'fibonacci')
