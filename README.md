@@ -205,7 +205,7 @@ The benchmarked code
 
 #### `cycle`
 
-A signals telling a `task thread` to execute it's task. 
+A signal, telling a `task thread` to execute it's task. 
 
 #### `cycle rate`
 
