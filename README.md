@@ -351,8 +351,6 @@ The following metrics are collected by default:
 | `cycles`           | cycle timings       |
 | `evt_loop`         | event loop timings  |
 
-> any custom metrics will appear here.
-
 ## Recording custom metrics
 
 Custom metrics can be recorded with either:
