@@ -7,7 +7,8 @@
 * [overview](#overview)
 * [quickstart](#install)
   + [parameters](#test-parameters)
-* [the process model](#the-process-model)
+* [glossary](#glossary)
+* [test process](#the-test-process)
 * [metrics](#metrics)
   - [querying metrics](#querying-metrics)
   - [default metrics](#default-metrics)
@@ -134,9 +135,7 @@ await dyno(async function cycle() {
 
 > these parameters are user-configurable on test startup.
 
-## The process model
-
-### Glosssary
+## Glosssary
 
 #### `primary`
 
@@ -190,7 +189,7 @@ Primary 0: cycles issued: 100, finished: 93, backlog: 7
         └── : n <= 2 ? 1 : fib(n - 1) + fib(n - 2)}
 ```
 
-### The test
+### The test process
 
 Task threads must execute their task faster than the time it takes for 
 the [next][rr] `cycle` command to come through, otherwise they will 
