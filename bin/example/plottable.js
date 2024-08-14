@@ -14,7 +14,9 @@ await dyno(async function cycle() {
   })(Math.random() * 20)
   
 }, {
+
   parameters: { cyclesPerSecond: 15, durationMs: 20 * 1000 },
+
   onTick: log => {  
     console.clear()
     console.plot(log().threads().pick('snapshots').of('mean').group(), {

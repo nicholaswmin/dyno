@@ -43,9 +43,8 @@ await dyno(async function cycle() {
 
   // </benchmarked-code>
 }, {
-  parameters: { 
-    cyclesPerSecond: 100, threads: 4, durationMs: 5 * 1000
-  },
+  // test parameters
+  parameters: { cyclesPerSecond: 100, threads: 4, durationMs: 5 * 1000 },
   
   // log live stats
   onTick: log => {    
@@ -363,9 +362,7 @@ await dyno(async function cycle() {
   })(30)
 
 }, {
-  parameters: { 
-    cyclesPerSecond: 20
-  },
+  parameters: { cyclesPerSecond: 20 },
   
   onTick: log => {    
     console.log(log().threads().metrics().pick('mean'))
@@ -410,7 +407,9 @@ await dyno(async function cycle() {
   })(Math.random() * 20)
   
 }, {
+
   parameters: { cyclesPerSecond: 15, durationMs: 20 * 1000 },
+
   onTick: log => {  
     console.clear()
     console.plot(log().threads().pick('snapshots').of('mean').group(), {

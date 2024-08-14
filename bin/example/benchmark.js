@@ -12,9 +12,8 @@ await dyno(async function cycle() {
 
   // </benchmarked-code>
 }, {
-  parameters: { 
-    cyclesPerSecond: 100, threads: 4, durationMs: 5 * 1000
-  },
+  // test parameters
+  parameters: { cyclesPerSecond: 100, threads: 4, durationMs: 5 * 1000 },
   
   // log live stats
   onTick: log => {    
