@@ -271,6 +271,10 @@ const snaps = log().primary().pick('snapshots')
 ```
 
 > available: `min`, `mean`, `max`, `stdev`, `snapshots`, `count`, `last`
+>
+> `stddev`: standard deviation between recorded values
+> `last`  : last recorded value
+> `count` : number of recorded values
 
 #### `.of()` 
 
