@@ -236,17 +236,17 @@ otherwise each test run would produce wildly inconsistent timings.
 
 A `Metric` is represented as a histogram with the following properties:
 
-| name        | description                       |
-|-------------|-----------------------------------|
-| `count`     | number of values/samples.         |
-| `min`       | minimum value                     |
-| `mean`      | mean/average of values            |
-| `max`       | maximum value                     |
-| `stddev`    | standard deviation between values |
-| `last`      | last value                        |
-| `snapshots` | last 50 states                    |
+| name        | description                                 |
+|-------------|---------------------------------------------|
+| `count`     | number of values/samples.                   |
+| `min`       | minimum value                               |
+| `mean`      | [mean][mean]/average of values              |
+| `max`       | maximum value                               |
+| `stddev`    | [standard deviation][stdev] between values  |
+| `last`      | last value                                  |
+| `snapshots` | last 50 states                              |
 
-Timing metrics are collected in *milliseconds*. 
+> **note:** timing metrics are collected in *milliseconds*. 
 
 ### Querying metrics
 
@@ -736,6 +736,7 @@ npm run examples:update
 [v8]: https://v8.dev/
 [opt]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Optional_chaining
 [mean]: https://en.wikipedia.org/wiki/Mean
+[stdev]: https://en.wikipedia.org/wiki/Standard_deviation
 [nd]: https://en.wikipedia.org/wiki/Normal_distribution#Standard_normal_distribution
 [obj-group-by]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/groupBy
 [tachometer]: https://github.com/google/tachometer?tab=readme-ov-file
