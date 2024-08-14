@@ -345,8 +345,7 @@ both of them are native extensions of the [User Timing APIs][perf-api].
 The metrics collector records their timings and attaches the tracked `Metric` 
 histogram to its corresponding `task thread`. 
 
-> In the following example, `performance.timerify` is used to 
-> instrument a function named `fibonacci`.  
+> **example:** instrumenting a function using `performance.timerify`:
 
 ```js
 // performance.timerify example
@@ -378,6 +377,9 @@ await dyno(async function cycle() {
 // │ 11      │ 5         │
 // └─────────┴───────────┘
 ```
+
+> **note:** the stats collector uses the function name for the metric name,
+> so anonymous lambdas/arrow-functions should be avoided.
 
 ### Plotting
 
