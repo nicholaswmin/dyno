@@ -138,7 +138,7 @@ await dyno(async function cycle() {
 
 ### Glosssary
 
-#### `primary thread`
+#### `primary`
 
 The main process. Orchestrates the test and the spawned `task threads`.
 
