@@ -239,8 +239,8 @@ onTick: log => {
 metrics of the primary/main.
 
 ```js
-// log the cycle backlog
-console.log(log().primary().backlog)
+// log all primary metrics
+console.log(log().primary())
 ```
 
 > **note:** most primary metrics are not *timing* metrics; they are *counters*, 
@@ -251,7 +251,7 @@ console.log(log().primary().backlog)
 metrics of the task threads
 
 ```js
-// log every metric of every task thread
+// log all metric of every task-thread
 console.log(log().threads())
 ```
 
