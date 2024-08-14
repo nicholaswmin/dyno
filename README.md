@@ -667,7 +667,8 @@ test coverage:
 npm run test:coverage
 ```
 
-> **note:** the parameter prompt is suppressed when `NODE_ENV=test`
+> **note:** Running individual tests requires `NODE_ENV=test`, 
+> which suppresses the parameter user prompt.
 
 meta checks:
 
