@@ -22,7 +22,7 @@
 
 ## Overview
 
-Loops a *task* function, for a given *duration*, across multiple threads.
+Loops a function, for a given *duration*, across multiple threads.
 
 A test is deemed succesful if it ends without creating a *cycle backlog*.
 
