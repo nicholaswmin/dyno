@@ -676,7 +676,7 @@ npm run examples:update
 [rr]: https://en.wikipedia.org/wiki/Round-robin_scheduling
 [cp-fork]: https://nodejs.org/api/child_process.html#child_processforkmodulepath-args-options
 [opt-chain]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Optional_chaining
-[perf-api]: https://nodejs.org/api/perf_hooks.html#performance-measurement-apis
+[perf-api]: https://w3c.github.io/perf-timing-primer/
 [hgram]: https://en.wikipedia.org/wiki/Histogram
 [hgrams]: https://nodejs.org/api/perf_hooks.html#class-histogram
 [timerify]: https://nodejs.org/api/perf_hooks.html#performancetimerifyfn-options
