@@ -10,7 +10,8 @@
 * [The Process Model](#the-process-model)
 * [Metrics](#metrics)
   - [Querying metrics](#querying-metrics)
-  - [Custom metrics](#custom-metrics)
+  - [Default metrics](#default-metrics)
+  - [Recording custom metrics](#custom-metrics)
 * [Plotting](#plotting)
 * [Gotchas](#gotchas)
   + [`missing custom metrics`](#missing-custom-metrics`)
@@ -222,6 +223,8 @@ This is necessary because only a [statistical method][nd] can shield the test
 results from uncontrollable environmental events, otherwise each test run 
 would produce vastly different results.
 
+### Querying metrics
+
 Metrics can be queried from the `log` function provided in the 
 `onTick` callback.
 
@@ -233,36 +236,6 @@ onTick: logs => {
   console.log(log().threads()) // task thread metrics 
 }
 ```
-
-### `primary`  
-
-> contains primary metrics
-
-By default, it records the following:
-
-| name        | description               |
-|-------------|---------------------------|
-| `issued`    | count of issued cycles    |
-| `completed` | count of completed cycles |
-| `backlog`   | size of cycles backlog    |
-| `uptime`    | seconds since test start  |
-
-### `threads`  
-
-> contains all `task threads`, 
-> each having it's own list of `Histograms`.
-
-> User-defined metrics will appear here.
-
-By default, it records the following:
-
-| name               | description         |
-|--------------------|---------------------|
-| `cycles`           | cycle timings       |
-| `evt_loop`         | event loop timings  |
-
-
-### Querying metrics
 
 The `log` function provided in the `onTick` callback can be queried with
 these methods:
@@ -335,7 +308,33 @@ return result as an object instead of an array
 const obj = log().threads().pick('snapshots').of('mean').group()
 ```
 
-### Custom metrics
+### Default metrics
+
+The following metrics are collected by default:
+
+#### `primary`  
+
+By default, it records the following:
+
+| name        | description               |
+|-------------|---------------------------|
+| `issued`    | count of issued cycles    |
+| `completed` | count of completed cycles |
+| `backlog`   | size of cycles backlog    |
+| `uptime`    | seconds since test start  |
+
+#### `threads`  
+
+By default, it records the following:
+
+| name               | description         |
+|--------------------|---------------------|
+| `cycles`           | cycle timings       |
+| `evt_loop`         | event loop timings  |
+
+> Any user-defined metrics will appear here.
+
+### Recording custom metrics
 
 Custom metrics can be recorded with either:
 
