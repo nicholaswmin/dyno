@@ -19,8 +19,8 @@ await dyno(async function cycle() {
 // Logs: 
 // 
 // MetricsList(4) [
-//  { cycle: 155.1, 'fibonacci': 123.6 },
-//  { cycle: 146.2, 'fibonacci': 111.5 },
-//  { cycle: 153.6, 'fibonacci': 120.1 },
-//  { cycle: 161.3, 'fibonacci': 131.2 }
+//  { cycle: 155.1, 'sleep-timing': 123.6 },
+//  { cycle: 146.2, 'sleep-timing': 111.5 },
+//  { cycle: 153.6, 'sleep-timing': 120.1 },
+//  { cycle: 161.3, 'sleep-timing': 131.2 }
 // })
