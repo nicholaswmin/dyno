@@ -11,7 +11,7 @@
 * [metrics](#metrics)
   - [querying metrics](#querying-metrics)
   - [default metrics](#default-metrics)
-  - [recording custom metrics](#custom-metrics)
+  - [recording custom metrics](#recording-custom-metrics)
 * [plotting metrics](#plotting)
 * [gotchas](#gotchas)
   + [missing custom metrics](#missing-custom-metrics`)
