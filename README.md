@@ -69,7 +69,7 @@ cycle stats
 │ 4       │ 100    │ 95        │ 5       │
 └─────────┴────────┴───────────┴─────────┘
 
-average timings/durations, in ms
+mean of durations, in ms
 
 ┌─────────┬───────────┬────────┐
 │ thread  │ evt_loop  │ cycle  │
