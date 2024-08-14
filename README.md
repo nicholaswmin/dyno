@@ -474,7 +474,7 @@ mean durations (ms)
 Using anonymous lambdas means the metrics collector has no function name to
 as a metric name. By their own definition, they are anonymous.
 
-Change this:
+change this:
 
 ```js
 const foo = () => {
@@ -551,7 +551,7 @@ await dyno(async function cycle() {
 // "after"
 ```
 
-#### Fallback to using a task file
+#### Use a task file
 
 Alternatively, the *task* function can be extracted to it's own file.
 
@@ -584,7 +584,8 @@ console.log('done')
 ```
 
 > This should be the preferred method when running this as part 
-> of a test suite. 
+> of a test suite, since this is the only method that actually runs
+> the benchmark file just once.
 
 ### Not a load-testing tool
 
