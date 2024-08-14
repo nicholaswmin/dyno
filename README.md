@@ -338,7 +338,7 @@ list().threads().pick('snapshots').of('mean').group()
 
 ### Default metrics
 
-The following metrics are collected by default:
+These are collected by default:
 
 #### `primary`  
 
