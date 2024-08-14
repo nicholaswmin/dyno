@@ -254,13 +254,13 @@ log a specific unit instead of the entire histogram.
 
 ```js
 const averages = log().threads().pick('mean')
-// log only the 'mean'/average for each thread metric
+// get only the 'mean'/average for each thread metric
 
 const maxes = log().primary().pick('max')
-// log only the 'max' for each primary metric
+// get only the 'max' for each primary metric
 
 const maxes = log().primary().pick('snapshots')
-// log only the 'snapshots' of the primary
+// get only the 'snapshots' of the primary
 ```
 
 > available: `min`, `mean`, `max`, `stdev`, `snapshots`, `count`, `last`
@@ -271,7 +271,7 @@ Reduce a `pick`-ed array to a single value.
 
 ```js
 const snapshotsMax = log().primary().pick('snapshots').of('max')
-// logs a 1-D array of the last 50 'maxes' of the primary
+// get a 1-D array of the last 50 'maxes' of the primary
 ```
 
 > note: only makes sense if it comes after `.pick('snapshots')`:
@@ -282,7 +282,7 @@ log specific metric(s)
 
 ```js
 const loopMetrics = log().threads().metrics('evt_loop', 'fibonacci')
-// log only the `evt_loop` and `fibonacci` metrics
+// get only the `evt_loop` and `fibonacci` metrics
 ```
 
 #### `.sortBy()`
@@ -298,7 +298,7 @@ const sorted = log().threads().pick('min').sort('cycle', 'desc')
 
 #### `.group()`
 
-return result as an object instead of an array
+get result as an object instead of an array
 
 ```js
 const obj = log().threads().pick('snapshots').of('mean').group()
