@@ -33,7 +33,6 @@ A test is deemed succesful if it ends without creating a *cycle backlog*.
 import { dyno } from '@nicholaswmin/dyno'
 
 await dyno(async function cycle() { 
-  // <benchmarked-code>
 
   function fibonacci(n) {
     return n < 1 ? 0
@@ -42,12 +41,9 @@ await dyno(async function cycle() {
 
   fibonacci(35)
 
-  // </benchmarked-code>
 }, {
-  // test parameters
   parameters: { cyclesPerSecond: 100, threads: 4, durationMs: 5 * 1000 },
   
-  // log live stats
   onTick: list => {    
     console.clear()
     console.table(list().primary().pick('count'))
