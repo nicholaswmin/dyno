@@ -194,7 +194,7 @@ Primary 0: cycles issued: 100, finished: 93, backlog: 7
 ### The test
 
 Task threads must execute their task faster than the time it takes for 
-the next cycle command to come through, otherwise they will 
+the [next][rr] `cycle` command to come through, otherwise they will 
 start accumulating a `cycle backlog`.
 
 When that happens, the test stops; & the configured `cycle rate` is 
@@ -674,8 +674,6 @@ npm run examples:update
 
 [heroku]: https://heroku.com
 [rr]: https://en.wikipedia.org/wiki/Round-robin_scheduling
-[cp-fork]: https://nodejs.org/api/child_process.html#child_processforkmodulepath-args-options
-[opt-chain]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Optional_chaining
 [perf-api]: https://w3c.github.io/perf-timing-primer/
 [hgram]: https://en.wikipedia.org/wiki/Histogram
 [hgrams]: https://nodejs.org/api/perf_hooks.html#class-histogram
