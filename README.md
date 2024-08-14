@@ -455,34 +455,10 @@ mean durations (ms)
 
 ## Gotchas
 
-### `onTick` returning undefined
-
-Threads and their histograms aren't synchronously available.  
-They spin up and become available as the runner spins up.
-
-Use [optional chaining][opt] to avoid `ReferenceError`s.
-
-change this:
-
-```js
-onTick: ({ threads }) => {    
-  console.log(threads.first().toList())
-}
-```
-
-to this:
-
-```js
-onTick: ({ threads }) => { 
-  console.log(threads.first()?.toList())
-}
-```
-
 ### missing custom measurements
 
 Using anonymous lambdas/arrow functions means the stats collector 
-has no function name to use for the measurement.
-
+has no function name to use for the measurement.  
 By their own definition, they are anonymous;
 
 Change this:
