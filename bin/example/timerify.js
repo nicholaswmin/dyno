@@ -21,7 +21,7 @@ await dyno(async function cycle() {
 // 
 // MetricsList(4) [
 //  { cycle: 148.9, 'fibonacci': 101.4 },
-//  { cycle: 173.4, 'fibonacci': 135.2 },
+//  { cycle: 163.6, 'fibonacci': 145.2 },
 //  { cycle: 184.6, 'fibonacci': 145.8 },
 //  { cycle: 145.3, 'fibonacci': 121.9 }
 // })

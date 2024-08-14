@@ -22,5 +22,5 @@ await dyno(async function cycle() {
 //  { cycle: 155.1, 'sleep': 123.6 },
 //  { cycle: 146.2, 'sleep': 111.5 },
 //  { cycle: 153.6, 'sleep': 120.1 },
-//  { cycle: 161.3, 'sleep': 131.2 }
+//  { cycle: 159.5, 'sleep': 131.2 }
 // })

@@ -363,7 +363,8 @@ tracked `Metric` histogram to its corresponding `task thread`.
 > **example:** log the average running time of a recursive `fibonacci`
 
 ```js
-// performance.timerify() example
+
+// performance.timerify()
 
 import { dyno } from '@nicholaswmin/dyno'
 
@@ -387,7 +388,7 @@ await dyno(async function cycle() {
 // 
 // MetricsList(4) [
 //  { cycle: 148.9, 'fibonacci': 101.4 },
-//  { cycle: 173.4, 'fibonacci': 135.2 },
+//  { cycle: 163.6, 'fibonacci': 145.2 },
 //  { cycle: 184.6, 'fibonacci': 145.8 },
 //  { cycle: 145.3, 'fibonacci': 121.9 }
 // })
@@ -400,7 +401,7 @@ await dyno(async function cycle() {
 another example, using `perfomance.measure():`
 
 ```js
-// performance.measure() example
+// performance.measure()
 
 import { dyno } from '@nicholaswmin/dyno'
 
@@ -425,7 +426,7 @@ await dyno(async function cycle() {
 //  { cycle: 155.1, 'sleep': 123.6 },
 //  { cycle: 146.2, 'sleep': 111.5 },
 //  { cycle: 153.6, 'sleep': 120.1 },
-//  { cycle: 161.3, 'sleep': 131.2 }
+//  { cycle: 159.5, 'sleep': 131.2 }
 // })
 ```
 
