@@ -165,6 +165,8 @@ Amount of time it takes a `task thread` to execute it's own code
 Count of issued `cycle` commands that have been issued/sent but not 
 executed yet.   
 
+### The process model
+
 This is how the process model would look, if sketched out.  
 
 ```js
