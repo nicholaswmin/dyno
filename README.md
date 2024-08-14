@@ -150,6 +150,10 @@ The benchmarked code, running in its own separate process.
 Receives `cycle` commands from the primary, executes it's code and records 
 its timings.
 
+### `task`
+
+The benchmarked code 
+
 #### `cycle`
 
 A command that signals a `task thread` to execute it's code. 
