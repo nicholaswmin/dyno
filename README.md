@@ -530,7 +530,7 @@ performance.timerify(foo)()
 
 ### code running multiple times
 
-The benchmark file self-forks itself. 👀 
+The benchmark file [self-forks][cp-fork] itself. 👀 
 
 This means that any code that exists *outside* the `dyno` block will *also* 
 run in multiple threads.
@@ -721,6 +721,7 @@ npm run examples:update
 
 [heroku]: https://heroku.com
 [rr]: https://en.wikipedia.org/wiki/Round-robin_scheduling
+[cp-fork]: https://nodejs.org/api/child_process.html#child_processforkmodulepath-args-options
 [perf-api]: https://nodejs.org/api/perf_hooks.html#performancemeasurename-startmarkoroptions-endmark
 [hgram]: https://en.wikipedia.org/wiki/Histogram
 [hgrams]: https://nodejs.org/api/perf_hooks.html#class-histogram
