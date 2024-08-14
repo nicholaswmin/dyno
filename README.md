@@ -324,8 +324,6 @@ The following metrics are collected by default:
 
 #### `primary`  
 
-By default, it records the following:
-
 | name        | description               |
 |-------------|---------------------------|
 | `issued`    | count of issued cycles    |
@@ -335,7 +333,6 @@ By default, it records the following:
 
 #### `threads`  
 
-By default, it records the following:
 
 | name               | description         |
 |--------------------|---------------------|
