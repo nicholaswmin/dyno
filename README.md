@@ -143,7 +143,7 @@ The `primary` spawns the benchmarked code in separate, concurrently-running
 Then, it starts issuing `cycle` commands to each one, in [round-robin][rr],
 at a set `cycle rate`, for a set `test duration`.
 
-A cycle command causes a `task thread` to execute it's own task, 
+A cycle command causes a `task thread` to execute it's own `task`, 
 the benchmarked code and then report it's timing.
 
 The `task threads` must collectively execute their tasks faster than 
