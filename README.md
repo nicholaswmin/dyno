@@ -135,7 +135,7 @@ await dyno(async function cycle() {
 
 > these parameters are user-configurable on test startup.
 
-## Glosssary
+## Glossary
 
 #### `primary`
 
