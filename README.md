@@ -219,8 +219,8 @@ Every recorded value is tracked as a `Metric` represented as
 a [histogram][hgram], so it has `min`, `mean(avg)`, `max`  properties.
 
 This is necessary because only a [statistical method][nd] can shield the test 
-results from uncontrollable environmental events.   
-Otherwise each test run would produce vastly different results.
+results from uncontrollable environmental events, otherwise each test run 
+would produce vastly different results.
 
 Metrics can be queried from the `log` function provided in the 
 `onTick` callback.
