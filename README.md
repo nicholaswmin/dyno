@@ -150,7 +150,7 @@ The benchmarked code, running in its own separate process.
 Receives `cycle` commands from the primary, executes it's code and records 
 its timings.
 
-### `task`
+#### `task`
 
 The benchmarked code 
 
