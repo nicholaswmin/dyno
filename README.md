@@ -223,7 +223,7 @@ This is necessary because only a [statistical method][nd] can shield the test
 results from uncontrollable environmental events, otherwise each test run 
 would produce vastly different results.
 
-All metrics are collected in *milliseconds*. 
+Timing metrics are collected in *milliseconds*. 
 
 ### Querying metrics
 
