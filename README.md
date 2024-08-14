@@ -257,7 +257,7 @@ console.log(log().threads())
 
 #### `.pick()` 
 
-get a specific unit, instead of entire histograms.
+get a specific histogram unit, instead of entire histograms.
 
 ```js
 const avgs = log().threads().pick('mean')
