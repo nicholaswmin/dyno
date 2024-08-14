@@ -533,7 +533,7 @@ await dyno(async function cycle() {
     console.log('before')
   },
 
-  after: async (parameters, { main, tasks, snapshots }) => {
+  after: async parameters => {
     console.log('after')
   }
 })
