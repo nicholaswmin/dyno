@@ -245,7 +245,7 @@ as part of the benchmarked code.
 | `max`       | maximum value                               |
 | `stddev`    | [standard deviation][stdev] between values  |
 | `last`      | last value                                  |
-| `snapshots` | past states                    mm           |
+| `snapshots` | past states                                 |
 
 > **note:** timing metrics are collected in *milliseconds*.   
 > **note:** each time a value is recorded, a snapshot of the current state 
