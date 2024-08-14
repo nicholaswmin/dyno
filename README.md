@@ -229,8 +229,9 @@ Every recorded value is tracked as a `Metric`, represented as a
 
 In the realm of performance-testing 
 (and especially so in a runtime with a garbage-collector), 
-a statistical method is the only way to get reliably reproducible test results, 
-otherwise each test run would produce wildly inconsistent timings.
+a statistical method is the only way one can get 
+[reliably reproducible][reproducible] test results, otherwise each test run 
+would produce wildly inconsistent timings.
 
 ### Metric structure 
 
@@ -240,7 +241,7 @@ A `Metric` is represented as a histogram with the following properties:
 |-------------|---------------------------------------------|
 | `count`     | number of values/samples.                   |
 | `min`       | minimum value                               |
-| `mean`      | [mean][mean]/average of values              |
+| `mean`      | [mean][mean] / average of values            |
 | `max`       | maximum value                               |
 | `stddev`    | [standard deviation][stdev] between values  |
 | `last`      | last value                                  |
@@ -737,6 +738,7 @@ npm run examples:update
 [opt]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Optional_chaining
 [mean]: https://en.wikipedia.org/wiki/Mean
 [stdev]: https://en.wikipedia.org/wiki/Standard_deviation
+[reproducible]: https://en.wikipedia.org/wiki/Reproducibility
 [nd]: https://en.wikipedia.org/wiki/Normal_distribution#Standard_normal_distribution
 [obj-group-by]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/groupBy
 [tachometer]: https://github.com/google/tachometer?tab=readme-ov-file
