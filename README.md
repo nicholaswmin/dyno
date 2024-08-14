@@ -291,13 +291,7 @@ list().threads().pick('min')
 // to this  : { cycle: 4, evt_loop: 2 ...
 ```
 
-> available: `min`, `mean`, `max`, `stdev`, `snapshots`, `count`, `last`
->
-> - `stddev`: standard deviation between recorded values  
-> - `last`  : last recorded value  
-> - `count` : number of recorded values  
-
-#### `.of()` 
+> `unit` can be: `min`, `mean`, `max`, `stdev`, `snapshots`, `count`, `last`
 
 reduce all metrics that have been `pick`-ed to an array of histograms, 
 to an array of single histogram values.
@@ -319,7 +313,7 @@ const loopMetrics = list().threads().metrics('evt_loop', 'fibonacci')
 // only the `evt_loop` and `fibonacci` metrics
 ```
 
-#### `.sortBy()`
+#### `.sortBy(metric, direction)`
 
 sort by specific metric
 
@@ -328,7 +322,7 @@ const sorted = list().threads().pick('min').sort('cycle', 'desc')
 // sort by descending min 'cycle' durations
 ```
 
-> available: `desc`, `asc`
+> `direction` can be: `asc`, `desc`
 
 #### `.group()`
 
