@@ -636,7 +636,7 @@ npm run checks
 
 ## Misc
 
-generate sample:
+generate a sample benchmark:
 
 ```bash
 npx init
