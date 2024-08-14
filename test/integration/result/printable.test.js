@@ -7,7 +7,7 @@ test('#onTick() getting metrics in printable formats', async t => {
   const onTick = t.mock.fn(function() {})
 
   t.before(() => dyno(path.join(import.meta.dirname, 'tasks/perf_apis.js'), {
-    parameters: { cyclesPerSecond: 500, threads: 2, durationMs: 250 },
+    parameters: { cyclesPerSecond: 200, threads: 3, durationMs: 500 },
     onTick: onTick
   }))
 

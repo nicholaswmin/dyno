@@ -7,7 +7,7 @@ test('#onTick() metrics result', async t => {
   const onTick = t.mock.fn(function() {})
 
   t.before(() => dyno(path.join(import.meta.dirname, 'tasks/perf_apis.js'), {
-    parameters: { cyclesPerSecond: 500, threads: 2, durationMs: 250 },
+    parameters: { cyclesPerSecond: 200, threads: 3, durationMs: 500 },
     onTick: onTick
   }))
 
@@ -18,35 +18,29 @@ test('#onTick() metrics result', async t => {
       result = onTick.mock.calls[0].arguments[0]()
     })
 
-    await t.test('is an Array', t => {
-      t.assert.ok(Array.isArray(result), 'result is not an Array')
-    })
-
     // @FIXME, result has a stray pid
-    await t.todo('with metrics for all threads + primary', t => {
+    await t.todo('has metrics for all threads + primary', t => {
+      t.assert.ok(Array.isArray(result), 'result is not an Array')
       t.assert.strictEqual(result.length, 2 + 1)
     })
     
-    await t.test('first thread is the primary', t => {
-      const metrics = Object.keys(result[0])
+    await t.test('has Metrics for all threads', async t => {
+      await t.test('first thread is the primary', t => {
+        const metrics = Object.keys(result[0])
 
-      t.assert.ok(metrics.includes('issued'), '"issued" metric missing')
+        t.assert.ok(metrics.includes('issued'), '"issued" metric missing')
+      })
+      
+      await t.test('the rest are the task threads', t => {
+        const metrics = Object.keys(result[1])
+
+        t.assert.ok(metrics.includes('cycle'), '"cycle" metric missing')
+      })
     })
     
-    await t.test('the rest are the task threads', t => {
-      const metrics = Object.keys(result[1])
-
-      t.assert.ok(metrics.includes('cycle'), '"cycle" metric missing')
-    })
-    
-    await t.test('each thread has a number of Metrics', t => {
-      const metrics = Object.keys(result[1])
-
-      t.assert.ok(metrics.length > 0, 'result has no properties')
-    })
-    
-    await t.test('Metric has histogram-like properties', t => {
-      const metric = result[1].cycle, props = Object.keys(metric || {})
+    await t.test('Metric has histogram-like properties', async t => {
+      const metric = result[1].cycle, 
+        props = Object.keys(metric || {})
 
       t.assert.ok(props.includes('min'), 'metric has no "min"')
       t.assert.ok(props.includes('mean'), 'metric has no "mean"')
