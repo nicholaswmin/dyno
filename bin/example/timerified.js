@@ -15,7 +15,7 @@ await dyno(async function cycle() {
   },
   
   onTick: log => {    
-    console.log(log().threads().metrics())
+    console.log(log().threads().metrics().pick('mean'))
   }
 })
 
