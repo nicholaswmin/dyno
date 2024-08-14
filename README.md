@@ -191,12 +191,16 @@ Primary 0: cycles issued: 100, finished: 93, backlog: 7
 
 ### The test process
 
-Task threads must execute their task faster than the time it takes for 
-the [next][rr] `cycle` command to come through, otherwise they will 
-start accumulating a `cycle backlog`.
+The `primary` spawns the benchmarked code as `task threads`.
 
-When that happens, the test stops; & the configured `cycle rate` is 
-deemed as the current *breaking point* of that code.
+Then, it starts issuing `cycle` commands to each one, in [round-robin][rr].
+
+A `task thread` must execute it's task faster than the time it takes for 
+its next `cycle` command to come through, otherwise it will start accumulating 
+a `cycle backlog`.
+
+When that happens, the test stops; the configured `cycle rate` is deemed as 
+the current *breaking point* of the benchmarked code.
 
 An example:
 
