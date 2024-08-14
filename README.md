@@ -225,7 +225,11 @@ Some metrics are recorded by default; others can be recorded by the user
 within a task thread.
 
 Every recorded value is tracked as a `Metric`, represented as a 
-[histogram][hgram] with statistically relevant properties.
+[histogram][hgram] with statistically relevant properties. 
+In the realm of performance-testing 
+(and especially so in an runtime with a garbage-collector), 
+a statistical method is the only way to get reliably reproducible test results, 
+otherwise each test run would produce wildly inconsistent timings.
 
 ### Metric structure 
 
