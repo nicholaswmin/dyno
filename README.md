@@ -498,10 +498,9 @@ This means that any code that exists *outside* the `dyno` block will *also*
 run in multiple threads.
 
 This is a design tradeoff, made to provide the ability to create simple, 
-single-file benchmarks.
-
-This can create issues if you intent to run code after the `dyno()` 
-resolves/ends; or when running this as part of an automated test suite.
+single-file benchmarks but it can create issues if you intent to run code 
+after the `dyno()` resolves/ends; 
+or when running this as part of an automated test suite.
 
 > In this example, `'done'` is logged `3` times instead of `1`: 
 
