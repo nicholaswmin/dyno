@@ -49,10 +49,10 @@ await dyno(async function cycle() {
   parameters: { cyclesPerSecond: 100, threads: 4, durationMs: 5 * 1000 },
   
   // log live stats
-  onTick: log => {    
+  onTick: list => {    
     console.clear()
-    console.table(log().primary().pick('count'))
-    console.table(log().threads().pick('mean'))
+    console.table(list().primary().pick('count'))
+    console.table(list().threads().pick('mean'))
   }
 })
 ```
@@ -121,7 +121,7 @@ await dyno(async function cycle() {
     // add test parameters
   },
   
-  onTick: log => {    
+  onTick: list => {    
     // build logging from the provided measurements
   }
 })
@@ -232,62 +232,64 @@ within a task thread.
 Every recorded value is tracked as a `Metric`, represented as a 
 [histogram][hgram] with `min`, `mean`, `max` properties.
 
-This is necessary because only a [statistical method][nd] can shield the test 
-results from uncontrollable environmental events, otherwise each test run 
-would produce vastly different results.
+### Histogram 
+
+A metric is represented as a histogram with the following properties:
+
+| name        | description                       |
+|-------------|-----------------------------------|
+| `count`     | number of values/samples.         |
+| `min`       | minimum value                     |
+| `mean`      | mean/average of values            |
+| `max`       | maximum value                     |
+| `stddev`    | standard deviation between values |
+| `last`      | last value                        |
+| `snapshots` | last 50 states                    |
 
 Timing metrics are collected in *milliseconds*. 
 
 ### Querying metrics
 
-Metrics can be queried from the `log` argument of the `onTick` callback.
+Metrics can be queried from the `list` argument of the `onTick` callback.
 
 ```js
 // ...
-onTick: log => {    
+onTick: list => {    
   // primary metrics
-  console.log(log().primary())
+  console.log(list().primary())
 
   // task thread metrics
-  console.log(log().threads()) 
+  console.log(list().threads()) 
 }
 ```
 
 #### `.primary()`
 
-metrics of the primary/main.
+get all primary/main metrics
 
 ```js
 // log all primary metrics
-console.log(log().primary())
+console.log(list().primary())
 ```
-
-> **note:** most primary metrics are not *timings*; they are *counters*, 
-> so logging anything other than their `.count` property doesnt make any sense.
 
 #### `.threads()`
 
-metrics of the task threads
+get all metrics, for each task thread
 
 ```js
 // log all metric of every task-thread
-console.log(log().threads())
+console.log(list().threads())
 ```
 
 #### `.pick()` 
 
-map metrics to a specific histogram unit,   
-instead of their entire histogram.
+reduce all metrics to a single histogram property
 
 ```js
-const avgs = log().threads().pick('mean')
-// only the `mean` for each thread metric
+list().threads().pick('min')
 
-const maxes = log().primary().pick('max')
-// only the 'max' for each primary metric
-
-const snaps = log().primary().pick('snapshots')
-// only the 'snapshots' of the primary
+// from this: { cycle: [{ min: 4, max: 5 }, evt_loop: { min: 2, max: 8 } ... 
+// to this  : { cycle: 4, evt_loop: 2 ...
 ```
 
 > available: `min`, `mean`, `max`, `stdev`, `snapshots`, `count`, `last`
@@ -298,21 +300,23 @@ const snaps = log().primary().pick('snapshots')
 
 #### `.of()` 
 
-reduce a `pick`-ed array to a single value.    
+reduce all metrics that have been `pick`-ed to an array of histograms, 
+to an array of single histogram values.
 
 ```js
-const snapshotsMax = log().primary().pick('snapshots').of('max')
-// 1-D array of the last 50 'maxes'
+list().primary().pick('snapshots').of('max')
+// from this: [{ cycle: [{ ... max: 5 }, { ... max: 3 }, { ... max: 2 } ] } ... 
+// to this  : [{ cycle: [5,3,2 ....] } ...
 ```
 
-> note: only makes sense if it comes after `.pick('snapshots')`:
+> note: only makes sense if it comes after `.pick('snapshots')` 
 
 #### `.metrics()`
 
 get specific metric(s) instead of all of them
 
 ```js
-const loopMetrics = log().threads().metrics('evt_loop', 'fibonacci')
+const loopMetrics = list().threads().metrics('evt_loop', 'fibonacci')
 // only the `evt_loop` and `fibonacci` metrics
 ```
 
@@ -321,7 +325,7 @@ const loopMetrics = log().threads().metrics('evt_loop', 'fibonacci')
 sort by specific metric
 
 ```js
-const sorted = log().threads().pick('min').sort('cycle', 'desc')
+const sorted = list().threads().pick('min').sort('cycle', 'desc')
 // sort by descending min 'cycle' durations
 ```
 
@@ -329,10 +333,11 @@ const sorted = log().threads().pick('min').sort('cycle', 'desc')
 
 #### `.group()`
 
-get the result as an `Object` instead of an `Array`.
+get result as an `Object`, like [`Object.groupBy][obj-group-by] 
+with the metric name used as the key.
 
 ```js
-const obj = log().threads().pick('snapshots').of('mean').group()
+const obj = list().threads().pick('snapshots').of('mean').group()
 ```
 
 ### Default metrics
@@ -355,7 +360,7 @@ The following metrics are collected by default:
 | `cycles`           | cycle timings       |
 | `evt_loop`         | event loop timings  |
 
-> any user-defined metrics will appear here.
+> any custom metrics will appear here.
 
 ## Recording custom metrics
 
@@ -387,8 +392,8 @@ await dyno(async function cycle() {
 }, {
   parameters: { cyclesPerSecond: 20 },
   
-  onTick: log => {    
-    console.log(log().threads().metrics().pick('mean'))
+  onTick: list => {    
+    console.log(list().threads().metrics().pick('mean'))
   }
 })
 
@@ -403,11 +408,11 @@ await dyno(async function cycle() {
 ```
 
 > **note:** the stats collector uses the function name for the metric name,
-> so anonymous lambdas/arrow-functions should be avoided.
+> so named `function`s should be preffered to anonymous arrow-functions
 
 ### Plotting
 
-Each metric contains up to 100 *snapshots* of its past states.
+Each metric contains up to 50 *snapshots* of its past states.
 
 This allows plotting them as a *timeline*, using the 
 [`console.plot`][console-plot] module.
@@ -436,9 +441,9 @@ await dyno(async function cycle() {
 
   parameters: { cyclesPerSecond: 15, durationMs: 20 * 1000 },
 
-  onTick: log => {  
+  onTick: list => {  
     console.clear()
-    console.plot(log().threads().pick('snapshots').of('mean').group(), {
+    console.plot(list().threads().pick('snapshots').of('mean').group(), {
       title: 'Plot',
       subtitle: 'mean durations (ms)'
     })
@@ -605,12 +610,11 @@ replication of an actual production environment.
 This is a prototyping tool that helps testing whether some prototype idea is 
 worth proceeding with or whether it has unworkable scalability issues. 
 
-It's multithreading nature is meant to mimic the execution model of 
-horizontally-scalable, shared-nothing, cloud-deployed parallel-services that 
-live behind a load balancer.
+It's multi-threaded model is meant to mimic the execution model of 
+horizontally-scalable, share-nothing services.
 
 It's original purpose was for benchmarking a module prototype that 
-heavily interacts with `Redis`. 
+heavily interacts with a data store over a network. 
 
 It's not meant for side-to-side benchmarking of synchronous code,
 [Google's Tachometer][tachometer] being a much better fit.
@@ -634,6 +638,8 @@ test coverage:
 ```bash
 npm run test:coverage
 ```
+
+> **note:** the parameter prompt is suppressed when `NODE_ENV=test`
 
 meta checks:
 
@@ -705,6 +711,7 @@ npm run examples:update
 [opt]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Optional_chaining
 [mean]: https://en.wikipedia.org/wiki/Mean
 [nd]: https://en.wikipedia.org/wiki/Normal_distribution#Standard_normal_distribution
+[obj-group-by]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/groupBy
 [tachometer]: https://github.com/google/tachometer?tab=readme-ov-file
 <!--- Basic -->
 

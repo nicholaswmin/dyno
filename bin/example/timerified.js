@@ -12,8 +12,8 @@ await dyno(async function cycle() {
 }, {
   parameters: { cyclesPerSecond: 20 },
   
-  onTick: log => {    
-    console.log(log().threads().metrics().pick('mean'))
+  onTick: list => {    
+    console.log(list().threads().metrics().pick('mean'))
   }
 })
 

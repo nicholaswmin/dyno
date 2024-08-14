@@ -15,7 +15,7 @@ class MetricsGroup {
     return this[pid]
   }
 
-  log() {
+  list() {
     return MetricsList.from(Object.values(this))
   }
 }

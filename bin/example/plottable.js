@@ -17,9 +17,9 @@ await dyno(async function cycle() {
 
   parameters: { cyclesPerSecond: 15, durationMs: 20 * 1000 },
 
-  onTick: log => {  
+  onTick: list => {  
     console.clear()
-    console.plot(log().threads().pick('snapshots').of('mean').group(), {
+    console.plot(list().threads().pick('snapshots').of('mean').group(), {
       title: 'Plot',
       subtitle: 'mean durations (ms)'
     })

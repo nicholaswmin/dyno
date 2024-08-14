@@ -17,7 +17,7 @@ class Collector {
     this.bus.listen(threads, metric => {
       return this.on ? (() => {
         this.#record(metric)
-        cb(this.metricsGroup.log.bind(this.metricsGroup)) 
+        cb(this.metricsGroup.list.bind(this.metricsGroup)) 
       })() : null
     })
   }
@@ -28,7 +28,7 @@ class Collector {
   }
   
   result() {
-    return this.metricsGroup
+    return this.metricsGroup.list()
   }
   
   #createTrackedMetricsForThread({ pid }) {
