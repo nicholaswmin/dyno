@@ -211,11 +211,11 @@ is the rate at which it receives `cycle` commands.
 
 The benchmarker comes with a statistical measurement system.
 
-Some metrics are recorded by default;   
-others can be recorded by the user within a task thread.
+Some metrics are recorded by default; others can be recorded by the user 
+within a task thread.
 
-Every recorded value is tracked as a `Metric` represented as 
-a [histogram][hgram], so it has `min`, `mean(avg)`, `max`  properties.
+Every recorded value is tracked as a `Metric`, represented as a 
+[histogram][hgram] with `min`, `mean`, `max` properties.
 
 This is necessary because only a [statistical method][nd] can shield the test 
 results from uncontrollable environmental events, otherwise each test run 
