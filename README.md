@@ -8,7 +8,6 @@
 * [quickstart](#install)
   + [parameters](#test-parameters)
 * [test process](#the-test-process)
-  - [process model](#process-model)
   - [glossary](#glossary)
 * [metrics](#metrics)
   - [querying metrics](#querying-metrics)
