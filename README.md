@@ -14,7 +14,7 @@
   - [querying metrics](#querying-metrics)
   - [default metrics](#default-metrics)
   - [recording custom metrics](#recording-custom-metrics)
-* [plotting metrics](#plotting)
+  - [plotting metrics](#plotting)
 * [gotchas](#gotchas)
 * [tests](#tests)
 * [misc.](#misc)
@@ -161,6 +161,32 @@ An example:
 Each `task thread` must execute its own code in `< 1 second` since this 
 is the rate at which it receives `cycle` commands.
 
+## The process model
+
+This is how the process model would look, if sketched out.  
+
+```js
+// assume `fib()` is the benchmarked code
+
+Primary 0: cycles issued: 100, finished: 93, backlog: 7
+│
+│
+├── Thread 1
+│   └── function fib(n) {
+│       ├── return n < 1 ? 0
+│       └── : n <= 2 ? 1 : fib(n - 1) + fib(n - 2)}
+│
+├── Thread 2
+│   └── function fib(n) {
+│       ├── return n < 1 ? 0
+│       └── : n <= 2 ? 1 : fib(n - 1) + fib(n - 2)}
+│
+└── Thread 3
+    └── function fib(n) {
+        ├── return n < 1 ? 0
+        └── : n <= 2 ? 1 : fib(n - 1) + fib(n - 2)}
+```
+
 ## Glossary
 
 #### `primary`
@@ -194,32 +220,6 @@ Amount of time it takes a `task thread` to execute it's own code
 
 Count of issued `cycle` commands that have been issued/sent but not 
 executed yet.   
-
-## The process model
-
-This is how the process model would look, if sketched out.  
-
-```js
-// assume `fib()` is the benchmarked code
-
-Primary 0: cycles issued: 100, finished: 93, backlog: 7
-│
-│
-├── Thread 1
-│   └── function fib(n) {
-│       ├── return n < 1 ? 0
-│       └── : n <= 2 ? 1 : fib(n - 1) + fib(n - 2)}
-│
-├── Thread 2
-│   └── function fib(n) {
-│       ├── return n < 1 ? 0
-│       └── : n <= 2 ? 1 : fib(n - 1) + fib(n - 2)}
-│
-└── Thread 3
-    └── function fib(n) {
-        ├── return n < 1 ? 0
-        └── : n <= 2 ? 1 : fib(n - 1) + fib(n - 2)}
-```
 
 ## Metrics
 
