@@ -16,7 +16,7 @@
 * [plotting metrics](#plotting)
 * [gotchas](#gotchas)
   + [missing custom metrics](#missing-custom-metrics`)
-  + [self-forking files](#avoiding-self-forking)
+  + [benchmark running multiple times](#avoiding-self-forking)
 * [tests](#tests)
 * [misc.](#misc)
 * [authors](#authors)
@@ -501,7 +501,7 @@ function foo() {
 performance.timerify(foo)()
 ```
 
-### self-forking files
+### file running multiple times
 
 The benchmark file self-forks itself. 👀 
 
