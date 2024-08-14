@@ -392,7 +392,7 @@ await dyno(async function cycle() {
 // └─────────┴───────────┘
 ```
 
-> **note:** the stats collector uses the function name for the metric name,
+> **note:** the metrics collector uses the *function name* as the metric name,
 > so named `function`s should be preffered to anonymous arrow-functions
 
 ### Plotting
