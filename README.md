@@ -227,8 +227,7 @@ All metrics are collected in *milliseconds*.
 
 ### Querying metrics
 
-Metrics can be queried from the `log` function provided in the 
-`onTick` callback.
+Metrics can be queried from the `log` argument of the `onTick` callback.
 
 ```js
 // ...
