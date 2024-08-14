@@ -281,8 +281,8 @@ const snapshotsMax = log().primary().pick('snapshots').of('max')
 log specific metric(s) 
 
 ```js
-const loopMetrics = log().threads().metrics('evt_loop').pick('max')
-// log only the 'max' event loop delay for each threads
+const loopMetrics = log().threads().metrics('evt_loop', 'fibonacci')
+// log only the `evt_loop` and `fibonacci` metrics
 ```
 
 #### `.sortBy()`
