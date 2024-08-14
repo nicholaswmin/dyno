@@ -16,8 +16,6 @@
 * [gotchas](#gotchas)
   + [missing custom metrics](#missing-custom-metrics`)
   + [self-forking files](#avoiding-self-forking)
-    - [using hooks](#using-hooks)
-    - [using a task file](#fallback-to-using-a-task-file)
 * [tests](#tests)
 * [misc.](#misc)
 * [authors](#authors)
@@ -333,20 +331,19 @@ The following metrics are collected by default:
 
 #### `threads`  
 
-
 | name               | description         |
 |--------------------|---------------------|
 | `cycles`           | cycle timings       |
 | `evt_loop`         | event loop timings  |
 
-> Any user-defined metrics will appear here.
+> any user-defined metrics will appear here.
 
 ### Recording custom metrics
 
 Custom metrics can be recorded with either:
 
 - [`performance.timerify`][timerify]
-- [`performanc.measure`][measure]
+- [`performance.measure`][measure]
 
 both of them are native extensions of the [User Timing APIs][perf-api].
 
