@@ -714,7 +714,7 @@ npm run examples:update
 [codeql-workflow]: https://github.com/nicholaswmin/dyno/actions/workflows/codeql.yml
 
 [deps-badge]: https://img.shields.io/badge/dependencies-0-b.svg
-[deps-report]: https://github.com/nicholaswmin/dyno/edit/main/README.md
+[deps-report]: https://blog.author.io/npm-needs-a-personal-trainer-537e0f8859c6
 
 <!--- Content -->
 
