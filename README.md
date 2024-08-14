@@ -236,9 +236,6 @@ onTick: logs => {
 }
 ```
 
-The `log` function provided in the `onTick` callback can be queried with
-these methods:
-
 #### `.primary()`
 
 log all metrics of the primary/main. 
