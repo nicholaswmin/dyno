@@ -294,8 +294,7 @@ to an array of single histogram values.
 
 ```js
 list().primary().pick('snapshots').of('max')
-// from this: [{ cycle: [{ ... max: 5 }, { ... max: 3 }, { ... max: 2 } ] } ... 
-// to this  : [{ cycle: [5,3,2 ....] } ...
+// [{ cycle: [5, 3, 2 ... ], evt_loop: [10, 12, 13, ...] } ...
 ```
 
 > note: only makes sense if it comes after `.pick('snapshots')` 
@@ -324,7 +323,9 @@ list().threads().pick('min').sort('cycle', 'desc')
 get result as an `Object` with each metric as a property
 
 ```js
-const obj = list().threads().pick('snapshots').of('mean').group()
+list().threads().pick('snapshots').of('mean').group()
+
+// { cycle: [5, 13, 2, 6 ....], evt_loop: [11, 12, 16 ...],  ...
 ```
 
 ### Default metrics
