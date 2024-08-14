@@ -389,10 +389,10 @@ await dyno(async function cycle() {
 
 ### Plotting
 
-The tracked histograms contain *snapshots* of their past values. 
+Each metric contains up to 100 *snapshots* of its past states.
 
-This allows plotting a timeline of the measurements, 
-using the [`console.plot`][console-plot] module.
+This allows plotting them as a *timeline*, using the 
+[`console.plot`][console-plot] module.
 
 > The following example benchmarks 2 `sleep` functions 
 > & plots their timings as an ASCII chart
