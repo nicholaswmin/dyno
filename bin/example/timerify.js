@@ -10,7 +10,7 @@ await dyno(async function cycle() {
   })(30)
 
 }, {
-  parameters: { cyclesPerSecond: 20 },
+  parameters: { threads: 4 },
   
   onTick: list => {    
     console.log(list().threads().pick('mean'))
