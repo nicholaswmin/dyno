@@ -212,7 +212,8 @@ is the rate at which it receives `cycle` commands.
 
 ## Metrics
 
-The benchmarker comes with a statistical measurement system.
+The benchmarker comes with a statistical measurement system that can be 
+optionally used to diagnose bottlenecks.
 
 Some metrics are recorded by default; others can be recorded by the user 
 within a task thread.
