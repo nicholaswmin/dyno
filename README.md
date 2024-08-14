@@ -227,9 +227,9 @@ within a task thread.
 Every recorded value is tracked as a `Metric`, represented as a 
 [histogram][hgram] with statistically relevant properties.
 
-### Histogram 
+### Metric structure 
 
-A metric is represented as a histogram with the following properties:
+A `Metric` is represented as a histogram with the following properties:
 
 | name        | description                       |
 |-------------|-----------------------------------|
