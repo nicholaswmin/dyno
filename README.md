@@ -237,8 +237,6 @@ as part of the benchmarked code.
 
 ### Metric structure 
 
-`Metric` properties:
-
 | name        | description                                 |
 |-------------|---------------------------------------------|
 | `count`     | number of values/samples.                   |
