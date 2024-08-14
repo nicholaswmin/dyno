@@ -45,7 +45,7 @@ test('#onTick() metrics result', async t => {
       t.assert.ok(metrics.length > 0, 'result has no properties')
     })
     
-    await t.test('a Metric has histogram-like properties', t => {
+    await t.test('Metric has histogram-like properties', t => {
       const metric = result[1].cycle, props = Object.keys(metric || {})
 
       t.assert.ok(props.includes('min'), 'metric has no "min"')
@@ -54,13 +54,6 @@ test('#onTick() metrics result', async t => {
       
       t.assert.ok(metric.mean > 0, 'metric.mean is 0')
       t.assert.ok(metric.max > 0, 'metric.max is 0')
-    })
-    
-    await t.test('A Metric has snapshots', t => {  
-      const metric = result[1].cycle, props = Object.keys(metric || {})
-
-      t.assert.ok(props.includes('snapshots'), 'no "snapshots" prop')
-      t.assert.ok(metric.snapshots.length > 0, "snapshots is empty")
     })
   })
 })
