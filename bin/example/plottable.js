@@ -5,11 +5,11 @@ import console from '@nicholaswmin/console-plot'
 
 await dyno(async function cycle() { 
 
-  await performance.timerify(function sleepRandom1(ms) {
+  await performance.timerify(function sleepOne(ms) {
     return new Promise(r => setTimeout(r, Math.random() * ms))
   })(Math.random() * 20)
   
-  await performance.timerify(function sleepRandom2(ms) {
+  await performance.timerify(function sleepTwo(ms) {
     return new Promise(r => setTimeout(r, Math.random() * ms))
   })(Math.random() * 20)
   

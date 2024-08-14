@@ -405,23 +405,23 @@ await dyno(async function cycle() {
   performance.mark('start')
   await new Promise(r => setTimeout(r, Math.random() * 500))
   performance.mark('end')
-  performance.measure('sleep-timing', 'start', 'end')
+  performance.measure('sleep', 'start', 'end')
 
 }, {
   parameters: { cyclesPerSecond: 20 },
   
   onTick: list => {    
-    console.log(list().threads().metrics().pick('mean'))
+    console.log(list().threads().metrics().pick('max'))
   }
 })
 
 // Logs: 
 // 
 // MetricsList(4) [
-//  { cycle: 155.1, 'fibonacci': 123.6 },
-//  { cycle: 146.2, 'fibonacci': 111.5 },
-//  { cycle: 153.6, 'fibonacci': 120.1 },
-//  { cycle: 161.3, 'fibonacci': 131.2 }
+//  { cycle: 155.1, 'sleep': 123.6 },
+//  { cycle: 146.2, 'sleep': 111.5 },
+//  { cycle: 153.6, 'sleep': 120.1 },
+//  { cycle: 161.3, 'sleep': 131.2 }
 // })
 ```
 
@@ -436,8 +436,7 @@ Each metric contains up to 50 *snapshots* of its past states.
 This allows plotting them as a *timeline*, using the 
 [`console.plot`][console-plot] module.
 
-> The following example benchmarks 2 `sleep` functions 
-> & plots their timings as an ASCII chart
+> **example:** instrument 2 functions & plot the timings as an ASCII chart
 
 ```js
 // Requires: 
@@ -448,11 +447,11 @@ import console from '@nicholaswmin/console-plot'
 
 await dyno(async function cycle() { 
 
-  await performance.timerify(function sleepRandom1(ms) {
+  await performance.timerify(function sleepOne(ms) {
     return new Promise(r => setTimeout(r, Math.random() * ms))
   })(Math.random() * 20)
   
-  await performance.timerify(function sleepRandom2(ms) {
+  await performance.timerify(function sleepTwo(ms) {
     return new Promise(r => setTimeout(r, Math.random() * ms))
   })(Math.random() * 20)
   
@@ -476,7 +475,7 @@ which logs:
 
 Plot
 
--- sleepRandom1  -- cycle  -- sleepRandom2  -- evt_loop
+-- sleepOne  -- sleepTwo  -- cycle  -- evt_loop
 
 11.75 ┤╭╮                                                                                                   
 11.28 ┼─────────────────────────────────────────────────────────────────────╮                               
