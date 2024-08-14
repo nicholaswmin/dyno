@@ -337,12 +337,12 @@ The following metrics are collected by default:
 
 #### `primary`  
 
-| name        | description               |
-|-------------|---------------------------|
-| `issued`    | count of issued cycles    |
-| `completed` | count of completed cycles |
-| `backlog`   | size of cycles backlog    |
-| `uptime`    | seconds since test start  |
+| name        | description                    |
+|-------------|--------------------------------|
+| `issued`    | count of issued cycles         |
+| `completed` | count of processed cycles      |
+| `backlog`   | count of unprocessed cycles    |
+| `uptime`    | count of elapsed seconds       |
 
 #### `threads`  
 
