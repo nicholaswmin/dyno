@@ -236,16 +236,14 @@ values are being repeatedly recorded over time.
 ### An example 
 
 Assume [`performance.measure('foo', ...)`][measure] is called in a task,
-which is a [`PerformanceAPI`][perf-api] method that records *durations*.
+which is a [`PerformanceAPI`][perf-api] method that records *durations*:
 
-The benchmarker automatically detects it and creates a `Metric:foo`.
-
-Subsequent calls with the same name: i.e `performance.measure('foo', ...)` 
-will cause the benchmarker to update that same `Metric:Foo`, using the 
-measure's `duration`.
-
-Given enough samples/cycles, the metric's computed `mean` value will reflect 
-a de-noised, good-enough approximation for that particular measurement.
+- The benchmarker automatically detects it and creates a `Metric:foo`.
+- Subsequent calls with the same name: i.e `performance.measure('foo', ...)` 
+  will cause the benchmarker to update that same `Metric:Foo`, using the 
+  measure's `duration`.
+- Given enough samples/cycles, the metric's computed `mean` value will reflect 
+  a de-noised, good-enough approximation for that particular measurement.
 
 Both the primary and each task thread record their own metrics.     
 Some metrics are provided by default; others can be recorded by the user 
