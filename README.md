@@ -325,7 +325,9 @@ sort by specific metric
 metrics().threads().pick('min').sort('cycle', 'desc')
 ```
 
-> `direction` can be: `asc`, `desc`
+> `direction` can be: `asc`, `desc`  
+
+>  **note:** no-op if `.group()` is chained before this.
 
 #### `.group()`
 
@@ -336,6 +338,9 @@ metrics().threads().pick('snapshots').of('mean').group()
 
 // { cycle: [5, 13, 2, 6 ....], evt_loop: [11, 12, 16 ...],  ...
 ```
+
+>  **note:** renders subsequent `.sortBy()` as no-ops
+
 
 ### Default metrics
 

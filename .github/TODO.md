@@ -2,7 +2,7 @@
 
 ## fix
 
-- [ ] implement the `metrics.sort()` method
+- [x] implement the `metrics.sort()` method
 - [ ] Sweep over values and make sure they are accurate - some timers miss
       a second, other values have `off-by-one` issues.
 - [ ] The task hooks might not be needed, if so ditch them.
