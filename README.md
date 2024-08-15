@@ -251,7 +251,7 @@ Both the primary and each task thread record their own metrics.
 Some metrics are provided by default; others can be recorded by the user 
 as part of the benchmarked code, as shown above.
 
-> a [working example](#using-performance.measure) using `performance.measure` 
+> a [working example](#using-performancemeasure) using `performance.measure` 
 > can be found below
 
 ### Metric structure 
@@ -431,7 +431,7 @@ await dyno(async function cycle() {
 > so it's best to avoid using arrow-functions.   
 > Read [this](#missing-custom-metrics) for more details.
 
-##### using `perfomance.measure():`
+##### using `performance.measure()`:
 
 ```js
 // performance.measure()
