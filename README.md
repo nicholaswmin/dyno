@@ -266,8 +266,8 @@ as part of the benchmarked code, as shown above.
 | `last`      | last value                                  |
 | `snapshots` | past states                                 |
 
-> **note:** timing metrics are collected in *milliseconds*.   
-> **note:** each time a value is recorded, a snapshot of the current state 
+> - timing metrics are collected in *milliseconds*.   
+> - each time a value is recorded, a snapshot of the current state 
 > of the metric is captured & saved in it's `snapshots` property. 
 
 ### Querying metrics
@@ -325,7 +325,7 @@ metrics().primary().pick('snapshots').of('max')
 // [{ cycle: [5, 3, 2 ... ], evt_loop: [10, 12, 13, ...] } ...
 ```
 
-> note: only makes sense if it comes after `.pick('snapshots')` 
+> only makes sense if it comes after `.pick('snapshots')` 
 
 #### `.only()`
 
@@ -336,8 +336,7 @@ metrics().threads().only('evt_loop', 'fibonacci')
 // only the `evt_loop` and `fibonacci` metrics
 ```
 
-> **note:** must be chained after `.primary()` or `.threads`, 
-> otherwise no-op.
+> must be chained after `.primary()` or `.threads`, otherwise no-op.
 
 #### `.sortBy(metric, direction)`
 
@@ -349,7 +348,7 @@ metrics().threads().pick('min').sortBy('cycle', 'desc')
 
 > `direction` can be: `asc`, `desc`  
 
->  **note:** no-op if `.group()` is chained before this.
+>  no-op if `.group()` is chained before this.
 
 #### `.group()`
 
@@ -361,7 +360,7 @@ metrics().threads().pick('snapshots').of('mean').group()
 // { cycle: [5, 13, 2, 6 ....], evt_loop: [11, 12, 16 ...],  ...
 ```
 
->  **note:** renders subsequent `.sortBy()` as no-ops
+> renders subsequent `.sortBy()` as no-ops
 
 
 ### Default metrics
@@ -430,7 +429,7 @@ await dyno(async function cycle() {
 // })
 ```
 
-> **note:** the benchmarker uses the *function name* as the metric name,
+> the benchmarker uses the *function name* as the metric name,
 > so it's best to avoid using arrow-functions.   
 
 ##### using `performance.measure()`:
@@ -697,8 +696,8 @@ test coverage:
 npm run test:coverage
 ```
 
-> **note:** Running individual tests requires `NODE_ENV=test`, 
-> which suppresses the parameter user prompt.
+> running tests individually requires `NODE_ENV=test`,  which suppresses 
+> the parameter user prompt.
 
 meta checks:
 
