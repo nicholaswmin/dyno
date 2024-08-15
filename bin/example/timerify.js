@@ -3,10 +3,18 @@ import { dyno } from '{{entrypath}}'
 
 await dyno(async function cycle() { 
 
-  performance.timerify(function fibonacci(n) {
+  performance.timerify(function recursive_fibonacci(n) {
     return n < 1 ? 0
       : n <= 2 ? 1
-      : fibonacci(n - 1) + fibonacci(n - 2)
+      : recursive_fibonacci(n - 1) + recursive_fibonacci(n - 2)
+  })(30)
+  
+  performance.timerify(function iterative_fibonacci(n) {
+    function fib(n) {
+      const phi = (1 + Math.sqrt(5)) / 2
+
+      return Math.round(Math.pow(phi, n) / Math.sqrt(5))
+    }
   })(30)
 
 }, {
@@ -20,8 +28,8 @@ await dyno(async function cycle() {
 // Logs: 
 // 
 // MetricsList(4) [
-//  { cycle: 148.9, 'fibonacci': 101.4 },
-//  { cycle: 163.6, 'fibonacci': 145.2 },
-//  { cycle: 184.6, 'fibonacci': 145.8 },
-//  { cycle: 145.3, 'fibonacci': 121.9 }
+//  { 'iterative_fibonacci': 18.45, 'recursive_fibonacci': 122.51 },
+//  { 'iterative_fibonacci': 13.12, 'recursive_fibonacci': 131.50 },
+//  { 'iterative_fibonacci': 18.42, 'recursive_fibonacci': 151.22 },
+//  { 'iterative_fibonacci': 14.11, 'recursive_fibonacci': 141.27 }
 // })
