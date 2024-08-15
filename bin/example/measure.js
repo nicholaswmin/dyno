@@ -2,12 +2,14 @@
 import { dyno } from '{{entrypath}}'
 
 await dyno(async function cycle() { 
-  
   performance.mark('start')
+  
   await new Promise(r => setTimeout(r, Math.random() * 500))
+  
   performance.measure('foo', 'start')
 
   await new Promise(r => setTimeout(r, Math.random() * 250))
+
   performance.measure('bar', 'start')
 }, {
   parameters: { threads: 4 },
