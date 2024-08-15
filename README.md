@@ -322,7 +322,7 @@ metrics().threads().only('evt_loop', 'fibonacci')
 sort by specific metric
 
 ```js
-metrics().threads().pick('min').sort('cycle', 'desc')
+metrics().threads().pick('min').sortBy('cycle', 'desc')
 ```
 
 > `direction` can be: `asc`, `desc`  
