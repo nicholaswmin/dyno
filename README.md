@@ -235,14 +235,14 @@ values are being repeatedly recorded over time.
 
 ### An example 
 
-Assume [`performance.measure('foo', ...)`][measure] is called within a task,
-a [`PerformanceAPI`][perf-api] method that records *durations* between 2 marks.
+Assume [`performance.measure('foo', ...)`][measure] is called in a task,
+which is a [`PerformanceAPI`][perf-api] method that records *durations*.
 
-The benchmarker will automatically detect it and create a `Metric:foo`.
+The benchmarker automatically detects it and creates a `Metric:foo`.
 
 Subsequent calls with the same name: i.e `performance.measure('foo', ...)` 
 will cause the benchmarker to update that same `Metric:Foo`, using the 
-measures `duration` value.
+measure's `duration`.
 
 Given enough samples/cycles, the metric's computed `mean` value will reflect 
 a de-noised, good-enough approximation for that particular measurement.
@@ -250,6 +250,9 @@ a de-noised, good-enough approximation for that particular measurement.
 Both the primary and each task thread record their own metrics.     
 Some metrics are provided by default; others can be recorded by the user 
 as part of the benchmarked code, as shown above.
+
+> a [working example](#using-performance.measure) using `performance.measure` 
+> can be found below
 
 ### Metric structure 
 
@@ -428,7 +431,7 @@ await dyno(async function cycle() {
 > so it's best to avoid using arrow-functions.   
 > Read [this](#missing-custom-metrics) for more details.
 
-another example, using `perfomance.measure():`
+##### using `perfomance.measure():`
 
 ```js
 // performance.measure()
@@ -439,8 +442,7 @@ await dyno(async function cycle() {
   
   performance.mark('start')
   await new Promise(r => setTimeout(r, Math.random() * 500))
-  performance.mark('end')
-  performance.measure('sleep', 'start', 'end')
+  performance.measure('sleep', 'start')
 
 }, {
   parameters: { threads: 4 },
