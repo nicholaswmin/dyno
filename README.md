@@ -233,6 +233,11 @@ The measurement system is based on a `Metric` type, which is a
 [histogram][hgram] of a *measurement*, progressively calculated as different 
 values are being repeatedly recorded over time.
 
+Both the primary and each task thread record their own metrics.  
+
+Some metrics are provided by default; others can be recorded by the user 
+as part of the benchmarked code, as shown above.
+
 ### An example 
 
 Assume [`performance.measure('foo', ...)`][measure] is called in a task,
@@ -245,9 +250,6 @@ which is a [`PerformanceAPI`][perf-api] method that records *durations*:
 - Given enough samples/cycles, the metric's computed `mean` value will reflect 
   a de-noised, good-enough approximation for that particular measurement.
 
-Both the primary and each task thread record their own metrics.     
-Some metrics are provided by default; others can be recorded by the user 
-as part of the benchmarked code, as shown above.
 
 > a [working example](#using-performancemeasure) using `performance.measure` 
 > can be found below
