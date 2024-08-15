@@ -442,7 +442,7 @@ await dyno(async function cycle() {
   
   performance.mark('start')
   await new Promise(r => setTimeout(r, Math.random() * 500))
-  performance.measure('sleep', 'start', 'end')
+  performance.measure('sleep', 'start')
 
 }, {
   parameters: { threads: 4 },
