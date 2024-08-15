@@ -393,10 +393,6 @@ both are part of the native [Performance Measurement APIs][perf-api].
 The benchmarker automatically records their timings and attaches the
 tracked `Metric` histogram to its corresponding `task thread`. 
 
-> Custom metrics only make sense when there are many parts to the benchmarked
-> code and you need to instrument each one to dissect the bottleneck.   
-> Simple, one-function benchmarks can use the default `cycle` metric
-
 > **example:** log the average running time of a 2 types of `fibonacci`
 
 ```js
@@ -441,6 +437,9 @@ await dyno(async function cycle() {
 
 > the benchmarker uses the *function name* as the metric name,
 > so it's best to avoid using arrow-functions.   
+
+> Custom metrics only make sense in complex multi-part benchmarks  
+> Simple, one-function benchmarks can use the default `cycle` metric
 
 ##### using `performance.measure()`:
 
