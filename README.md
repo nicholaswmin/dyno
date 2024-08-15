@@ -658,8 +658,8 @@ console.log('done')
 
 ### Unnecessary metrics
 
-If the only benchmark is a simple `function`, it makes no sense to measure 
-a custom duration.
+If the only benchmark is a simple `function`, it makes no sense to create 
+a custom metric.
 
 Instead, use the provided default `cycle` metric.
 
