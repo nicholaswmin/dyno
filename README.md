@@ -393,7 +393,11 @@ both are part of the native [Performance Measurement APIs][perf-api].
 The benchmarker automatically records their timings and attaches the
 tracked `Metric` histogram to its corresponding `task thread`. 
 
-> **example:** log the average running time of a recursive `fibonacci`
+> Custom metrics only make sense when there are many parts to the benchmarked
+> code and you need to instrument each one to dissect the bottleneck. 
+> Simple, one-function benchmarks can use the default `cycle` metric
+
+> **example:** log the average running time of a 2 types of `fibonacci`
 
 ```js
 
@@ -403,10 +407,18 @@ import { dyno } from '@nicholaswmin/dyno'
 
 await dyno(async function cycle() { 
 
-  performance.timerify(function fibonacci(n) {
+  performance.timerify(function recursive_fibonacci(n) {
     return n < 1 ? 0
       : n <= 2 ? 1
-      : fibonacci(n - 1) + fibonacci(n - 2)
+      : recursive_fibonacci(n - 1) + recursive_fibonacci(n - 2)
+  })(30)
+  
+  performance.timerify(function iterative_fibonacci(n) {
+    function fib(n) {
+      const phi = (1 + Math.sqrt(5)) / 2
+
+      return Math.round(Math.pow(phi, n) / Math.sqrt(5))
+    }
   })(30)
 
 }, {
@@ -420,10 +432,10 @@ await dyno(async function cycle() {
 // Logs: 
 // 
 // MetricsList(4) [
-//  { cycle: 148.9, 'fibonacci': 101.4 },
-//  { cycle: 163.6, 'fibonacci': 145.2 },
-//  { cycle: 184.6, 'fibonacci': 145.8 },
-//  { cycle: 145.3, 'fibonacci': 121.9 }
+//  { 'iterative_fibonacci': 18.45, 'recursive_fibonacci': 122.51 },
+//  { 'iterative_fibonacci': 13.12, 'recursive_fibonacci': 131.50 },
+//  { 'iterative_fibonacci': 18.42, 'recursive_fibonacci': 151.22 },
+//  { 'iterative_fibonacci': 14.11, 'recursive_fibonacci': 141.27 }
 // })
 ```
 
@@ -655,16 +667,6 @@ console.log('done')
 > This should be the preferred method when running this as part 
 > of a test suite, since this is the only method that actually runs
 > the benchmark file just once.
-
-### Unnecessary metrics
-
-If the only benchmark is a simple `function`, it makes no sense to create 
-a custom metric.
-
-Instead, use the provided default `cycle` metric.
-
-Custom metrics only make sense when there are many parts to the benchmarked
-code and you need to instrument each one to dissect the bottleneck.
 
 
 ### Not a load-testing tool
