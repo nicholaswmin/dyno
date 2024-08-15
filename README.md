@@ -235,13 +235,14 @@ values are being repeatedly recorded over time.
 
 ### An example 
 
-Assume [`performance.measure('foo', 'a', 'b')`][measure] is called 
-within a task. 
+Assume [`performance.measure('foo', ...)`][measure] is called within a task,
+a [`PerformanceAPI`][perf-api] method that records *durations* between 2 marks.
 
 The benchmarker will automatically detect it and create a `Metric:foo`.
 
 Subsequent calls with the same name: i.e `performance.measure('foo', ...)` 
-will cause the benchmarker to update that same `Metric:Foo`.   
+will cause the benchmarker to update that same `Metric:Foo`, using the 
+measures `duration` value.
 
 Given enough samples/cycles, the metric's computed `mean` value will reflect 
 a de-noised, good-enough approximation for that particular measurement.
