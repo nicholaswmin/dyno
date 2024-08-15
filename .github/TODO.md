@@ -3,12 +3,13 @@
 ## fix
 
 - [x] implement the `metrics.sort()` method
-- [ ] the metrics `snapshots` ring buffer must save snapshots in a 
+- [ ] metrics `snapshots` ring buffer must save saved snapshots in a 
       way that allows maintaining a good-enough historical fidelity 
       while keeping a relatively low number of items.   
-      The starting values should not be replaced 
-      for example, neither the current ones. There must be a statistical
-      formula as to how this should be implemented.
+      The initial values should not be replaced; neither the current ones. 
+      It's current method of operation renders it of no real utility since the 
+      buffer size is often less than even a 1-second cycle rate.
+      There must be a statistical method as to how this can be implemented.
 - [ ] Sweep over values and make sure they are accurate - some timers miss
       a second, other values have `off-by-one` issues.
 - [ ] The task hooks might not be needed, if so ditch them.
@@ -20,16 +21,22 @@
 
 ## feat 
 
-- [ ] Implement progressive-rate
-  - start at a given cycles-per-second and increase automatically. 
-  - detect when a backlog is created and stop.
-  - the current cycles-per-second rate is the result score of the benchmark
-- [ ] warmup period
+- [ ] Implement automatic *progressive-rate* benchmarking.
+  - start at a low cycle rate and increase progressively, automatically. 
+    Detect when a backlog is created and stop.
+    The current cycle rate is set as the benchmark result.
+  - this almost(?) eliminates the need for test parameters and automates the 
+    bulk of the process.
+- [ ] warmup period 
+  - try implementing progressive-rate first which might eliminate the need
+    for this.
 - [x] event loop measures for each thread
-- [ ] implement max backlog limit
-- [x] implement last value on `histogram` (actual ones in collector)
+- [ ] implement a backlog threshold and end the test
+- [x] implement last value on `Metric`
 - [x] `tasks:run` and `backlog` should ideally be tracked on the `primary`
 - [ ] log test constants/parameters
+  - might not be needed with single file benchmarks, user can simply 
+    extract them in a variable on top-level and log them anyway.
 - [x] ~~log to file?~~ 
      - No, out of scope
 
@@ -54,7 +61,7 @@ s
 
 ## build
 
-- [ ] actually publish a `v1`
+- [ ] publish a `v1`
 - [x] "pull" this into its own project/repository
 - [x] publish to `npm`
 
