@@ -3,6 +3,7 @@
 ## fix
 
 - [x] implement the `metrics.sort()` method
+- [ ] Use a separate thread for the scheduler
 - [ ] metrics `snapshots` ring buffer must save saved snapshots in a 
       way that allows maintaining a good-enough historical fidelity 
       while keeping a relatively low number of items.   
@@ -34,18 +35,18 @@
 - [ ] implement a backlog threshold and end the test
 - [x] implement last value on `Metric`
 - [x] `tasks:run` and `backlog` should ideally be tracked on the `primary`
-- [ ] log test constants/parameters
+- [ ] ~~log test constants/parameters~~
   - might not be needed with single file benchmarks, user can simply 
     extract them in a variable on top-level and log them anyway.
-- [x] ~~log to file?~~ 
+- [ ] ~~log to file?~~ 
      - No, out of scope
 
 ## refactor 
 s
 - [x] `npx init` should generate the bare-minimum benchmark that includes 
       reasonable features (i.e plot etc)
-- [ ] `runner` and `task` are state machines, think about implementing them
-      as such
+- [ ] `runner` and `task` are state machines, think about implementing a
+  superclass for them.
 - [x] The entire `stats` `tracking`/`observer` infra/language needs to be 
       rethought; what is a `stat`, what is a `measure`, why is it called 
       `tracker`?  Must get a simple, non-convoluted domain language about it.
