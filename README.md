@@ -429,7 +429,6 @@ await dyno(async function cycle() {
 
 > **note:** the benchmarker uses the *function name* as the metric name,
 > so it's best to avoid using arrow-functions.   
-> Read [this](#missing-custom-metrics) for more details.
 
 ##### using `performance.measure()`:
 
@@ -442,8 +441,10 @@ await dyno(async function cycle() {
   
   performance.mark('start')
   await new Promise(r => setTimeout(r, Math.random() * 500))
-  performance.measure('sleep', 'start')
+  performance.measure('foo', 'start')
 
+  await new Promise(r => setTimeout(r, Math.random() * 250))
+  performance.measure('bar', 'start')
 }, {
   parameters: { threads: 4 },
   
@@ -455,10 +456,10 @@ await dyno(async function cycle() {
 // Logs: 
 // 
 // MetricsList(4) [
-//   { cycle: 141.33, sleep: 140.67 },
-//   { cycle: 241.21, sleep: 240.53 },
-//   { cycle: 333.37, sleep: 332.65 },
-//   { cycle: 317.67, sleep: 316.67 }
+//   { foo: 305.25, bar: 445.50 },
+//   { foo: 168.21, bar: 287.10 },
+//   { foo: 169.35, bar: 252.55 },
+//   { foo: 297.01, bar: 456.51 }
 // ]
 ```
 
