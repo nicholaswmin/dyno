@@ -5,8 +5,7 @@ await dyno(async function cycle() {
   
   performance.mark('start')
   await new Promise(r => setTimeout(r, Math.random() * 500))
-  performance.mark('end')
-  performance.measure('sleep', 'start', 'end')
+  performance.measure('sleep', 'start')
 
 }, {
   parameters: { threads: 4 },
@@ -19,8 +18,8 @@ await dyno(async function cycle() {
 // Logs: 
 // 
 // MetricsList(4) [
-//  { cycle: 155.1, 'sleep': 123.6 },
-//  { cycle: 146.2, 'sleep': 111.5 },
-//  { cycle: 153.6, 'sleep': 120.1 },
-//  { cycle: 159.5, 'sleep': 131.2 }
-// })
+//   { cycle: 141.33, sleep: 140.67 },
+//   { cycle: 241.21, sleep: 240.53 },
+//   { cycle: 333.37, sleep: 332.65 },
+//   { cycle: 317.67, sleep: 316.67 }
+// ]
