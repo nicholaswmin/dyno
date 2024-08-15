@@ -438,7 +438,7 @@ await dyno(async function cycle() {
 > the benchmarker uses the *function name* as the metric name,
 > so it's best to avoid using arrow-functions.   
 
-> Custom metrics only make sense in complex *multi-part* benchmarks.
+> Custom metrics only make sense in complex *multi-part* benchmarks.  
 > Simple, one-function benchmarks can use the default `cycle` metric
 
 ##### using `performance.measure()`:
