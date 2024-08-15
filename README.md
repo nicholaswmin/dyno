@@ -227,18 +227,26 @@ a statistical method is the only way one can capture
 [*reliable & reproducible*][reproducible] test results, otherwise each test run 
 would produce wildly inconsistent timings.
 
+### Metrics model
+
 The measurement system is based on a `Metric` type, which is a 
 [histogram][hgram] of a *measurement*, progressively calculated as different 
 values are being repeatedly recorded over time.
 
-As an example, assume `performance.measure('foo', 'mark-a', 'mark-b')` is 
-called in a task. 
+### An example 
 
-The collector detects it and creates a `Metric:foo` for it.  
-Any subsequent calls with the same name: i.e `performance.measure('foo', ...)` 
-will cause the collector to update the created `Metric`.
+Assume [`performance.measure('foo', 'a', 'b')`][measure] is called 
+within a task. 
 
-Both the primary and each task thread record their own metrics.   
+The collector will detect it and create a `Metric:foo`.
+
+Subsequent calls with the same name: i.e `performance.measure('foo', ...)` 
+will cause the collector to update that same `Metric:Foo`.   
+
+Given enough samples/cycles, the metric's computed `mean` value will reflect 
+a de-noised, good-enough approximation for that particular measurement.
+
+Both the primary and each task thread record their own metrics.     
 Some metrics are provided by default; others can be recorded by the user 
 as part of the benchmarked code, as shown above.
 
