@@ -1,9 +1,9 @@
 // Metrics 
 // 
 // - The exported `metric` emitter can be used to emit/record values. 
-//   It can be used either locally or a `child process`; the emitted 
-//   values are transmitted via a `Bus` which transparently works across 
-//   process boundaries.
+//   It can be used either locally or in a `child process`.   
+//   The emitted values are transmitted via a `Bus` which transparently 
+//   works across process boundaries.
 // 
 // - This collector listens for those recordings and records them as a 
 //   `Metric`, which is a histogram of all recorded values. A `Metric` is 
