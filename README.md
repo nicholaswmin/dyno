@@ -266,7 +266,7 @@ as part of the benchmarked code, as shown above.
 | `last`      | last value                                  |
 | `snapshots` | past states                                 |
 
-> timing metrics are collected in *milliseconds*.   
+> timing values (durations etc) are recorded in *milliseconds*.   
 
 ### Querying metrics
 
