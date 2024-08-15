@@ -238,10 +238,10 @@ values are being repeatedly recorded over time.
 Assume [`performance.measure('foo', 'a', 'b')`][measure] is called 
 within a task. 
 
-The collector will detect it and create a `Metric:foo`.
+The benchmarker will automatically detect it and create a `Metric:foo`.
 
 Subsequent calls with the same name: i.e `performance.measure('foo', ...)` 
-will cause the collector to update that same `Metric:Foo`.   
+will cause the benchmarker to update that same `Metric:Foo`.   
 
 Given enough samples/cycles, the metric's computed `mean` value will reflect 
 a de-noised, good-enough approximation for that particular measurement.
@@ -534,7 +534,7 @@ mean durations (ms)
 
 ### Missing custom metrics
 
-Using anonymous lambdas means the metrics collector has no function name to
+Using anonymous lambdas means the benchmarker has no function name to
 as a metric name. By their own definition, they are anonymous.
 
 change this:
