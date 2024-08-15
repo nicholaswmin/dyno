@@ -12,14 +12,15 @@
 // - It also provides a method to query collected metrics, via the
 //   a class that allows querying its contents via a fluent API.
 
-import { Bus } from '../bus/index.js'
 import { ThreadMetricsGroup } from './collection/index.js'
 import { metric } from './emitter/index.js'
 
 class MetricsCollector {
   constructor() {
     this.on = true  
-    this.bus = Bus()  
+    this.bus = global.universalBus || (() => {
+      throw new TypeError('Missing Bus() instance on: global.universalBus')
+    })()
     this.threads = new ThreadMetricsGroup()
   }
   

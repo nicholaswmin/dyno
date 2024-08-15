@@ -7,7 +7,7 @@ await dyno(async function cycle() {
     : n <= 2 ? 1 : fibonacci(n - 1) + fibonacci(n - 2)
   }
 
-  fibonacci(24)
+  fibonacci(30)
 
 }, {
   parameters: { cyclesPerSecond: 100, threads: 4, durationMs: 5 * 1000 },

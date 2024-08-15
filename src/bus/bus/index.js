@@ -55,4 +55,9 @@ class Bus {
 
 const bus = new Bus()
 
+// yes, I pollute the global scope.
+// yes, I know I should be DI-ing it.
+// ... but I won't.
+global.universalBus = bus
+
 export default () => bus

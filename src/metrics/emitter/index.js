@@ -1,8 +1,9 @@
-import { Bus } from '../../bus/index.js'
 import Measurement from './measurement/index.js'
 
 const metric = name => {
-  const bus = Bus()
+  const bus = global.universalBus || (() => {
+    throw new TypeError('Missing Bus() instance on: global.universalBus')
+  })()
   const record = ({ name, value }) => 
     bus.emit(new Measurement({ name, value }))
 
