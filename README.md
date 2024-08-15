@@ -337,7 +337,7 @@ metrics().threads().only('evt_loop', 'fibonacci')
 ```
 
 > **note:** must be chained after `.primary()` or `.threads`, 
-> otherwise noop.
+> otherwise no-op.
 
 #### `.sortBy(metric, direction)`
 
