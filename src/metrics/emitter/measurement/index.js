@@ -1,3 +1,8 @@
+// There is no concept of a saved `Measurement`. 
+// 
+// This is just a DTO to ensure data validity. 
+// As soon as it's collected by the metrics collector it becomes a `Metric`.
+
 class Measurement {
   constructor({ name, value }) {
     this.pid = this.#validateInteger(process.pid, 'pid')

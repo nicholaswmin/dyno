@@ -49,6 +49,7 @@ s
 - [x] The entire `stats` `tracking`/`observer` infra/language needs to be 
       rethought; what is a `stat`, what is a `measure`, why is it called 
       `tracker`?  Must get a simple, non-convoluted domain language about it.
+- [ ] include a sentence in each module, explaining what it's supposed to be.
 
 ## test
 
@@ -76,6 +77,4 @@ s
   - `.github/example/` 
   - `README` docs example 
   - `npx init` sample
-- [ ] document the architecture in a small paragraph
-    - include a sentence within each module, explaining at least what 
-      it's supposed to be.
+- [x] document the architecture in a small paragraph

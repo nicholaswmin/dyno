@@ -231,9 +231,16 @@ The measurement system is based on a `Metric` type, which is a
 [histogram][hgram] of a *measurement*, progressively calculated as different 
 values are being repeatedly recorded over time.
 
+As an example, assume `performance.measure('foo', 'mark-a', 'mark-b')` is 
+called in a task. 
+
+The collector detects it and creates a `Metric:foo` for it.  
+Any subsequent calls with the same name: i.e `performance.measure('foo', ...)` 
+will cause the collector to update the created `Metric`.
+
 Both the primary and each task thread record their own metrics.   
 Some metrics are provided by default; others can be recorded by the user 
-as part of the benchmarked code.
+as part of the benchmarked code, as shown above.
 
 ### Metric structure 
 
