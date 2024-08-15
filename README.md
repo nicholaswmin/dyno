@@ -236,7 +236,7 @@ values are being repeatedly recorded over time.
 Both the primary and each task thread record their own metrics.  
 
 Some metrics are provided by default; others can be recorded by the user 
-as part of the benchmarked code, as shown above.
+as part of the benchmarked code, as shown below.
 
 ### An example 
 
