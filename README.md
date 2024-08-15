@@ -656,6 +656,17 @@ console.log('done')
 > of a test suite, since this is the only method that actually runs
 > the benchmark file just once.
 
+### Unnecessary metrics
+
+If the only benchmark is a simple `function`, it makes no sense to measure 
+a custom duration.
+
+Instead, use the provided default `cycle` metric.
+
+Custom metrics only make sense when there are many parts to the benchmarked
+code and you need to instrument each one to dissect the bottleneck.
+
+
 ### Not a load-testing tool
 
 This is not a stress-testing tool.    
