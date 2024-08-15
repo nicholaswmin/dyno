@@ -130,10 +130,7 @@ await dyno(async function cycle() {
 | `durationMs`      | `Number` 	| `5000`     | total test duration, in `ms`    |
 | `threads`         | `Number` 	| `auto` 	   | number of spawned threads       |
 
-> `auto`: attempts to prefill with count of available cores, can be overriden
->
-> these parameters are user-configurable on test startup.
-
+> test parameters are user-configurable on test startup.
 
 ## The test process
 
