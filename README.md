@@ -394,7 +394,7 @@ The benchmarker automatically records their timings and attaches the
 tracked `Metric` histogram to its corresponding `task thread`. 
 
 > Custom metrics only make sense in complex, *multi-part* benchmarks.  
-> Simple, one-function benchmarks can use the default `cycle` metric
+> Simple, one-function benchmarks can just log the default `cycle` metric.
 
 > **example:** log the average running time of a 2 types of `fibonacci`
 
