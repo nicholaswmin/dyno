@@ -1,5 +1,5 @@
-import { process } from '../bus/index.js'
-import histogram from '../histogram/index.js'
+import '../global-bus/index.js'
+import { metric } from '../metrics/index.js'
 import { 
   LoopDelayObserver, 
   mapToEntries 
@@ -14,15 +14,15 @@ const run = async (taskFn, {
 
   const timed_task = performance.timerify(taskFn.bind(this))
   const taskRunner = parameters => timed_task(parameters)
-  const loopObserver = new LoopDelayObserver(histogram('evt_loop').record)
+  const loopObserver = new LoopDelayObserver(metric('evt_loop').record)
   const perfObserver = new PerformanceObserver(mapToEntries(entry => {
-    histogram(entry.name).record(entry.duration)
+    metric(entry.name).record(entry.duration)
   }))
   
   process.on('process:disconnect', async () => {
     loopObserver.disconnect()
     perfObserver.disconnect()
-    histogram().stop()
+    metric().stop()
 
     process.stop()
     await after(parameters)

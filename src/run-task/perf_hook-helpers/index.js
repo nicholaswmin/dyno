@@ -1,5 +1,5 @@
 // helpers to avoid convoluted user code, 
-// makes it easier to track measures using: `histogram().record()`
+// makes it easier to track measures using: `metric().record()`
 
 import { monitorEventLoopDelay } from 'node:perf_hooks'
 

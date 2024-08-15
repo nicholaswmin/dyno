@@ -2,7 +2,7 @@ import RingBuffer from '../ring-buffer/index.js'
 import RecordableHistogram from './rec-histogram.js'
 import MetricsList from './metrics-list.js'
 
-class MetricsGroup {
+class ThreadMetricsGroup {
   constructor() {
     this.ppid = process.pid.toString()
   }
@@ -15,7 +15,7 @@ class MetricsGroup {
     return this[pid]
   }
 
-  list() {
+  metrics() {
     return MetricsList.from(Object.values(this))
   }
 }
@@ -84,4 +84,4 @@ class Metric extends RecordableHistogram {
   }
 }
 
-export { MetricsGroup, Metrics, Metric }
+export { ThreadMetricsGroup, Metrics, Metric }

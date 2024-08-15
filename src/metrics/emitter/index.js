@@ -1,8 +1,10 @@
-import { Bus } from '../bus/index.js'
 import Measurement from './measurement/index.js'
 
-const histogram = name => {
-  const bus = Bus()
+const bus = global.globalBus || (() => {
+  throw new TypeError('Missing GlobalBus() instance on: global.globalBus')
+})()
+
+const metric = name => {
   const record = ({ name, value }) => 
     bus.emit(new Measurement({ name, value }))
 
@@ -12,4 +14,4 @@ const histogram = name => {
   }
 }
 
-export default histogram
+export { metric }

@@ -8,13 +8,12 @@
 * [quickstart](#install)
   + [parameters](#test-parameters)
 * [test process](#the-test-process)
-  - [process model](#the-process-model)
   - [glossary](#glossary)
 * [metrics](#metrics)
   - [querying metrics](#querying-metrics)
   - [default metrics](#default-metrics)
-  - [recording custom metrics](#recording-custom-metrics)
-* [plotting metrics](#plotting)
+  - [custom metrics](#recording-custom-metrics)
+  - [plotting metrics](#plotting)
 * [gotchas](#gotchas)
 * [tests](#tests)
 * [misc.](#misc)
@@ -23,41 +22,37 @@
 
 ## Overview
 
-Loops a *task* function, for a given *duration*, across multiple threads.
+Loops a *function*, at a given *rate*, for a given *duration*, in `n` threads.
 
 A test is deemed succesful if it ends without creating a *cycle backlog*.
 
-> **example:** benchmark a recursive fibonacci function across 4 threads
+> **example:** benchmark a recursive `fibonacci` function
 
 ```js
 // benchmark.js
 import { dyno } from '@nicholaswmin/dyno'
 
 await dyno(async function cycle() { 
-  // <benchmarked-code>
 
   function fibonacci(n) {
     return n < 1 ? 0
     : n <= 2 ? 1 : fibonacci(n - 1) + fibonacci(n - 2)
   }
 
-  fibonacci(35)
+  fibonacci(30)
 
-  // </benchmarked-code>
 }, {
-  // test parameters
   parameters: { cyclesPerSecond: 100, threads: 4, durationMs: 5 * 1000 },
   
-  // log live stats
-  onTick: list => {    
+  onTick: metrics => {    
     console.clear()
-    console.table(list().primary().pick('count'))
-    console.table(list().threads().pick('mean'))
+    console.table(metrics().primary().pick('count'))
+    console.table(metrics().threads().pick('mean'))
   }
 })
 ```
 
-run it: 
+run: 
 
 ```bash
 node benchmark.js
@@ -74,7 +69,7 @@ cycle stats
 │ 4       │ 100    │ 95        │ 5       │
 └─────────┴────────┴───────────┴─────────┘
 
-average timings/durations, in ms
+mean of durations, in ms
 
 ┌─────────┬───────────┬────────┐
 │ thread  │ evt_loop  │ cycle  │
@@ -121,7 +116,7 @@ await dyno(async function cycle() {
     // add test parameters
   },
   
-  onTick: list => {    
+  onTick: metrics => {    
     // build logging from the provided measurements
   }
 })
@@ -129,30 +124,31 @@ await dyno(async function cycle() {
 
 ### Test parameters
 
-| name            	| type     	| default    | description                 	|
-|-----------------  |----------	|----------- |----------------------------- |
-| `cyclesPerSecond` | `Number` 	| `50`       | global cycle issue rate     	|
-| `durationMs`      | `Number` 	| `5000`     | how long the test should run |
-| `threads`         | `Number` 	| `auto` 	   | number of spawned threads    |
+| name            	| type     	| default    | description                     |
+|-----------------  |----------	|----------- |-------------------------------- |
+| `cyclesPerSecond` | `Number` 	| `50`       | cycle issue rate, per `second`  |
+| `durationMs`      | `Number` 	| `5000`     | total test duration, in `ms`    |
+| `threads`         | `Number` 	| `auto` 	   | number of spawned threads       |
 
-> `auto` means it detects the available cores but can be overriden
->
-> these parameters are user-configurable on test startup.
-
+> test parameters are user-configurable on test startup.
 
 ## The test process
 
-The `primary` spawns the benchmarked code as `task threads`.
+The `primary` spawns the benchmarked code in separate, concurrently-running 
+`task threads`.
 
 Then, it starts issuing `cycle` commands to each one, in [round-robin][rr],
-at a set rate, for a set duration.
+at a set `cycle rate`, for a set `test duration`.
 
-The `task threads` must execute their tasks faster than the time it takes for 
-their next `cycle` command to come through, otherwise the test will start 
-accumulating a `cycle backlog`.
+A cycle command causes a `task thread` to execute it's own `task`, 
+the benchmarked code and then report it's timing.
 
-When that happens, the test stops; the configured `cycle rate` is deemed as 
-the current *breaking point* of the benchmarked code.
+The task threads must collectively execute their tasks faster than 
+the time it takes for their next `cycle` command to come through,
+otherwise the entire test will start accumulating a `cycle backlog`.
+
+When the `backlog threshold` is reached, the test stops; the configured 
+`cycle rate` is deemed as the current *breaking point*  of that code.
 
 An example:
 
@@ -161,41 +157,7 @@ An example:
 Each `task thread` must execute its own code in `< 1 second` since this 
 is the rate at which it receives `cycle` commands.
 
-## Glossary
-
-#### `primary`
-
-The main process. Orchestrates the test and the spawned `task threads`.
-
-#### `task thread`
-
-The benchmarked code, running in its own separate process.
-
-Receives `cycle` commands from the primary, executes it's code and records 
-its timings.
-
-#### `task`
-
-The benchmarked code 
-
-#### `cycle`
-
-A command that signals a `task thread` to execute it's code. 
-
-#### `cycle rate`
-
-The rate at which the primary sends `cycle` commands to the `task threads`
-
-#### `cycle timing`
-
-Amount of time it takes a `task thread` to execute it's own code
-
-#### `cycle backlog`
-
-Count of issued `cycle` commands that have been issued/sent but not 
-executed yet.   
-
-## The process model
+### process model
 
 This is how the process model would look, if sketched out.  
 
@@ -221,45 +183,101 @@ Primary 0: cycles issued: 100, finished: 93, backlog: 7
         └── : n <= 2 ? 1 : fib(n - 1) + fib(n - 2)}
 ```
 
+## Glossary
+
+#### `primary`
+
+The main process. Orchestrates the test and the spawned `task threads`.
+
+#### `task thread`
+
+The benchmarked code, running in its own separate process.
+
+Receives `cycle` commands from the primary, executes it's code and records 
+its timings.
+
+#### `task`
+
+The benchmarked code 
+
+#### `cycle`
+
+A signal, telling a `task thread` to execute it's task. 
+
+#### `cycle rate`
+
+The rate at which the primary sends `cycle` commands to the `task threads`
+
+#### `backlog`
+
+Count of issued `cycle` commands that have been issued/sent but not 
+executed yet.   
+
 ## Metrics
 
 The benchmarker comes with a statistical measurement system that can be 
 optionally used to diagnose bottlenecks.
 
-Some metrics are recorded by default; others can be recorded by the user 
-within a task thread.
+In the realm of performance-testing 
+(and especially so in a runtime with a garbage-collector), 
+[statistical sampling][sampling] methods are robust methods used to capture 
+[*reliable & reproducible*][reproducible] test results, otherwise each test run 
+would produce wildly inconsistent timings.
 
-Every recorded value is tracked as a `Metric`, represented as a 
-[histogram][hgram] with `min`, `mean`, `max` properties.
+### Metrics model
 
-### Histogram 
+The measurement system is based on a `Metric` type, which is a 
+[histogram][hgram] of a *measurement*, progressively calculated as different 
+values are being repeatedly recorded over time.
 
-A metric is represented as a histogram with the following properties:
+Both the primary and each task thread record their own metrics.  
 
-| name        | description                       |
-|-------------|-----------------------------------|
-| `count`     | number of values/samples.         |
-| `min`       | minimum value                     |
-| `mean`      | mean/average of values            |
-| `max`       | maximum value                     |
-| `stddev`    | standard deviation between values |
-| `last`      | last value                        |
-| `snapshots` | last 50 states                    |
+Some metrics are provided by default; others can be recorded by the user 
+as part of the benchmarked code, as shown below.
 
-Timing metrics are collected in *milliseconds*. 
+### An example 
+
+Assume [`performance.measure('foo', ...)`][measure] is called in a task,
+which is a [`PerformanceAPI`][perf-api] method that records *durations*:
+
+- The benchmarker automatically detects it and creates a `Metric:foo`.
+- Subsequent calls with the same name: i.e `performance.measure('foo', ...)` 
+  will cause the benchmarker to update that same `Metric:Foo`, using the 
+  measure's `duration`.
+- Given enough samples/cycles, the metric's computed `mean` value will reflect 
+  a de-noised, good-enough approximation for that particular measurement.
+
+
+> a [working example](#using-performancemeasure) using `performance.measure` 
+> can be found below
+
+### Metric structure 
+
+| name        | description                                 |
+|-------------|---------------------------------------------|
+| `count`     | number of values/samples.                   |
+| `min`       | minimum value                               |
+| `mean`      | [mean][mean] / average of values            |
+| `max`       | maximum value                               |
+| `stddev`    | [standard deviation][stdev] between values  |
+| `last`      | last value                                  |
+| `snapshots` | past states                                 |
+
+> timing values (durations etc) are recorded in *milliseconds*.   
 
 ### Querying metrics
 
-Metrics can be queried from the `list` argument of the `onTick` callback.
+Metrics can be queried using a `metrics` function, provided as an argument 
+to the `onTick` callback.
 
 ```js
 // ...
-onTick: list => {    
+onTick: metrics => {    
   // primary metrics
-  console.log(list().primary())
+  console.log(metrics().primary())
 
   // task thread metrics
-  console.log(list().threads()) 
+  console.log(metrics().threads()) 
 }
 ```
 
@@ -269,7 +287,7 @@ get all primary/main metrics
 
 ```js
 // log all primary metrics
-console.log(list().primary())
+console.log(metrics().primary())
 ```
 
 #### `.threads()`
@@ -278,7 +296,7 @@ get all metrics, for each task thread
 
 ```js
 // log all metric of every task-thread
-console.log(list().threads())
+console.log(metrics().threads())
 ```
 
 #### `.pick()` 
@@ -286,72 +304,72 @@ console.log(list().threads())
 reduce all metrics to a single histogram property
 
 ```js
-list().threads().pick('min')
+metrics().threads().pick('min')
 
 // from this: { cycle: [{ min: 4, max: 5 }, evt_loop: { min: 2, max: 8 } ... 
 // to this  : { cycle: 4, evt_loop: 2 ...
 ```
 
-> available: `min`, `mean`, `max`, `stdev`, `snapshots`, `count`, `last`
->
-> - `stddev`: standard deviation between recorded values  
-> - `last`  : last recorded value  
-> - `count` : number of recorded values  
-
-#### `.of()` 
+> `unit` can be: `min`, `mean`, `max`, `stdev`, `snapshots`, `count`, `last`
 
 reduce all metrics that have been `pick`-ed to an array of histograms, 
 to an array of single histogram values.
 
 ```js
-list().primary().pick('snapshots').of('max')
-// from this: [{ cycle: [{ ... max: 5 }, { ... max: 3 }, { ... max: 2 } ] } ... 
-// to this  : [{ cycle: [5,3,2 ....] } ...
+metrics().primary().pick('snapshots').of('max')
+// [{ cycle: [5, 3, 2 ... ], evt_loop: [10, 12, 13, ...] } ...
 ```
 
-> note: only makes sense if it comes after `.pick('snapshots')` 
+> only makes sense if it comes after `.pick('snapshots')` 
 
-#### `.metrics()`
+#### `.only()`
 
-get specific metric(s) instead of all of them
+get specific metric(s)
 
 ```js
-const loopMetrics = list().threads().metrics('evt_loop', 'fibonacci')
+metrics().threads().only('evt_loop', 'fibonacci')
 // only the `evt_loop` and `fibonacci` metrics
 ```
 
-#### `.sortBy()`
+> must be chained after `.primary()` or `.threads`, otherwise no-op.
+
+#### `.sortBy(metric, direction)`
 
 sort by specific metric
 
 ```js
-const sorted = list().threads().pick('min').sort('cycle', 'desc')
-// sort by descending min 'cycle' durations
+metrics().threads().pick('min').sortBy('cycle', 'desc')
 ```
 
-> available: `desc`, `asc`
+> `direction` can be: `asc`, `desc`  
+
+>  no-op if `.group()` is chained before this.
 
 #### `.group()`
 
-get result as an `Object`, like [`Object.groupBy][obj-group-by] 
-with the metric name used as the key.
+get result as an `Object` with each metric as a property
 
 ```js
-const obj = list().threads().pick('snapshots').of('mean').group()
+metrics().threads().pick('snapshots').of('mean').group()
+
+// { cycle: [5, 13, 2, 6 ....], evt_loop: [11, 12, 16 ...],  ...
 ```
+
+> renders subsequent `.sortBy()` as no-ops
+
 
 ### Default metrics
 
-The following metrics are collected by default:
+These are collected by default:
 
 #### `primary`  
 
-| name        | description               |
-|-------------|---------------------------|
-| `issued`    | count of issued cycles    |
-| `completed` | count of completed cycles |
-| `backlog`   | size of cycles backlog    |
-| `uptime`    | seconds since test start  |
+| name        | description                    |
+|-------------|--------------------------------|
+| `issued`    | count of issued cycles         |
+| `completed` | count of processed cycles      |
+| `backlog`   | count of unprocessed cycles    |
+| `uptime`    | count of elapsed seconds       |
 
 #### `threads`  
 
@@ -360,8 +378,6 @@ The following metrics are collected by default:
 | `cycles`           | cycle timings       |
 | `evt_loop`         | event loop timings  |
 
-> any custom metrics will appear here.
-
 ## Recording custom metrics
 
 Custom metrics can be recorded with either:
@@ -369,56 +385,102 @@ Custom metrics can be recorded with either:
 - [`performance.timerify`][timerify]
 - [`performance.measure`][measure]
 
-both of them are native extensions of the [User Timing APIs][perf-api].
+both are part of the native [Performance Measurement APIs][perf-api].
 
-The metrics collector records their timings and attaches the tracked `Metric` 
-histogram to its corresponding `task thread`. 
+The benchmarker automatically records their timings and attaches the
+tracked `Metric` histogram to its corresponding `task thread`. 
 
-> **example:** instrumenting a function using `performance.timerify`:
+> Custom metrics only make sense in complex, *multi-part* benchmarks.  
+> Simple, one-function benchmarks can just log the default `cycle` metric.
+
+> **example:** log the running times of 2 types of `fibonacci`
 
 ```js
-// performance.timerify example
+
+// performance.timerify()
 
 import { dyno } from '@nicholaswmin/dyno'
 
 await dyno(async function cycle() { 
 
-  performance.timerify(function fibonacci(n) {
+  performance.timerify(function recursive_fibonacci(n) {
     return n < 1 ? 0
       : n <= 2 ? 1
-      : fibonacci(n - 1) + fibonacci(n - 2)
+      : recursive_fibonacci(n - 1) + recursive_fibonacci(n - 2)
+  })(30)
+  
+  performance.timerify(function iterative_fibonacci(n) {
+    function fib(n) {
+      const phi = (1 + Math.sqrt(5)) / 2
+
+      return Math.round(Math.pow(phi, n) / Math.sqrt(5))
+    }
   })(30)
 
 }, {
-  parameters: { cyclesPerSecond: 20 },
+  parameters: { threads: 4 },
   
   onTick: list => {    
-    console.log(list().threads().metrics().pick('mean'))
+    console.log(metrics().threads().pick('mean'))
   }
 })
 
-// logs 
-// ┌─────────┬───────────┐
-// │ cycle   │ fibonacci │
-// ├─────────┼───────────┤
-// │ 7       │ 7         │
-// │ 11      │ 5         │
-// │ 11      │ 5         │
-// └─────────┴───────────┘
+// Logs: 
+// 
+// MetricsList(4) [
+//  { 'iterative_fibonacci': 18.45, 'recursive_fibonacci': 122.51 },
+//  { 'iterative_fibonacci': 13.12, 'recursive_fibonacci': 131.50 },
+//  { 'iterative_fibonacci': 18.42, 'recursive_fibonacci': 151.22 },
+//  { 'iterative_fibonacci': 14.11, 'recursive_fibonacci': 141.27 }
+// })
 ```
 
-> **note:** the stats collector uses the function name for the metric name,
-> so named `function`s should be preffered to anonymous arrow-functions
+> the benchmarker uses the *function name* as the metric name,
+> so it's best to avoid using arrow-functions.   
+
+##### using `performance.measure()`:
+
+```js
+// performance.measure()
+
+import { dyno } from '@nicholaswmin/dyno'
+
+await dyno(async function cycle() { 
+  performance.mark('start')
+  
+  await new Promise(r => setTimeout(r, Math.random() * 500))
+  
+  performance.measure('foo', 'start')
+
+  await new Promise(r => setTimeout(r, Math.random() * 250))
+
+  performance.measure('bar', 'start')
+}, {
+  parameters: { threads: 4 },
+  
+  onTick: metrics => {    
+    console.log(metrics().threads().pick('mean'))
+  }
+})
+
+// Logs: 
+// 
+// MetricsList(4) [
+//   { foo: 305.25, bar: 445.50 },
+//   { foo: 168.21, bar: 287.10 },
+//   { foo: 169.35, bar: 252.55 },
+//   { foo: 297.01, bar: 456.51 }
+// ]
+```
 
 ### Plotting
 
-Each metric contains up to 50 *snapshots* of its past states.
+Each metric contains *snapshots* of its past states.
 
 This allows plotting them as a *timeline*, using the 
 [`console.plot`][console-plot] module.
 
-> The following example benchmarks 2 `sleep` functions 
-> & plots their timings as an ASCII chart
+> **example:** instrument 2 functions & plot the timings as an ASCII chart
 
 ```js
 // Requires: 
@@ -429,11 +491,11 @@ import console from '@nicholaswmin/console-plot'
 
 await dyno(async function cycle() { 
 
-  await performance.timerify(function sleepRandom1(ms) {
+  await performance.timerify(function sleepOne(ms) {
     return new Promise(r => setTimeout(r, Math.random() * ms))
   })(Math.random() * 20)
   
-  await performance.timerify(function sleepRandom2(ms) {
+  await performance.timerify(function sleepTwo(ms) {
     return new Promise(r => setTimeout(r, Math.random() * ms))
   })(Math.random() * 20)
   
@@ -441,9 +503,9 @@ await dyno(async function cycle() {
 
   parameters: { cyclesPerSecond: 15, durationMs: 20 * 1000 },
 
-  onTick: list => {  
+  onTick: metrics => {  
     console.clear()
-    console.plot(list().threads().pick('snapshots').of('mean').group(), {
+    console.plot(metrics().threads().pick('snapshots').of('mean').group(), {
       title: 'Plot',
       subtitle: 'mean durations (ms)'
     })
@@ -457,7 +519,7 @@ which logs:
 
 Plot
 
--- sleepRandom1  -- cycle  -- sleepRandom2  -- evt_loop
+-- sleepOne  -- sleepTwo  -- cycle  -- evt_loop
 
 11.75 ┤╭╮                                                                                                   
 11.28 ┼─────────────────────────────────────────────────────────────────────╮                               
@@ -486,10 +548,10 @@ mean durations (ms)
 
 ### Missing custom metrics
 
-Using lambdas/arrow functions means the metrics collector has no function 
-name to use for the metric. By their own definition, they are anonymous.
+Using anonymous lambdas means the benchmarker has no function name to
+as a metric name. By their own definition, they are anonymous.
 
-Change this:
+change this:
 
 ```js
 const foo = () => {
@@ -511,7 +573,7 @@ performance.timerify(foo)()
 
 ### code running multiple times
 
-The benchmark file self-forks itself. 👀 
+The benchmark file [self-forks][cp-fork] itself. 👀 
 
 This means that any code that exists *outside* the `dyno` block will *also* 
 run in multiple threads.
@@ -521,7 +583,7 @@ single-file benchmarks but it can create issues if you intent to run code
 after the `dyno()` resolves/ends; 
 or when running this as part of an automated test suite.
 
-> In this example, `'done'` is logged `3` times instead of `1`: 
+> **example**: `'done'` is logged `3` times instead of `1`: 
 
 ```js
 import { dyno } from '@nicholaswmin/dyno'
@@ -566,7 +628,7 @@ await dyno(async function cycle() {
 // "after"
 ```
 
-#### Fallback to using a task file
+#### Use a task file
 
 Alternatively, the *task* function can be extracted to it's own file.
 
@@ -599,7 +661,9 @@ console.log('done')
 ```
 
 > This should be the preferred method when running this as part 
-> of a test suite. 
+> of a test suite, since this is the only method that actually runs
+> the benchmark file just once.
+
 
 ### Not a load-testing tool
 
@@ -616,7 +680,7 @@ horizontally-scalable, share-nothing services.
 It's original purpose was for benchmarking a module prototype that 
 heavily interacts with a data store over a network. 
 
-It's not meant for side-to-side benchmarking of synchronous code,
+It's not meant for side-by-side benchmarking of synchronous code,
 [Google's Tachometer][tachometer] being a much better fit.
 
 ## Tests
@@ -639,7 +703,8 @@ test coverage:
 npm run test:coverage
 ```
 
-> **note:** the parameter prompt is suppressed when `NODE_ENV=test`
+> running tests individually requires `NODE_ENV=test`,  which suppresses 
+> the parameter user prompt.
 
 meta checks:
 
@@ -695,13 +760,14 @@ npm run examples:update
 [codeql-workflow]: https://github.com/nicholaswmin/dyno/actions/workflows/codeql.yml
 
 [deps-badge]: https://img.shields.io/badge/dependencies-0-b.svg
-[deps-report]: https://github.com/nicholaswmin/dyno/edit/main/README.md
+[deps-report]: https://blog.author.io/npm-needs-a-personal-trainer-537e0f8859c6
 
 <!--- Content -->
 
 [heroku]: https://heroku.com
 [rr]: https://en.wikipedia.org/wiki/Round-robin_scheduling
-[perf-api]: https://w3c.github.io/perf-timing-primer/
+[cp-fork]: https://nodejs.org/api/child_process.html#child_processforkmodulepath-args-options
+[perf-api]: https://nodejs.org/api/perf_hooks.html#performancemeasurename-startmarkoroptions-endmark
 [hgram]: https://en.wikipedia.org/wiki/Histogram
 [hgrams]: https://nodejs.org/api/perf_hooks.html#class-histogram
 [timerify]: https://nodejs.org/api/perf_hooks.html#performancetimerifyfn-options
@@ -710,6 +776,9 @@ npm run examples:update
 [v8]: https://v8.dev/
 [opt]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Optional_chaining
 [mean]: https://en.wikipedia.org/wiki/Mean
+[stdev]: https://en.wikipedia.org/wiki/Standard_deviation
+[reproducible]: https://en.wikipedia.org/wiki/Reproducibility
+[sampling]: https://en.wikipedia.org/wiki/Sampling_(statistics)
 [nd]: https://en.wikipedia.org/wiki/Normal_distribution#Standard_normal_distribution
 [obj-group-by]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/groupBy
 [tachometer]: https://github.com/google/tachometer?tab=readme-ov-file

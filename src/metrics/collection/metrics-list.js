@@ -1,13 +1,10 @@
-// fuunctions as a View, provides a fluent API for 
-// picking measurements.
+// Provides a fluent API for querying metrics.
 // 
 // i.e `console.table(foo.tasks().metrics().pick('mean'))`
 
 import { Metric, Metrics } from './index.js'
 
-const round = num => {
-  return Math.round((num + Number.EPSILON) * 100) / 100 || 'n/a'
-}
+const round = num => Math.round((num + Number.EPSILON) * 100) / 100 || 'n/a'
 
 const throwOnMissingUnit = unit => {
   if (typeof unit === 'undefined')
@@ -18,7 +15,7 @@ const throwOnMissingUnit = unit => {
 
 class MetricsList extends Array {
   #ppid = process.pid.toString() 
-  #only = []
+  #_only = []
   
   constructor(...args) {
     super(...args)
@@ -34,14 +31,28 @@ class MetricsList extends Array {
       .filter(metrics => metrics.pid !== this.#ppid)
   }
   
-  metrics(...args) {
-    this.#only = args
+  only(...args) {
+    this.#_only = args
     
     return this
   }
   
-  sortBy(key, direction) {
-    // @TODO
+  sortBy(key = '', direction = 'asc') {
+    if (!Array.isArray(this))
+      return    
+
+    if (typeof key !== 'string' || !key)
+      throw new TypeError('sorting key must be a non-empty string')
+
+    if (!['asc', 'desc'].includes(direction))
+      throw new RangeError('sorting direction can only be: "asc" or "desc"')
+    
+    if (this.length > 0 && typeof this[0][key] === 'undefined') 
+      throw new RangeError(`sorting key: ${key} does not exist`)
+
+    return this.sort((a, b) => {
+      return direction === 'asc' ? a[key] - b[key] : b[key] - a[key]
+    })
   }
 
   of(unit) {
@@ -63,7 +74,7 @@ class MetricsList extends Array {
 
     return this.map((metrics, i) => Object.keys(metrics)
         .filter(key => metrics[key] instanceof Metric)
-        .filter(key => this.#only.length ? this.#only.includes(key) : true)
+        .filter(key => this.#_only.length ? this.#_only.includes(key) : true)
         .reduce((acc, key) => ({
         ...acc, 
         [key]: typeof metrics[key][unit] == 'number' 
