@@ -396,7 +396,7 @@ tracked `Metric` histogram to its corresponding `task thread`.
 > Custom metrics only make sense in complex, *multi-part* benchmarks.  
 > Simple, one-function benchmarks can just log the default `cycle` metric.
 
-> **example:** log the average running time of 2 types of `fibonacci`
+> **example:** log the running times of 2 types of `fibonacci`
 
 ```js
 
