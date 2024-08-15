@@ -266,9 +266,7 @@ as part of the benchmarked code, as shown above.
 | `last`      | last value                                  |
 | `snapshots` | past states                                 |
 
-> - timing metrics are collected in *milliseconds*.   
-> - each time a value is recorded, a snapshot of the current state 
-> of the metric is captured & saved in it's `snapshots` property. 
+> timing metrics are collected in *milliseconds*.   
 
 ### Querying metrics
 
