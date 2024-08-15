@@ -1,5 +1,7 @@
 import os from 'node:os'
 import timer from 'timers/promises'
+
+import './src/global-bus/index.js'
 import prompt from './src/prompt/index.js'
 import threadpool from './src/threadpool/index.js'
 import runTask from './src/run-task/index.js'

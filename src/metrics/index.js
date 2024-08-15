@@ -18,8 +18,8 @@ import { metric } from './emitter/index.js'
 class MetricsCollector {
   constructor() {
     this.on = true  
-    this.bus = global.universalBus || (() => {
-      throw new TypeError('Missing Bus() instance on: global.universalBus')
+    this.bus = global.globalBus || (() => {
+      throw new TypeError('Missing GBus() instance on: global.globalBus')
     })()
     this.threads = new ThreadMetricsGroup()
   }

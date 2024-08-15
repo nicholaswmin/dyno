@@ -1,7 +1,7 @@
 import Measurement from './measurement/index.js'
 
-const bus = global.universalBus || (() => {
-  throw new TypeError('Missing Bus() instance on: global.universalBus')
+const bus = global.globalBus || (() => {
+  throw new TypeError('Missing GlobalBus() instance on: global.globalBus')
 })()
 
 const metric = name => {

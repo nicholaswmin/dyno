@@ -1,7 +1,7 @@
 import { EventEmitter } from 'node:events'
 import process from '../process/index.js'
 
-class Bus {
+class GlobalBus {
   constructor({ event = 'histogram:recorded' } = {}) {
     this.event = event
 
@@ -53,11 +53,11 @@ class Bus {
   }
 }
 
-const bus = new Bus()
+let instances = 0
 
-// yes, I pollute the global scope.
-// yes, I know I should be DI-ing it.
-// ... but I won't.
-global.universalBus = bus
-
-export default () => bus
+export default () => instances < 1 ? (() => {
+  ++instances
+  return new GlobalBus()
+})() : (() => {
+  throw new Error('cannot create > 1 GlobalBus()')
+})()
