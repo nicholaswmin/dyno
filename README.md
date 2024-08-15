@@ -223,7 +223,7 @@ optionally used to diagnose bottlenecks.
 
 In the realm of performance-testing 
 (and especially so in a runtime with a garbage-collector), 
-a statistical method is the only way one can capture 
+[statistical sampling][sampling] methods are robust methods used to capture 
 [*reliable & reproducible*][reproducible] test results, otherwise each test run 
 would produce wildly inconsistent timings.
 
@@ -764,6 +764,7 @@ npm run examples:update
 [mean]: https://en.wikipedia.org/wiki/Mean
 [stdev]: https://en.wikipedia.org/wiki/Standard_deviation
 [reproducible]: https://en.wikipedia.org/wiki/Reproducibility
+[sampling]: https://en.wikipedia.org/wiki/Sampling_(statistics)
 [nd]: https://en.wikipedia.org/wiki/Normal_distribution#Standard_normal_distribution
 [obj-group-by]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/groupBy
 [tachometer]: https://github.com/google/tachometer?tab=readme-ov-file
