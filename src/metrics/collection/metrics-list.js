@@ -4,9 +4,7 @@
 
 import { Metric, Metrics } from './index.js'
 
-const round = num => {
-  return Math.round((num + Number.EPSILON) * 100) / 100 || 'n/a'
-}
+const round = num => Math.round((num + Number.EPSILON) * 100) / 100 || 'n/a'
 
 const throwOnMissingUnit = unit => {
   if (typeof unit === 'undefined')
