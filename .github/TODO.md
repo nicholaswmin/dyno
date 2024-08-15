@@ -3,6 +3,12 @@
 ## fix
 
 - [x] implement the `metrics.sort()` method
+- [ ] the metrics `snapshots` ring buffer must save snapshots in a 
+      way that allows maintaining a good-enough historical fidelity 
+      while keeping a relatively low number of items.   
+      The starting values should not be replaced 
+      for example, neither the current ones. There must be a statistical
+      formula as to how this should be implemented.
 - [ ] Sweep over values and make sure they are accurate - some timers miss
       a second, other values have `off-by-one` issues.
 - [ ] The task hooks might not be needed, if so ditch them.
