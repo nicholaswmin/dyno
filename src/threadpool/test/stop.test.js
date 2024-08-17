@@ -12,7 +12,7 @@ test('#stop(', async t => {
   t.beforeEach(() => cp.fork.mock.resetCalls())
   t.afterEach(() => threads.stop())
 
-  await t.test('children exit promptly', async t => {
+  await t.test('children behaving ideally', async t => {
     t.before(async () => {
       threads = new Threads(join(import.meta.dirname, '/task/ok.js'))
 
@@ -21,13 +21,13 @@ test('#stop(', async t => {
       children = cp.fork.mock.calls.map(c => c.result)
     })
     
-    await t.test('returns the exit codes', async t => {   
+    await t.test('resolves an array of exit codes: zero', async t => {   
       const exitCodes = await threads.stop()
 
       t.assert.deepStrictEqual(exitCodes, [0,0,0,0])
     })
     
-    await t.test('with exit code: zero', t => {          
+    await t.test('children have exit code: zero', t => {          
       t.assert.strictEqual(children.filter(exitZero).length, 4)
     })
     
@@ -63,7 +63,7 @@ test('#stop(', async t => {
     })
   })
   
-  await t.test('child exits with non-zero during cleanups', async t => {
+  await t.test('children exit wih non-zero during cleanups', async t => {
     t.before(async () => {
       threads = new Threads(join(import.meta.dirname, 'task/exit-err.js'))
       
@@ -90,7 +90,7 @@ test('#stop(', async t => {
     })
   })
   
-  await t.test('child is not responding to shutdown signals', async t => {
+  await t.test('children unresponsive to shutdown signals', async t => {
     t.before(async () => {
       threads = new Threads(join(import.meta.dirname, 'task/no-exit-fn.js'))
       
@@ -113,7 +113,7 @@ test('#stop(', async t => {
     })
   })
   
-  await t.test('child has a blocked event loop', async t => {
+  await t.test('children with a blocked event loop', async t => {
     t.before(async () => {
       threads = new Threads(join(import.meta.dirname, 'task/blocked-loop.js'))
       
