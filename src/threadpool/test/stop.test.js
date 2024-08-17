@@ -1,7 +1,6 @@
 import test from 'node:test'
 import cp from 'node:child_process'
 import { join } from 'node:path'
-import { once } from 'node:events'
 import { alive, dead, exitZero, exitNonZero, sigkilled } from './utils/utils.js'
 
 import Threads from '../index.js'
@@ -13,13 +12,19 @@ test('#stop(', async t => {
   t.beforeEach(() => cp.fork.mock.resetCalls())
   t.afterEach(() => threads.stop())
 
-  await t.test('children exit when signalled: "exit"', async t => {
+  await t.test('children exit promptly', async t => {
     t.before(async () => {
       threads = new Threads(join(import.meta.dirname, '/task/ok.js'))
 
-      await threads.start() && await threads.stop()
+      await threads.start()
 
       children = cp.fork.mock.calls.map(c => c.result)
+    })
+    
+    await t.test('returns the exit codes', async t => {   
+      const exitCodes = await threads.stop()
+
+      t.assert.deepStrictEqual(exitCodes, [0,0,0,0])
     })
     
     await t.test('with exit code: zero', t => {          
@@ -33,15 +38,19 @@ test('#stop(', async t => {
   })
  
   await t.test('children take too long to exit', async t => {
-    t.mock.timers.enable({ apis: ['setTimeout'] })
-
     t.before(async () => {
       threads = new Threads(join(import.meta.dirname, 'task/slow-exit.js'))
       
-      setImmediate(() => t.mock.timers.tick(2000))
-      await threads.start() && await threads.stop()
+      await threads.start()
       
       children = cp.fork.mock.calls.map(c => c.result)
+    })
+    
+    await t.test('rejects the returned promise', async t => {   
+      threads.on('error', t => { console.log(err) })
+      await t.assert.rejects(async () => {
+        await threads.stop()
+      })
     })
     
     await t.test('children are SIGKILL-ed', t => {
@@ -58,9 +67,13 @@ test('#stop(', async t => {
     t.before(async () => {
       threads = new Threads(join(import.meta.dirname, 'task/exit-err.js'))
       
-      await threads.start() && await threads.stop()
+      await threads.start()
 
       children = cp.fork.mock.calls.map(c => c.result)
+    })
+    
+    await t.test('resolves the returned promise', async t => {          
+      await t.assert.doesNotReject(threads.stop.bind(threads))
     })
     
     await t.test('child exits with exit code: non-zero', t => {
@@ -77,16 +90,17 @@ test('#stop(', async t => {
     })
   })
   
-  await t.test('child does not listen for "exit" signals', async t => {
-    t.mock.timers.enable({ apis: ['setTimeout'] })
-
+  await t.test('child is not responding to shutdown signals', async t => {
     t.before(async () => {
       threads = new Threads(join(import.meta.dirname, 'task/no-exit-fn.js'))
       
-      setImmediate(() => t.mock.timers.tick(2000))
-      await threads.start() && await threads.stop()
+      await threads.start()
 
       children = cp.fork.mock.calls.map(c => c.result)
+    })
+    
+    await t.test('rejects the returned promise', async t => { 
+      await t.assert.rejects(threads.stop.bind(threads))
     })
 
     await t.test('children are SIGKILL-ed', t => {
@@ -103,9 +117,13 @@ test('#stop(', async t => {
     t.before(async () => {
       threads = new Threads(join(import.meta.dirname, 'task/blocked-loop.js'))
       
-      await threads.start() && await threads.stop()
+      await threads.start()
 
       children = cp.fork.mock.calls.map(c => c.result)
+    })
+    
+    await t.test('rejects the returned promise', async t => { 
+      await t.assert.rejects(threads.stop.bind(threads))
     })
 
     await t.test('children are SIGKILL-ed', t => {

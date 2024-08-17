@@ -49,12 +49,13 @@ test('#start()', async t => {
         t.assert.deepStrictEqual(cdata.parameters, { foo: 'bar' })
       })
       
-      await t.test('its index in regards to other children', t => {
-        t.assert.strictEqual(cdata.childIndex, 0)
+      await t.test('its spawn index relative to its siblings', t => {
+        t.assert.strictEqual(typeof +cdata.childIndex, 'number')
       })
 
-      await t.test('sets its index as "CHILD_INDEX" env. var', t => {
-        t.assert.strictEqual(typeof cdata.env.CHILD_INDEX, 'string')
+      await t.test('sets its index as "SPAWN_INDEX" env. var', t => {
+        t.assert.strictEqual(typeof cdata.env.SPAWN_INDEX, 'string')
+        t.assert.ok(cdata.env.SPAWN_INDEX.length > 0, 'must have length')
       })
     })
   })

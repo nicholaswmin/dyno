@@ -1,0 +1,29 @@
+{
+  "name": "threadpool",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "tiny threadpool",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "node --test test/index.test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nicholaswmin/threadpool.git"
+  },
+  "keywords": [
+    "thread-pool",
+    "nodejs",
+    "javascript",
+    "multithreading"
+  ],
+  "author": "@nicholaswmin",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/nicholaswmin/threadpool/issues"
+  },
+  "homepage": "https://github.com/nicholaswmin/threadpool#readme"
+}

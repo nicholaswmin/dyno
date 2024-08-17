@@ -1,4 +1,4 @@
-const validateInt = (v, name) => {
+const validInt = (v, name) => {
   if (!Number.isInteger(v))
     throw new RangeError(`${name} must be an integer, has decimals: ${v}`)
 
@@ -11,7 +11,7 @@ const validateInt = (v, name) => {
   return v
 }
   
-const validateObj = (v, name) => {
+const validObj = (v, name) => {
   if (typeof v === 'undefined')
     return v
 
@@ -27,7 +27,7 @@ const validateObj = (v, name) => {
   return v
 }
   
-const validateIfString = (v, name) => {
+const validStr = (v, name) => {
   if (typeof v === 'undefined' || v === null)
     return v
 
@@ -40,4 +40,4 @@ const validateIfString = (v, name) => {
   return v
 }
 
-export { validateInt, validateObj, validateIfString }
+export { validInt, validObj, validStr }

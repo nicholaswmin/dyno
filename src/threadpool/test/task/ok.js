@@ -3,7 +3,7 @@
 process.on('message', message => {  
   message === 'env' ? process.connected ? process.send({
     env: process.env,
-    childIndex: +process.env.CHILD_INDEX,
+    spawnIndex: +process.env.SPAWN_INDEX,
     parameters: JSON.parse(process.env.parameters || null)
   }) : 0 : 0
   

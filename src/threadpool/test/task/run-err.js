@@ -1,6 +1,6 @@
 // spawns OK but exits: 1 during runtime
 
-if (+process.env.CHILD_INDEX === 0)
+if (+process.env.SPAWN_INDEX === 0)
   setImmediate(() => process.exit(1))
 
 process.on('message', message => {

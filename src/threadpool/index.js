@@ -1,30 +1,29 @@
-import t from 'node:timers/promises'
-import child_process from 'node:child_process'
+import cp from 'node:child_process'
+import { env, nextTick } from 'node:process'
+import { setTimeout } from 'node:timers/promises'
 import { EventEmitter, once } from 'node:events'
-import { validateInt, validateObj, validateIfString } from './validate.js'
-import { queryObjects } from 'node:v8'
+import { validInt, validObj, validStr } from './validate.js'
 
 // @TODO provide message sending methods
-
 class Threadpool extends EventEmitter {
   constructor(task = process.argv.at(-1), threadCount = 4, parameters = {}) {
     super()
 
     Object.defineProperties(this, {
       task: {
-        value: validateIfString(task, 'task'),
+        value: validStr(task, 'task'),
         writable : false, enumerable : false, configurable : false
       },
       threadCount: {
-        value: validateInt(threadCount, 'thread_count'),
+        value: validInt(threadCount, 'thread_count'),
         writable : false, enumerable : false, configurable : false
       },
       parameters: {
-        value: validateObj(parameters, 'parameters'),
+        value: validObj(parameters, 'parameters'),
         writable : false, enumerable : false, configurable : false
       },
       exitTimeout: {
-        value: validateInt(250, 'exitTimeout'),
+        value: validInt(150, 'exitTimeout'),
         writable : false, enumerable : false, configurable : false
       },
       threads: {
@@ -35,8 +34,8 @@ class Threadpool extends EventEmitter {
   }
   
   async start() {
-    const children = Array.from({ length: this.threadCount }, (_, index) => 
-      this.#fork(this.task, { parameters: this.parameters, index })
+    const children = Array.from({ length: this.threadCount }, (_, i) => 
+      this.#fork(this.task, { parameters: this.parameters, i })
     )
 
     this.threads = Object.freeze(await Promise.all(children))
@@ -47,16 +46,16 @@ class Threadpool extends EventEmitter {
   async stop() {
     // @REVIEW needed?
     //this.removeAllListeners()
-    return await this.#killAliveChildren()
+    const exitCodes = await this.#killAliveChildren()
+    
+    return exitCodes.some(code => code > 0) 
+      ? Promise.reject(new Error('Some threads exited with nonzero')) 
+      : Promise.resolve(exitCodes)
   }
   
-  async #fork (task, { index, parameters }) {
-    const child = child_process.fork(task, {
-      env: {  
-        ...process.env, 
-        CHILD_INDEX: index, 
-        parameters: JSON.stringify(parameters)  
-      }
+  async #fork (task, { parameters, i }) {
+    const child = cp.fork(task, {
+      env: { ...env, SPAWN_INDEX: i, parameters: JSON.stringify(parameters) }
     })
     .once('exit', this.#handleChildExit.bind(this))
     .once('error', this.#handleChildError.bind(this))
@@ -81,20 +80,18 @@ class Threadpool extends EventEmitter {
     ])
 
     return ['KILL_TIMEOUT'].includes(winner) 
-      ? this.#forceKillChild(child) : child
+      ? this.#forceKillChild(child).then(v => 1)
+      : 0
   }
   
-  #forceKillChild(child) {
-    process.nextTick(() => child.kill('SIGKILL') )
+  async #forceKillChild(child) {
+    nextTick(() => child.kill('SIGKILL'))
 
     return this.#waitUntilDead(child)
   }
   
   #attemptChildExit(child) {
-    process.nextTick(() => 
-      child.connected 
-      ? child.send('exit')
-      : child)
+    nextTick(() => child.connected ? child.send('exit'): child)
     
     return this.#waitUntilDead(child)
   }
@@ -116,7 +113,7 @@ class Threadpool extends EventEmitter {
   }
   
   async #startKillTimeout() {
-    await t.setTimeout(this.exitTimeout)
+    await setTimeout(this.exitTimeout)
     
     return ['KILL_TIMEOUT']
   }
