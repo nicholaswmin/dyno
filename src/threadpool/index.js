@@ -1,75 +1,140 @@
+import t from 'node:timers/promises'
 import child_process from 'node:child_process'
+import { EventEmitter, once } from 'node:events'
+import { validateInt, validateObj, validateIfString } from './validate.js'
+import { queryObjects } from 'node:v8'
 
-const forkProcess = (task, { parameters, threadIndex }) => 
-  new Promise((resolve, reject) => {
-    const onSpawn = function ()    { this.off('error', onError); resolve(this) }
-    const onError = function (err) { this.off('spawn', onSpawn); reject(err)   }
+// @TODO provide message sending methods
 
-    child_process.fork(task, {
-      env: { 
-        ...process.env, 
-        parameters: JSON.stringify(parameters),
-        THREAD_INDEX: threadIndex
+class Threadpool extends EventEmitter {
+  constructor(task = process.argv.at(-1), threadCount = 4, parameters = {}) {
+    super()
+
+    Object.defineProperties(this, {
+      task: {
+        value: validateIfString(task, 'task'),
+        writable : false, enumerable : false, configurable : false
+      },
+      threadCount: {
+        value: validateInt(threadCount, 'thread_count'),
+        writable : false, enumerable : false, configurable : false
+      },
+      parameters: {
+        value: validateObj(parameters, 'parameters'),
+        writable : false, enumerable : false, configurable : false
+      },
+      exitTimeout: {
+        value: validateInt(250, 'exitTimeout'),
+        writable : false, enumerable : false, configurable : false
+      },
+      threads: {
+        value: [], 
+        writable : true, enumerable : false, configurable : false
       }
-    }).once('spawn', onSpawn).once('error', onError)
-})
-
-const fork = async (task, { parameters, threads = 4 }) => {
-  const forked = await Promise.all(
-    Array.from({ length: threads }, 
-        (_, i) => forkProcess(task, { parameters, threadIndex: i })))
-      .then(threads => threads.reduce((acc, thread) => ({ 
-        ...acc, [thread.pid]: thread 
-      }), {}))
+    })
+  }
   
-  return Object.freeze(forked)
+  async start() {
+    const children = Array.from({ length: this.threadCount }, (_, index) => 
+      this.#fork(this.task, { parameters: this.parameters, index })
+    )
+
+    this.threads = Object.freeze(await Promise.all(children))
+
+    return this.threads
+  }
+  
+  async stop() {
+    // @REVIEW needed?
+    //this.removeAllListeners()
+    return await this.#killAliveChildren()
+  }
+  
+  async #fork (task, { index, parameters }) {
+    const child = child_process.fork(task, {
+      env: {  
+        ...process.env, 
+        CHILD_INDEX: index, 
+        parameters: JSON.stringify(parameters)  
+      }
+    })
+    .once('exit', this.#handleChildExit.bind(this))
+    .once('error', this.#handleChildError.bind(this))
+
+    await once(child, 'spawn') 
+
+    return child
+  } 
+  
+  async #killAliveChildren() {
+    return Promise.all(
+      this.threads
+        .filter(this.#isAlive)
+        .map(this.#killChild.bind(this))
+    )
+  }
+  
+  async #killChild(child) {
+    const [ winner ] = await Promise.race([
+      this.#startKillTimeout(),
+      this.#attemptChildExit(child)
+    ])
+
+    return ['KILL_TIMEOUT'].includes(winner) 
+      ? this.#forceKillChild(child) : child
+  }
+  
+  #forceKillChild(child) {
+    process.nextTick(() => child.kill('SIGKILL') )
+
+    return this.#waitUntilDead(child)
+  }
+  
+  #attemptChildExit(child) {
+    process.nextTick(() => 
+      child.connected 
+      ? child.send('exit')
+      : child)
+    
+    return this.#waitUntilDead(child)
+  }
+  
+  #waitUntilDead(child) {
+    child.removeAllListeners()
+
+    return this.#isAlive(child)
+      ? Promise.race([
+        once(child, 'exit'),  
+        once(child, 'error'),
+        once(child, 'close')
+      ]) : child
+  }
+  
+  #isAlive(child) {
+    return [child.exitCode, child.signalCode]
+      .every(val => val === null)
+  }
+  
+  async #startKillTimeout() {
+    await t.setTimeout(this.exitTimeout)
+    
+    return ['KILL_TIMEOUT']
+  }
+  
+  #handleChildExit(code) {
+    // @TODO check for `signalCode` too ?
+    return code > 0 
+      ? this.#handleChildError(new Error('child exited with non-zero code')) 
+      : null
+  }
+  
+  async #handleChildError(err = '') {
+    await this.#killAliveChildren()
+
+    this.emit('error', err instanceof Error ? err : new Error(err))
+
+    this.removeAllListeners()
+  }
 }
 
-const watch = (threads, { signal }) => {
-  const alive = Object.values(threads).filter(thread => thread.connected)  
-
-  return alive.length 
-    ? Promise.all(alive.map(thread => new Promise((resolve, reject) => {
-        const _handleThreadExit = code => !code 
-          ? resolve() 
-          : reject(new Error(`A thread exited with code: ${code}.`))
-      
-        thread.once('exit', _handleThreadExit).once('error', reject)
-        
-        signal.addEventListener('abort', () => {
-          thread.off('exit', _handleThreadExit)
-
-          resolve()
-        })
-      })))
-    : true
-}
-
-const disconnect = async threads => {
-  const timeout = 500
-  const alive = Object.values(threads).filter(thread => thread.connected)  
-  
-  const deaths = alive.map(thread => new Promise((resolve, reject) => {
-    const onExit = function () {  this.off('error', onError); resolve(this) }
-    const onError = function (err) {  this.off('exit', onExit); reject(err) }
-
-    thread.once('exit', onExit)
-    thread.once('error', onError)
-  }))
-  
-  let sigkilled = setTimeout(() => {
-    alive.forEach(thread => thread.kill('SIGKILL'))
-    sigkilled = true
-  }, timeout)
-  
-  alive.forEach(thread => thread.connected 
-    ? thread.send({ name: 'process:disconnect' }) 
-    : null)
-  
-  return Promise.all(deaths)
-    .then(() => sigkilled === true ? (() => {
-      throw new Error('process:disconnect timeout. Exited with:SIGKILL')
-    })() : clearTimeout(sigkilled))
-}
-
-export default { fork, disconnect, watch }
+export default Threadpool
