@@ -4,22 +4,22 @@ import { join } from 'node:path'
 import { once } from 'node:events'
 import { connected, dead, exitZero } from './utils/utils.js'
 
-import Threads from '../index.js'
+import { Threadpool } from '../index.js'
 
 test('#start()', async t => {
-  let threads = null, children = []
+  let threadpool = null, children = []
 
   t.before(() => cp.fork = t.mock.fn(cp.fork))
   t.beforeEach(() => cp.fork.mock.resetCalls())
 
   await t.test('all children spawn without errors', async t => {
-    t.after(() => threads.stop())
+    t.after(() => threadpool.stop())
     t.before(async () => {
-      threads = new Threads(join(import.meta.dirname, 'task/ok.js'), 7, { 
+      threadpool = new Threadpool(join(import.meta.dirname, 'task/ok.js'), 7, { 
         foo: 'bar' 
       })
       
-      await threads.start()
+      await threadpool.start()
 
       children = cp.fork.mock.calls.map(c => c.result)
     })
@@ -30,7 +30,9 @@ test('#start()', async t => {
       })
       
       await t.test('all children are connected and running', t => {
-        t.assert.strictEqual(children.filter(connected).length, 7)
+        const connectedChildrenCount = children.filter(connected).length
+
+        t.assert.strictEqual(connectedChildrenCount, threadpool.count)
       })
       
       await t.test('as independent processes', t => {
@@ -66,17 +68,17 @@ test('#start()', async t => {
   // but I don't find that clean'
   t.todo('child fails to spawn', async t => {
     t.beforeEach(async () => {
-      threads = new Threads(join(import.meta.dirname, 'task/spawn-err.js'), { 
-        parameters: { foo: 'bar' },  threadCount: 3 
+      threadpool = new Threadpool(join(import.meta.dirname, 'task/spawn-err.js'), { 
+        parameters: { foo: 'bar' },  count: 3 
       })      
       
-      await threads.start()
+      await threadpool.start()
       
       children = cp.fork.mock.calls.map(c => c.result)
     })
     
     await t.test('start() promise rejects', async t => {
-      await t.assert.rejects(() => threads.start())
+      await t.assert.rejects(() => threadpool.start())
     })
     
     await t.test('all children exit', async t => {  
@@ -88,28 +90,31 @@ test('#start()', async t => {
     const children = []
   
     t.beforeEach(() => {
-      threads = new Threads(join(import.meta.dirname, 'task/run-err.js'), 4)      
+      threadpool = new Threadpool(join(import.meta.dirname, 'task/run-err.js'), 4)      
     })
     
     await t.test('emits an "error" event', async t => {
-      process.nextTick(() => threads.start())
+      queueMicrotask(() => threadpool.start())
   
-      await once(threads, 'error')
+      await once(threadpool, 'error')
     })
     
     await t.test('cleans up', { timeout: 500 }, async t => {
-      process.nextTick(() => threads.start())
-  
-      await once(threads, 'error')
+      queueMicrotask(() => threadpool.start())
+        
+      await once(threadpool, 'error')
   
       const children = cp.fork.mock.calls.map(c => c.result)
   
       await t.test('all children exit', async t => {
-        t.assert.strictEqual(children.filter(dead).length, 4)
+        t.assert.strictEqual(children.filter(dead).length, threadpool.count)
       })
   
       await t.test('with zero exit codes', t => {
-        t.assert.strictEqual(children.filter(exitZero).length, 3)
+        t.assert.strictEqual(
+          children.filter(exitZero).length, 
+          threadpool.count - 1
+        )
       })
     })
   })
