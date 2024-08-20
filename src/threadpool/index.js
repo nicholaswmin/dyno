@@ -1,17 +1,15 @@
 import cp from 'node:child_process'
-import { emitWarning, env } from 'node:process'
+import { env } from 'node:process'
 import { setTimeout } from 'node:timers/promises'
 import { EventEmitter, once } from 'node:events'
 
 import { validInt, validObj, validStr } from './validate.js'
-import { PrimaryBus, ChildBus } from './bus/index.js'
+import { Thread } from './src/thread/index.js'
+import { ThreadBus } from './src/bus/index.js'
 
 // @TODO provide message sending methods
 class Threadpool extends EventEmitter {
-  #lastPingdex = 0
-  #bus = new PrimaryBus()
-
-  constructor(task = process.argv.at(-1), count = 4, parameters = {}) {
+  constructor(task = process.argv.at(-1), size = 4, parameters = {}) {
     super()
 
     Object.defineProperties(this, {
@@ -19,8 +17,8 @@ class Threadpool extends EventEmitter {
         value: validStr(task, 'task'),
         writable : false, enumerable : false, configurable : false
       },
-      count: {
-        value: validInt(count, 'count'),
+      size: {
+        value: validInt(size, 'size'),
         writable : false, enumerable : false, configurable : false
       },
       parameters: {
@@ -39,23 +37,22 @@ class Threadpool extends EventEmitter {
   }
   
   async start() {
-    const children = Array.from({ length: this.count }, (_, i) => 
-      this.#fork(this.task, { parameters: this.parameters, i })
-    )
+    const spawns = Array.from({
+      length: this.size 
+    }, (_, i) => this.#fork(this.task, { parameters: this.parameters, i }))
 
-    this.threads = Object.freeze(await Promise.all(children))
+    this.threads = Object.freeze(await Promise.all(spawns))
     
     return this.threads
   }
   
   async stop() {
-    // @REVIEW needed?
-    //this.removeAllListeners()
-    const exitCodes = await this.#killAliveChildren()
-    
-    return exitCodes.some(code => code > 0) 
-      ? Promise.reject(new Error('Some threads exited with nonzero')) 
-      : Promise.resolve(exitCodes)
+    const exitCodes = await this.#exit()
+    const isNonZero = code => code > 0
+
+    return exitCodes.some(isNonZero) ? (() => {
+        throw new Error('nonzero exits')
+      })() : exitCodes
   }
   
   ping() {
@@ -72,88 +69,33 @@ class Threadpool extends EventEmitter {
   }
   
   async #fork (task, { parameters, i  }) {
-    const child = cp.fork(task, ['child'], {
-      env: { 
-        ...env, 
-        SPAWN_INDEX: i,
-        parameters: JSON.stringify(parameters) 
-      }
+    const fork = cp.fork(task, ['child'], {
+      env: { ...process.env, parameters: JSON.stringify(parameters), index: i }
     })
-    .once('exit', this.#handleChildExit.bind(this))
-    .once('error', this.#handleChildError.bind(this))
-
-    await once(child, 'spawn') 
-
-    return child
+      
+    await Promise.race([ 
+      once(fork, 'error'),
+      once(fork, 'spawn') 
+    ])
+    .then(([err]) => err 
+      ? Promise.reject(err) 
+      : null
+    )
+    
+    return (new Thread(fork))
+      .once('end', this.#onThreadEnd.bind(this))
   } 
   
-  async #killAliveChildren() {
-    return Promise.all(
-      this.threads
-        .filter(this.#isAlive)
-        .map(this.#killChild.bind(this))
-    )
-  }
-  
-  async #killChild(child) {
-    const [ winner ] = await Promise.race([
-      this.#startKillTimeout(),
-      this.#attemptChildExit(child)
-    ])
+  async #exit() {
+    const isAlive = thread => thread.alive, 
+          exit    = thread => thread.exit()
 
-    return ['KILL_TIMEOUT'].includes(winner) 
-      ? this.#forceKillChild(child).then(v => 1)
-      : 0
+    return Promise.all(this.threads.filter(isAlive).map(exit))
   }
   
-  async #forceKillChild(child) {
-    queueMicrotask(() => child.kill('SIGKILL'))
-
-    return this.#waitUntilDead(child)
-  }
-  
-  #attemptChildExit(child) {
-    queueMicrotask(() => child.connected ? child.send('exit'): child)
-    
-    return this.#waitUntilDead(child)
-  }
-  
-  #waitUntilDead(child) {
-    child.removeAllListeners()
-
-    return this.#isAlive(child)
-      ? Promise.race([
-        once(child, 'exit'),  
-        once(child, 'error'),
-        once(child, 'close')
-      ]) : child
-  }
-  
-  #isAlive(child) {
-    return [child.exitCode, child.signalCode]
-      .every(val => val === null)
-  }
-  
-  async #startKillTimeout() {
-    await setTimeout(this.exitTimeout)
-    
-    return ['KILL_TIMEOUT']
-  }
-  
-  #handleChildExit(code) {
-    // @TODO check for `signalCode` too ?
-    return code > 0 
-      ? this.#handleChildError(new Error('child exited with non-zero code')) 
-      : null
-  }
-  
-  async #handleChildError(err = '') {
-    await this.#killAliveChildren()
-
-    this.emit('error', err instanceof Error ? err : new Error(err))
-
-    this.removeAllListeners()
+  async #onThreadEnd(err) {
+    this.emit('end', err ? await this.stop() : null)
   }
 }
 
-export { Threadpool, ChildBus }
+export { Threadpool }

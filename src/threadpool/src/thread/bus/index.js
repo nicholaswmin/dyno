@@ -1,4 +1,4 @@
-import { EventEmitter } from 'node:events/emitter'
+import { EventEmitter } from 'node:events'
 
 class ThreadBus extends EventEmitter {
   #on = true

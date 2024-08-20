@@ -30,9 +30,9 @@ test('#start()', async t => {
       })
       
       await t.test('all children are connected and running', t => {
-        const connectedChildrenCount = children.filter(connected).length
+        const connectedChildrensize = children.filter(connected).length
 
-        t.assert.strictEqual(connectedChildrenCount, threadpool.count)
+        t.assert.strictEqual(connectedChildrensize, threadpool.size)
       })
       
       await t.test('as independent processes', t => {
@@ -55,9 +55,9 @@ test('#start()', async t => {
         t.assert.strictEqual(typeof +cdata.childIndex, 'number')
       })
 
-      await t.test('sets its index as "SPAWN_INDEX" env. var', t => {
-        t.assert.strictEqual(typeof cdata.env.SPAWN_INDEX, 'string')
-        t.assert.ok(cdata.env.SPAWN_INDEX.length > 0, 'must have length')
+      await t.test('sets its index as "index" env. var', t => {
+        t.assert.strictEqual(typeof cdata.env.index, 'string')
+        t.assert.ok(cdata.env.index.length > 0, 'must have length')
       })
     })
   })
@@ -68,8 +68,9 @@ test('#start()', async t => {
   // but I don't find that clean'
   t.todo('child fails to spawn', async t => {
     t.beforeEach(async () => {
-      threadpool = new Threadpool(join(import.meta.dirname, 'task/spawn-err.js'), { 
-        parameters: { foo: 'bar' },  count: 3 
+      threadpool = new Threadpool(
+        join(import.meta.dirname, 'task/spawn-err.js'), 
+        3, { parameters: { foo: 'bar' } 
       })      
       
       await threadpool.start()
@@ -90,31 +91,17 @@ test('#start()', async t => {
     const children = []
   
     t.beforeEach(() => {
-      threadpool = new Threadpool(join(import.meta.dirname, 'task/run-err.js'), 4)      
+      threadpool = new Threadpool(join(import.meta.dirname, 'task/run-err.js'))      
     })
     
-    await t.test('emits an "error" event', async t => {
-      queueMicrotask(() => threadpool.start())
-  
-      await once(threadpool, 'error')
-    })
-    
-    await t.test('cleans up', { timeout: 500 }, async t => {
-      queueMicrotask(() => threadpool.start())
-        
-      await once(threadpool, 'error')
-  
+    await t.test('cleans up', { timeout: 500 }, async t => {      
+      await threadpool.start()
+      await once(threadpool, 'end')
+
       const children = cp.fork.mock.calls.map(c => c.result)
   
       await t.test('all children exit', async t => {
-        t.assert.strictEqual(children.filter(dead).length, threadpool.count)
-      })
-  
-      await t.test('with zero exit codes', t => {
-        t.assert.strictEqual(
-          children.filter(exitZero).length, 
-          threadpool.count - 1
-        )
+        t.assert.strictEqual(children.filter(dead).length, threadpool.size)
       })
     })
   })

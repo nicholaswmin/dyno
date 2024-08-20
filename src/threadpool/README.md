@@ -5,8 +5,7 @@
 ## Todos
 
 - [] implement `.ping()` method
- - at the event emitter level - but must be on the thread,
-  else we are forced to keep 2 data lists .
+
 
 ## test 
 

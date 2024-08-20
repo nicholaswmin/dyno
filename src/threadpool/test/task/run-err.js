@@ -1,8 +1,8 @@
 // spawns OK but exits: 1 during runtime
 
-if (+process.env.SPAWN_INDEX === 0)
-  setImmediate(() => process.exit(1))
+if (+process.env.index === 0)
+  setTimeout(() => process.exit(1), 50)
 
 process.on('message', message => {
-  message === 'exit' ? setTimeout(() => process.exit(0), 10) : 0
+  message === 'exit' ? setImmediate(() => process.exit(0)) : 0
 })

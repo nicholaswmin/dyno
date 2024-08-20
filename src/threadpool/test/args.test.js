@@ -6,17 +6,17 @@ test('#constructor()', async t => {
     await t.test('does not throw', t => {
       t.assert.doesNotThrow(() => new Threadpool())
     })
-    
+
     await t.test('uses defaults', async t => {
-      const { task, count } = new Threadpool()
+      const { task, size } = new Threadpool()
 
       await t.test('task set to current file path', t => {
         t.assert.strictEqual(task, process.argv.at(-1))
       })
 
-      await t.test('thread count set to a positive integer', t => {
-        t.assert.ok(count > 0, 'thread count is: <= 0')
-        t.assert.ok(Number.isInteger(count), 'thread count !== integer')
+      await t.test('pool size set to a positive integer', t => {
+        t.assert.ok(size > 0, 'thread size is: <= 0')
+        t.assert.ok(Number.isInteger(size), 'thread size !== integer')
       })
     })
   })
@@ -24,7 +24,9 @@ test('#constructor()', async t => {
   await t.test('task is provided', async t => {
     await t.test('empty', async t => {
       await t.test('throws a RangeError', t => {
-        t.assert.throws(() => new Threadpool(null, 'abc'), { name: 'RangeError' })
+        t.assert.throws(() => new Threadpool(null, 'abc'), { 
+          name: 'RangeError' 
+        })
       })
     })
   })
