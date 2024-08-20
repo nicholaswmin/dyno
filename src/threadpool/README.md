@@ -23,6 +23,7 @@ const pool = await (new Threadpool('thread.js', 4)).start()
 for (const thread of pool.threads)
   thread.on('pong', () => {
     console.log('🏓 pong')
+
     thread.emit('ping')
   })
 ```
@@ -35,6 +36,7 @@ import { primary } from '@nicholaswmin/threadpool'
 
 primary.on('ping', () => {
   console.log('ping 🏓')
+
   setTimeout(() => primary.emit('pong'), 50)
 })
 
