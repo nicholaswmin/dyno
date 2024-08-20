@@ -2,13 +2,15 @@
 
 # 🧵 threadpool
 
-> a [threadpool][threadpool] 
+> a [threadpool][threadpool] with threads that are easy to talk to
 
-## Usage
+## Install
 
 ```bash
 npm i https://github.com/nicholaswmin/threadpool
 ```
+
+## Run
 
 Run `thread.js` in `4` threads, sending `ping`/`pong`s between them:
 
@@ -59,10 +61,16 @@ node primary.js
 - "threads" are based on [`child_process.fork()`][cp-fork]
 - a thread must exit within `200ms`, otherwise it gets reaped by `SIGKILL`.
 
-## test 
+## Test 
 
 ```bash 
-node run --test
+node --run test
+```
+
+### Coverage 
+
+```bash
+node --run test:coverage
 ```
 
 ## Authors
@@ -72,6 +80,10 @@ node run --test
 ## License 
 
 The [MIT-0][license] License 
+
+
+[test-badge]: https://github.com/nicholaswmin/threadpool/actions/workflows/test.yml/badge.svg
+[test-workflow]: https://github.com/nicholaswmin/threadpool/actions/workflows/test.yml
 
 [threadpool]: https://en.wikipedia.org/wiki/Thread_pool
 [cp-fork]: https://nodejs.org/api/child_process.html#child_processforkmodulepath-args-options
