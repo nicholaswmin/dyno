@@ -2,7 +2,7 @@
 
 # :thread: threadpool
 
-> a [threadpool][threadpool] with threads that are easy to talk to
+> a [threadpool][threadpool] that's easy to talk to
 
 ## Install
 
