@@ -1,8 +1,6 @@
 [![dep-url][dep-badge]][dep-url] [![test-url][test-badge]][test-url] 
 
-# :stopwatch: dyno
-
-# 🧵 threadpool
+# :thread: threadpool
 
 > a [threadpool][threadpool] with threads that are easy to talk to
 
