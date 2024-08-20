@@ -59,7 +59,8 @@ node primary.js
 ## Gotchas 
 
 - "threads" are based on [`child_process.fork()`][cp-fork]
-- a thread must exit within `200ms`, otherwise it gets reaped by `SIGKILL`.
+- a thread must exit within `200ms`, otherwise it gets reaped by 
+  [`SIGKILL`][sigkill].
 
 ## Test 
 
@@ -87,6 +88,7 @@ The [MIT-0][license] License
 
 [threadpool]: https://en.wikipedia.org/wiki/Thread_pool
 [cp-fork]: https://nodejs.org/api/child_process.html#child_processforkmodulepath-args-options
+[sigkill]: https://www.gnu.org/software/libc/manual/html_node/Termination-Signals.html#index-SIGKILL
 
 [nicholaswmin]: https://github.com/nicholaswmin
 [license]: https://spdx.org/licenses/MIT-0.html
