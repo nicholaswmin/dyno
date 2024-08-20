@@ -20,7 +20,7 @@ import { Threadpool } from '@nicholaswmin/threadpool'
 
 const pool = await (new Threadpool('thread.js', 4)).start()
 
-for (const thread of pool.threads())
+for (const thread of pool.threads)
   thread.on('pong', () => {
     console.log('🏓 pong')
     thread.emit('ping')
