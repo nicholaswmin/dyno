@@ -1,5 +1,4 @@
-import { ChildProcess } from 'node:child_process'
-import { once, EventEmitter } from 'node:events'
+import { EventEmitter, once } from 'node:events'
 
 import { PrimaryBus } from '../bus/index.js'
 import { validInt } from '../validate/index.js'

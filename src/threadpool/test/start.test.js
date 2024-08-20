@@ -7,45 +7,45 @@ import { connected, dead } from './utils/utils.js'
 import { Threadpool } from '../index.js'
 
 test('#start()', { timeout: 1000 }, async t => {
-  let threadpool = null, children = []
+  let pool = null, threads = []
 
   t.before(() => cp.fork = t.mock.fn(cp.fork))
   t.beforeEach(() => cp.fork.mock.resetCalls())
 
-  await t.test('all children spawn without errors', async t => {
-    t.after(() => threadpool.stop())
+  await t.test('all threads spawn without errors', async t => {
+    t.after(() => pool.stop())
     t.before(async () => {
-      threadpool = new Threadpool(join(import.meta.dirname, 'task/ok.js'), 7, { 
+      pool = new Threadpool(join(import.meta.dirname, 'task/ok.js'), 7, { 
         foo: 'bar' 
       })
       
-      await threadpool.start()
+      await pool.start()
 
-      children = cp.fork.mock.calls.map(c => c.result)
+      threads = cp.fork.mock.calls.map(c => c.result)
     })
     
-    await t.test('child processes spawn', async t => {
+    await t.test('thread processes spawn', async t => {
       await t.test('as many as specified', async t => {
-        t.assert.strictEqual(children.length, 7) 
+        t.assert.strictEqual(threads.length, 7) 
       })
       
-      await t.test('all children are connected and running', t => {
-        const connectedChildrensize = children.filter(connected).length
+      await t.test('all threads are connected and running', t => {
+        const connectedThreadCount = threads.filter(connected).length
 
-        t.assert.strictEqual(connectedChildrensize, threadpool.size)
+        t.assert.strictEqual(connectedThreadCount, pool.size)
       })
       
       await t.test('as independent processes', t => {
-        children.forEach(c => t.assert.strictEqual(typeof c.pid, 'number'))
+        threads.forEach(c => t.assert.strictEqual(typeof c.pid, 'number'))
       })
     })  
     
-    await t.test('children get passed correct data', async t => {
-      const child = children[0]
+    await t.test('threads get passed correct data', async t => {
+      const thread = threads[0]
 
-      setImmediate(() => child.send('env')) 
+      setImmediate(() => thread.send('env')) 
 
-      const [ cdata ] = await once(child, 'message')
+      const [ cdata ] = await once(thread, 'message')
 
       await t.test('the parameters', t => {
         t.assert.deepStrictEqual(cdata.parameters, { foo: 'bar' })
@@ -66,42 +66,42 @@ test('#start()', { timeout: 1000 }, async t => {
   // is a synchronous exception on startup of the `child_process`. 
   // The NodeJS people recommend an initial IPC `ping/pong`, 
   // but I don't find that clean'
-  t.todo('child fails to spawn', async t => {
+  t.todo('thread fails to spawn', async t => {
     t.beforeEach(async () => {
-      threadpool = new Threadpool(
+      pool = new Threadpool(
         join(import.meta.dirname, 'task/spawn-err.js'), 
         3, { parameters: { foo: 'bar' } 
       })      
       
-      await threadpool.start()
+      await pool.start()
       
-      children = cp.fork.mock.calls.map(c => c.result)
+      threads = cp.fork.mock.calls.map(c => c.result)
     })
     
     await t.test('start() promise rejects', async t => {
-      await t.assert.rejects(() => threadpool.start())
+      await t.assert.rejects(() => pool.start())
     })
     
-    await t.test('all children exit', async t => {  
-      t.assert.strictEqual(children.filter(alive).length, 0)
+    await t.test('all threads exit', async t => {  
+      t.assert.strictEqual(threads.filter(alive).length, 0)
     })
   })
   
-  await t.test('child exits != 0, after spawn', { timeout: 500 }, async t => {
-    const children = []
+  await t.test('thread exits != 0, after spawn', { timeout: 500 }, async t => {
+    const threads = []
   
     t.beforeEach(() => {
-      threadpool = new Threadpool(join(import.meta.dirname, 'task/run-err.js'))      
+      pool = new Threadpool(join(import.meta.dirname, 'task/run-err.js'))      
     })
     
     await t.test('cleans up', { timeout: 500 }, async t => {      
-      await threadpool.start()
-      await once(threadpool, 'end')
+      await pool.start()
+      await once(pool, 'end')
 
-      const children = cp.fork.mock.calls.map(c => c.result)
+      const threads = cp.fork.mock.calls.map(c => c.result)
   
-      await t.test('all children exit', async t => {
-        t.assert.strictEqual(children.filter(dead).length, threadpool.size)
+      await t.test('all threads exit', async t => {
+        t.assert.strictEqual(threads.filter(dead).length, pool.size)
       })
     })
   })

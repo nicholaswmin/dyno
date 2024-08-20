@@ -1,5 +1,6 @@
-import { EventEmitter, once, getEventListeners } from 'node:events'
+import { EventEmitter } from 'node:events'
 import { emitWarning } from 'node:process'
+
 import { validChildProcess, validStr } from '../validate/index.js'
 
 class Bus extends EventEmitter {

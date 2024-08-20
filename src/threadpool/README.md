@@ -1,11 +1,13 @@
-# 🧵 Threadpool
+[![test-workflow][test-badge]][test-workflow]
 
-> a [threadpool][threadpool] based on [`child_process.fork`][cp-fork]
+# 🧵 threadpool
+
+> a [threadpool][threadpool] 
 
 ## Usage
 
 ```bash
-npm i @nicholaswmin/threadpool
+npm i https://github.com/nicholaswmin/threadpool
 ```
 
 Run `thread.js` in `4` threads, sending `ping`/`pong`s between them:
@@ -23,7 +25,7 @@ for (const thread of pool.threads())
   })
 ```
 
-then:
+and in `thread.js`:
 
 ```js
 // thread.js
@@ -39,7 +41,7 @@ primary.emit('pong')
 setTimeout(() => process.disconnect(), 1000)
 ```
 
-run:
+then run:
 
 ```bash
 node primary.js
@@ -53,6 +55,13 @@ node primary.js
 
 ```bash 
 node run --test
+
+# ping 🏓
+# 🏓 pong
+# ping 🏓
+# 🏓 pong
+# 
+# ...
 ```
 
 ## Authors

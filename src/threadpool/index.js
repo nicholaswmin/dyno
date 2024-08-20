@@ -6,7 +6,7 @@ import { PrimaryBus, ThreadBus } from './src/bus/index.js'
 import { validInt, validObj, validStr } from './src/validate/index.js'
 
 class Threadpool extends EventEmitter {
-  #lastPingdex = 0
+  #nextIndex = 0
 
   constructor(task = process.argv.at(-1), size = 4, parameters = {}) {
     super()
@@ -54,10 +54,10 @@ class Threadpool extends EventEmitter {
       })() : exitCodes
   }
   
-  pingNext() {
-    const thread = this.threads[++this.#lastPingdex % this.threads.length]
+  ping() {
+    const thread = this.threads[++this.#nextIndex % this.threads.length]
 
-    thread.emit('ping', { foo: 'bar' })
+    thread.emit('ping')
   }
   
   async #fork (task, { parameters, i  }) {
@@ -76,7 +76,7 @@ class Threadpool extends EventEmitter {
     
     return (new Thread(fork))
       .once('end', this.#onThreadEnd.bind(this))
-      .once('pong', this.#onThreadPong.bind(this))
+      .on('pong', this.#onThreadPong.bind(this))
   } 
   
   async #exit() {
@@ -91,7 +91,7 @@ class Threadpool extends EventEmitter {
   }
   
   async #onThreadPong(args) {
-    //console.log('primary got:', 'pong', args)
+    this.emit('pong')
   }
 }
 
