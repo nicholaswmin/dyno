@@ -5,7 +5,7 @@ import { alive, dead, exitZero, exitNonZero, sigkilled } from './utils/utils.js'
 
 import { Threadpool } from '../index.js'
 
-test('#stop()', { timeout: 1000 }, async t => {
+test('#stop()', { timeout: 3000 }, async t => {
   let threadpool = null, threads = []
   
   t.before(() => cp.fork = t.mock.fn(cp.fork))

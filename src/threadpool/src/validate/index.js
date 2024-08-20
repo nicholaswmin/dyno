@@ -1,3 +1,15 @@
+import { ChildProcess } from 'node:child_process'
+
+const validChildProcess = (v, name) => {
+  if (typeof v !== 'object')
+    throw new TypeError(`${name} must be an object, is: ${typeof v}`)
+
+  if (!(v instanceof ChildProcess))
+    throw new TypeError(`${name} must be a ChildProcess, is: ${typeof v}`)
+  
+  return v
+}
+
 const validInt = (v, name) => {
   if (!Number.isInteger(v))
     throw new RangeError(`${name} must be an integer, has decimals: ${v}`)
@@ -40,4 +52,4 @@ const validStr = (v, name) => {
   return v
 }
 
-export { validInt, validObj, validStr }
+export { validChildProcess, validInt, validObj, validStr }

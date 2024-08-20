@@ -1,7 +1,8 @@
 import { ChildProcess } from 'node:child_process'
 import { once, EventEmitter } from 'node:events'
 
-import { validInt } from '../../validate.js'
+import { PrimaryBus } from '../bus/index.js'
+import { validInt } from '../validate/index.js'
 
 class Thread extends EventEmitter {
   #exitTimer = null
@@ -10,9 +11,10 @@ class Thread extends EventEmitter {
   #dead = false
   #alive = true
 
-  #exitCode = 0
-  #signalCode = null
-  #connected = null
+  // @REVIEW not needed, 
+  // set so `Object.assign` doesnt throw for lacking 
+  // setters of below.
+  #x = null
  
   get pid()        { return this.cp.pid             }
   get dead()       { return this.exitCode !== null  }
@@ -23,22 +25,28 @@ class Thread extends EventEmitter {
   get connected()  { return this.cp.connected       }
 
   // @REVIEW not needed
-  set pid(pid)             { return this.#pid = pid             }
-
-  set exitCode(code)       { return this.#exitCode = code       }
-  set signalCode(signal)   { return this.#signalCode = signal   }
-  set connected(connected) { return this.#connected = connected }
+  // set so `Object.assign` doesnt throw for lacking setters of above.
+  set pid(pid)             { return this.#x = pid       }
+  set exitCode(code)       { return this.#x = code      }
+  set signalCode(signal)   { return this.#x = signal    }
+  set connected(connected) { return this.#x = connected }
   
   constructor(cp) {
     super()
     this.cp = cp
-    this.exitTimeout = 100
+  
+    this.exitTimeout = 300
+
+    this.bus = new PrimaryBus(cp)
 
     Object.assign(this, cp)
+
     this.#addEndListeners(this.cp)
   }
   
   async exit() {
+    await this.bus.stop()
+
     const [ winner ] = await Promise.race([
       this.#startExitTimeout(),
       this.#startExitAttempt()
@@ -48,6 +56,20 @@ class Thread extends EventEmitter {
     return ['EXIT_TIMEOUT'].includes(winner) 
       ? this.#forceKill().then(() => 1)
       : winner
+  }
+  
+  emit(...args) {
+    this.bus.emit(...args)
+    super.emit(...args)
+    return this
+  }
+  
+  on(...args) {
+    this.bus.on(...args)
+
+    super.on(...args)
+    
+    return this
   }
   
   async #forceKill() {
@@ -75,7 +97,7 @@ class Thread extends EventEmitter {
     return new Promise(resolve => 
       this.#exitTimer = setTimeout(() => 
         resolve(['EXIT_TIMEOUT']), 
-        validInt(this.exitTimeout)
+        validInt(this.exitTimeout, 'exitTimeout')
       )
     )
   }

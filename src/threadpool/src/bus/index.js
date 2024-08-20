@@ -1,93 +1,97 @@
-import { setImmediate, setTimeout } from 'node:timers/promises'
 import { EventEmitter, once, getEventListeners } from 'node:events'
-import { randomUUID }  from 'node:crypto'
+import { emitWarning } from 'node:process'
+import { validChildProcess, validStr } from '../validate/index.js'
 
-class PrimaryBus extends EventEmitter {
-  #on = true
+class Bus extends EventEmitter {
+  #emittedWarnings = {}
+  #stopped = false
 
-  constructor() {
+  constructor(name = 'bus') {
     super()
-    this.id  = randomUUID()
-    this.pid = process.pid
-    this.threads = []
-  }
-  
-  start(threads) {
-    const self = this
-    function emit(args) { 
-      self.#on ? self.emit(...args) : 0
-    }
-
-    this.threads = threads
-      .map(thread => new DiscreetEmitter(thread))
-      .map(thread => {
-        return thread
-          .on('message', emit)
-          .once('error', t => this.removeThread(t))
-          .once('exit',  t => this.removeThread(t))
-          .once('close', t => this.removeThread(t))
-      })
-  }
-  
- async stop() {
-    this.#on = false
-    process.removeAllListeners()
-
-    await setImmediate()
-
-    this.threads
-      .forEach(thread => this
-        .removeThread(thread))
+    this.name = validStr(name, 'name')
     
-    return this
+    process.on('disconnect', () => this.stop())
   }
   
-  emit(...args) {
-    if (!this.#on) 
-      return null
-
-    this.threads
-      .filter(thread => thread.connected)
-      .filter(thread => thread.exitCode === null)
-      .filter(thread => thread.signalCode === null)
-      .forEach(thread => thread.send(Object.values(args)))
+  stop() {
+     this.#stopped = true
+     this.removeAllListeners()
+   }  
+   
+  cannotEmit() {
+    if (this.#stopped)
+      this.emitWarning('cannot emit() on stopped bus')
     
-    super.emit(...args)
+    if (Object.hasOwn(process, 'connected') && process.connected === false) 
+      this.emitWarning('cannot emit(), process disconnected')
+    
+    return this.#stopped
   }
   
-  removeThread(thread) {
-    this.threads = this.threads
-      .map(thread => thread.removeTrackedListeners())
-      .filter(_thread => _thread.pid !== thread.pid)
+  cannotReceive() {
+    if (Object.hasOwn(process, 'send') && this.#stopped)
+      this.emitWarning('cannot emit() on stopped bus')
+    
+    return this.#stopped
+  }
+
+  emitWarning(text = '', type) {
+    validStr(text, 'text')
+
+    if (typeof text !== 'string' || !text.length)
+      throw new RangeError('arg. "text" must be a string with length')
+
+    if (!!this.#emittedWarnings[text])
+      return
+    
+    emitWarning(`${this.name}: ${text}`, type)
+    
+    this.#emittedWarnings[text] = true
   }
 }
 
-class ThreadBus extends EventEmitter {
-  #on = true
+class PrimaryBus extends Bus {
+  constructor(cp) {
+    super('primary')
+    
+    validChildProcess(cp, 'cp')
+    
+    this.cp = cp    
+    this.cp.connected 
+      ? this.cp.on('message', args => {
+        super.emit(args[0], { ...args[1], pid: args[2] })
+      })
+      : this.emitWarning('cannot listen cp.on(), cp disconnected.')
+  }
+  
+  emit(...args) {
+    if (this.cannotEmit()) 
+      return
 
+    return this.cp.connected 
+      ? this.cp.send(Object.values({ ...args, pid: this.cp.pid }))
+      : this.emitWarning('cant emit(), thread disconnected')
+  }
+}
+
+class ThreadBus extends Bus {
   constructor() {
-    super()
+    super('child')
     this.pid = process.pid
 
     process.on('message', args => {
-      this.#on && args.pid === this.pid 
-        ? super.emit(...args)
-        : 0
+      this.cannotReceive()
+        ? null : args.at(-1) === this.pid
+          ? super.emit(args[0], args[1], args[2]) : null
     })
   }
 
   emit(...args) {
-    if (!process.connected || !this.#on)
-      return null
-    
-    return process.send(Object.values(args))
-  }
-  
-  async stop() {
-    this.removeAllListeners()
-    this.#on = false
-    await setTimeout(1)
+    if (this.cannotEmit()) 
+      return
+
+    return process.send(Object.values({ ...args, pid: this.pid }))
   }
 }
 
-export { ThreadBus }
+export { PrimaryBus, ThreadBus }
