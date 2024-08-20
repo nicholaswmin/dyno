@@ -82,8 +82,7 @@ node --run test:coverage
 
 ## License 
 
-The [MIT-0][license] License 
-
+The [MIT-0 License][license] 
 
 [test-badge]: https://github.com/nicholaswmin/threadpool/actions/workflows/test.yml/badge.svg
 [test-workflow]: https://github.com/nicholaswmin/threadpool/actions/workflows/test.yml
