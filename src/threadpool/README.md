@@ -1,4 +1,6 @@
-[![test-workflow][test-badge]][test-workflow]
+[![test-url][test-badge]][test-url] [![dep-url][dep-badge]][dep-url]
+
+# :stopwatch: dyno
 
 # 🧵 threadpool
 
@@ -82,10 +84,13 @@ node --run test:coverage
 
 ## License 
 
-The [MIT-0 License][license] 
+The [MIT-0][license] License 
+
 
 [test-badge]: https://github.com/nicholaswmin/threadpool/actions/workflows/test.yml/badge.svg
-[test-workflow]: https://github.com/nicholaswmin/threadpool/actions/workflows/test.yml
+[test-url]: https://github.com/nicholaswmin/threadpool/actions/workflows/test.yml
+[dep-badge]: https://img.shields.io/badge/dependencies-0-b.svg
+[dep-url]: https://blog.author.io/npm-needs-a-personal-trainer-537e0f8859c6
 
 [threadpool]: https://en.wikipedia.org/wiki/Thread_pool
 [cp-fork]: https://nodejs.org/api/child_process.html#child_processforkmodulepath-args-options
