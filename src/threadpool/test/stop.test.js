@@ -5,12 +5,11 @@ import { alive, dead, exitZero, exitNonZero, sigkilled } from './utils/utils.js'
 
 import { Threadpool } from '../index.js'
 
-test('#stop(', async t => {
+test('#stop()', { timeout: 1000 }, async t => {
   let threadpool = null, threads = []
   
   t.before(() => cp.fork = t.mock.fn(cp.fork))
   t.beforeEach(() => cp.fork.mock.resetCalls())
-  t.afterEach(() => threadpool.stop().catch(err => {}))
 
   await t.test('threads exit normally', async t => {
     t.before(async () => {
@@ -53,7 +52,7 @@ test('#stop(', async t => {
       })
     })
     
-    await t.test('threads are SIGKILL-ed', t => {
+    await t.test('threads are force killed', t => {
       t.assert.strictEqual(threads.filter(sigkilled).length, threadpool.size)
     })
     
@@ -76,13 +75,13 @@ test('#stop(', async t => {
       await t.assert.rejects(threadpool.stop.bind(threadpool))
     })
     
-    // flaky
-    await t.skip('thread exits with exit code: non-zero', t => {
+    // @FIXME flaky
+    t.todo('thread exits with exit code: non-zero', t => {
       t.assert.strictEqual(threads.filter(exitNonZero).length, 1)
     })
 
-    // flaky
-    await t.skip('remaining exit with exit code: zero', t => {
+    // @FIXME flaky
+    t.todo('remaining exit with exit code: zero', t => {
       t.assert.strictEqual(threads.filter(exitZero).length, threadpool.size - 1)
     })
     

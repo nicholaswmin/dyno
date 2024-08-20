@@ -32,7 +32,7 @@ class Thread extends EventEmitter {
   constructor(cp) {
     super()
     this.cp = cp
-    this.exitTimeout = 250
+    this.exitTimeout = 100
 
     Object.assign(this, cp)
     this.#addEndListeners(this.cp)

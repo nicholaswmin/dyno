@@ -2,11 +2,11 @@ import test from 'node:test'
 import cp from 'node:child_process'
 import { join } from 'node:path'
 import { once } from 'node:events'
-import { connected, dead, exitZero } from './utils/utils.js'
+import { connected, dead } from './utils/utils.js'
 
 import { Threadpool } from '../index.js'
 
-test('#start()', async t => {
+test('#start()', { timeout: 1000 }, async t => {
   let threadpool = null, children = []
 
   t.before(() => cp.fork = t.mock.fn(cp.fork))
