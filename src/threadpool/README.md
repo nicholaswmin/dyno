@@ -2,7 +2,8 @@
 
 # :thread: threadpool
 
-> a [threadpool][threadpool] that's easy to talk to
+> a [threadpool][threadpool] that's easy to talk to  
+> requires Node v22.6+
 
 ## Install
 
