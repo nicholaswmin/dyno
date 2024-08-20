@@ -45,16 +45,6 @@ then run:
 
 ```bash
 node primary.js
-```
-
-## Todos
-
-- [] implement `.ping()` method
-
-## test 
-
-```bash 
-node run --test
 
 # ping 🏓
 # 🏓 pong
@@ -62,6 +52,17 @@ node run --test
 # 🏓 pong
 # 
 # ...
+```
+
+## Gotchas 
+
+- "threads" are based on [`child_process.fork()`][cp-fork]
+- a thread must exit within `200ms`, otherwise it gets reaped by `SIGKILL`.
+
+## test 
+
+```bash 
+node run --test
 ```
 
 ## Authors
