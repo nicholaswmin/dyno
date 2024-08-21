@@ -1,7 +1,6 @@
 import { EventEmitter, once } from 'node:events'
-
 import { PrimaryBus } from '../bus/index.js'
-import { validInt } from '../validate/index.js'
+import { validateInteger } from '../validate/index.js'
 
 class Thread extends EventEmitter {
   #exitTimer = null
@@ -9,6 +8,8 @@ class Thread extends EventEmitter {
   #pid = null
   #dead = false
   #alive = true
+  
+  #stderr = ''
 
   // @REVIEW not needed, 
   // set so `Object.assign` doesnt throw for lacking 
@@ -34,7 +35,7 @@ class Thread extends EventEmitter {
     super()
     this.cp = cp
   
-    this.exitTimeout = 300
+    this.exitTimeout = 200
 
     this.bus = new PrimaryBus(cp)
 
@@ -44,13 +45,12 @@ class Thread extends EventEmitter {
   }
   
   async exit() {
-    await this.bus.stop()
+    this.bus.stop()
 
     const [ winner ] = await Promise.race([
       this.#startExitTimeout(),
       this.#startExitAttempt()
-    ])
-    .finally(this.#abortExitTimer.bind(this))
+    ]).finally(this.#abortExitTimer.bind(this))
 
     return ['EXIT_TIMEOUT'].includes(winner) 
       ? this.#forceKill().then(() => 1)
@@ -60,6 +60,7 @@ class Thread extends EventEmitter {
   emit(...args) {
     this.bus.emit(...args)
     super.emit(...args)
+
     return this
   }
   
@@ -96,7 +97,7 @@ class Thread extends EventEmitter {
     return new Promise(resolve => 
       this.#exitTimer = setTimeout(() => 
         resolve(['EXIT_TIMEOUT']), 
-        validInt(this.exitTimeout, 'exitTimeout')
+        validateInteger(this.exitTimeout, 'exitTimeout')
       )
     )
   }
@@ -118,15 +119,17 @@ class Thread extends EventEmitter {
   #addEndListeners(ee) {
     const self = this
 
+    ee.stderr.on('data', data => 
+      this.#stderr += data.toString()) 
+
     const onError = err => 
       self.off('exit', onExit)
-          .emit('end', err)
-
+        .emit('end', err)
+    
     const onExit = () =>
       self.off('error', onError)
           .emit('end', this.exitCode > 0 
-        ? new Error('nonzero exit') : null
-      )
+        ? new Error(this.#stderr) : null)
     
     ee.once('exit', onExit).once('error', onError)
   }

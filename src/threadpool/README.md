@@ -60,9 +60,9 @@ node primary.js
 
 ## Gotchas 
 
-- "threads" are based on [`child_process.fork()`][cp-fork]
-- a thread must exit within `200ms`, otherwise it gets reaped by 
-  [`SIGKILL`][sigkill].
+- "threads" are based on [`child_process.fork()`][cp-fork], 
+  so technically it's multiprocessing
+- a thread must exit within `200ms`, otherwise it gets [`SIGKILL`][sigkill]-ed.
 
 ## Test 
 

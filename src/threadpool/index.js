@@ -3,7 +3,11 @@ import { EventEmitter, once } from 'node:events'
 
 import { Thread } from './src/thread/index.js'
 import { PrimaryBus, ThreadBus } from './src/bus/index.js'
-import { validInt, validObj, validStr } from './src/validate/index.js'
+import { 
+  validateInteger, 
+  validateObject, 
+  validateString 
+} from './src/validate/index.js'
 
 class Threadpool extends EventEmitter {
   #nextIndex = 0
@@ -13,19 +17,19 @@ class Threadpool extends EventEmitter {
 
     Object.defineProperties(this, {
       task: {
-        value: validStr(task, 'task'),
+        value: validateString(task, 'task'),
         writable : false, enumerable : false, configurable : false
       },
       size: {
-        value: validInt(size, 'size'),
+        value: validateInteger(size, 'size'),
         writable : false, enumerable : false, configurable : false
       },
       parameters: {
-        value: validObj(parameters, 'parameters'),
+        value: validateObject(parameters, 'parameters'),
         writable : false, enumerable : false, configurable : false
       },
       exitTimeout: {
-        value: validInt(50, 'exitTimeout'),
+        value: validateInteger(50, 'exitTimeout'),
         writable : false, enumerable : false, configurable : false
       },
       threads: {
@@ -38,7 +42,9 @@ class Threadpool extends EventEmitter {
   async start() {
     const spawns = Array.from({
       length: this.size 
-    }, (_, i) => this.#fork(this.task, { parameters: this.parameters, i }))
+    }, (_, index) => this.#fork(this.task, { 
+      parameters: this.parameters, index
+    }))
 
     this.threads = Object.freeze(await Promise.all(spawns))
     
@@ -60,9 +66,14 @@ class Threadpool extends EventEmitter {
     thread.emit('ping')
   }
   
-  async #fork (task, { parameters, i  }) {
+  async #fork (task, { parameters, index }) {
     const fork = cp.fork(task, ['child'], {
-      env: { ...process.env, parameters: JSON.stringify(parameters), index: i }
+      stdio: ['ipc', null, 'pipe'],
+        env: { 
+          ...process.env, 
+          parameters: JSON.stringify(parameters), 
+          index 
+      }
     })
       
     await Promise.race([ 
@@ -87,11 +98,14 @@ class Threadpool extends EventEmitter {
   }
   
   async #onThreadEnd(err) {
-    this.emit('end', err ? await this.stop() : null)
+    if (err) 
+      await this.stop()
+
+    this.emit('thread:end', err)
   }
   
   async #onThreadPong(args) {
-    this.emit('pong')
+    this.emit('pong', args)
   }
 }
 

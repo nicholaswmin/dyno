@@ -4,40 +4,52 @@ import { once, EventEmitter } from 'node:events'
 import { setTimeout } from 'node:timers/promises'
 
 import { Threadpool } from '../index.js'
-import { resolve } from 'node:url'
 
-EventEmitter.defaultMaxListeners = 100
+EventEmitter.defaultMaxListeners = 50
 
-test('#ping()', { timeout: 500 }, async t => {
+test('#ping()', { timeout: 1000 }, async t => {
   let pool = null
 
+  t.beforeEach(() => {
+    pool = new Threadpool(join(import.meta.dirname, 'task/pong.js'), 10)
+  })
+  
   t.afterEach(() => {
     pool.removeAllListeners('pong').stop()
   })
+  
+  await t.test('sends back 1 pong', async t => {
+    await pool.start()
 
-  t.beforeEach(() => {
-    pool = new Threadpool(join(import.meta.dirname, 'task/pong.js'))
+    await new Promise(resolve => pool.once('pong', resolve).ping())
   })
   
-  await t.test('sending one ping', async t => {    
-    await t.test('sends back one pong', async t => {
-      await pool.start()
+  await t.test('completes ~1000 ping/pong cycles', async t => {
+    await pool.start()
 
-      await new Promise(resolve => pool.once('pong', resolve).ping())
+    await new Promise(resolve => {
+      let pongs = 0
+
+      pool.on('pong', e => ++pongs >= 1000 ? resolve() : pool.ping())
+      
+      pool.ping()
     })
   })
   
-  await t.test('recursively sending ping/pongs', async t => {    
-    await t.test('completes at least 100 ping/pong cycles', async t => {
-      await pool.start()
+  await t.test('each cycle lands on the next thread', async t => {
+    await pool.start()
+    const pids = pool.threads.map(thread => thread.pid)
+    const pongs = await new Promise(resolve => {
+      const _pongs = []
 
-      await new Promise(resolve => {
-        let pongs = 0
-
-        pool.on('pong', e => ++pongs >= 100 ? resolve() : pool.ping())
-        
-        pool.ping()
-      })
+      pool.on('pong', data => _pongs.length === pool.size 
+        ? resolve(_pongs) : pool.ping(_pongs.push(data.pid)))
+      
+      pool.ping()
     })
+
+    t.assert.strictEqual(pongs.length, 10)
+    t.assert.ok(pongs.every(_pid => pids.find(p => p === _pid)),
+      'cannot find all thread PIDs (or none at all) in sent pongs')
   })
 })
