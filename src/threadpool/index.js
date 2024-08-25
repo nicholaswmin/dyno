@@ -1,7 +1,7 @@
 import cp from 'node:child_process'
 import { availableParallelism } from 'node:os'
 import { EventEmitter } from 'node:events'
-import { emitWarning } from 'node:process'
+import { emitWarning, argv } from 'node:process'
 
 import { Thread } from './src/thread/index.js'
 import { PrimaryBus, ThreadBus } from './src/bus/index.js'
@@ -11,18 +11,16 @@ class Threadpool extends EventEmitter {
   static readyTimeout = 300
   static killTimeout = 300
 
-  #starting = false
-  #stopping = false
   #nextIndex = 0
   
+  #starting = false
+  #stopping = false  
+
   get #started() {
     return this.threads.some(t => t.alive) && !this.#stopping
   }
 
-  constructor(
-    modulePath = process.argv.at(-1), 
-    size = availableParallelism() - 1,  
-    parameters = {}) {
+  constructor(path = argv.at(-1), size = availableParallelism(),  env = {}) {
     super()
 
     Object.defineProperties(this, {
@@ -36,8 +34,8 @@ class Threadpool extends EventEmitter {
         writable : false, enumerable : false, configurable : false
       },
 
-      modulePath: {
-        value: aString(modulePath, 'modulePath'),
+      path: {
+        value: aString(path, 'path'),
         writable : false, enumerable : false, configurable : false
       },
 
@@ -46,8 +44,8 @@ class Threadpool extends EventEmitter {
         writable : false, enumerable : false, configurable : false
       },
       
-      parameters: {
-        value: anObject(parameters, 'parameters'),
+      env: {
+        value: anObject(env, 'env'),
         writable : false, enumerable : false, configurable : false
       },
 
@@ -67,9 +65,9 @@ class Threadpool extends EventEmitter {
     const forks = []
 
     for (let i = 0; i < this.size; i++) {
-      forks.push(await this.#forkThread(this.modulePath, {
+      forks.push(await this.#forkThread(this.path, {
         stdio: ['ipc', 'pipe', 'pipe'],
-        env: { ...process.env, ...this.parameters, index: i }
+        env: { ...process.env, ...this.env, index: i }
       }))
     }
 
@@ -77,7 +75,7 @@ class Threadpool extends EventEmitter {
 
     this.#starting = false
 
-    return this
+    return this.threads
   }
 
   async stop() {
@@ -103,9 +101,9 @@ class Threadpool extends EventEmitter {
     thread.emit('ping', { start: performance.now() })
   }
   
-  async #forkThread (modulepath, args) {
+  async #forkThread (path, args) {
     const thread = new Thread(
-      cp.fork(modulepath, args), {
+      cp.fork(path, args), {
       readyTimeout: this.readyTimeout,
       killTimeout: this.killTimeout
     })
