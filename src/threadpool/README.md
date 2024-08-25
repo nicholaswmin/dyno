@@ -66,11 +66,11 @@ node primary.js
 
 Starts the pool
 
-| name         | description                                 |
-|--------------|---------------------------------------------|
-| `modulePath` | file path of per-thread code                |
-| `size`       | number of threads                           |
-| `env`        | Environment key-value pairs for each thread |
+| name         	| description                                 	| default             	|
+|--------------	|---------------------------------------------	|---------------------	|
+| `modulePath` 	| file path of per-thread code                	| current file path   	|
+| `size`       	| number of threads                           	| available CPU cores 	|
+| `env`        	| Environment key-value pairs for each thread 	| undefined           	|
 
 #### `pool.stop()`
 

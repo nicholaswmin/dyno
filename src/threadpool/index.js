@@ -1,4 +1,5 @@
 import cp from 'node:child_process'
+import { availableParallelism } from 'node:os'
 import { EventEmitter, once } from 'node:events'
 
 import { Thread } from './src/thread/index.js'
@@ -22,7 +23,10 @@ class Threadpool extends EventEmitter {
       this.threads.some(t => t.exitCode === null)
   }
 
-  constructor(modulePath = process.argv.at(-1), size = 4, parameters = {}) {
+  constructor(
+    modulePath = process.argv.at(-1), 
+    size = availableParallelism(), 
+    parameters = {}) {
     super()
 
     Object.defineProperties(this, {
