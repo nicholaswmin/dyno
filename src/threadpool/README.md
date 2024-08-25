@@ -112,7 +112,7 @@ Emit an event to the primary.
 
 ## Gotchas 
 
-- Blocking the event loop on startup will trip a thread `SIGKILL`.
+- [Blocking the event loop][ee-block] on startup will trip a thread `SIGKILL`.
 - Delayed cleanups in `SIGTERM` handlers will trip a thread `SIGKILL`.
 - Dead threads cause the entire process to exit with `code: 1`.
 - Based on [`child_process.fork()`][cp-fork] so technically 
@@ -148,6 +148,7 @@ The [MIT-0][license] License
 [cp-fork]: https://nodejs.org/api/child_process.html#child_processforkmodulepath-args-options
 [ee]: https://nodejs.org/docs/latest/api/events.html#emitteremiteventname-args
 [ecodes]: https://en.wikipedia.org/wiki/Exit_status
+[ee-block]: https://nodejs.org/en/learn/asynchronous-work/dont-block-the-event-loop
 [mprocessing]: https://en.wikipedia.org/wiki/Multiprocessing
 [nicholaswmin]: https://github.com/nicholaswmin
 [license]: https://spdx.org/licenses/MIT-0.html
