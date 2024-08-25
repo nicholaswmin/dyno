@@ -76,16 +76,16 @@ Starts the pool.
 #### `pool.stop()`
 
 Stops the pool.  
-Returns an array of thread exit codes
+Returns an array of thread [exit codes][ecodes].
 
 #### `pool.threads`
 
 Array of threads.  
 
 Each thread has an [EventEmitter][ee]-like API for sending messages between a 
-thread and the parent/primary process.
+thread and the primary process.
 
-See example above.
+See example above for usage details.
 
 ### Events
 
@@ -131,6 +131,7 @@ The [MIT-0][license] License
 [threadpool]: https://en.wikipedia.org/wiki/Thread_pool
 [cp-fork]: https://nodejs.org/api/child_process.html#child_processforkmodulepath-args-options
 [ee]: https://nodejs.org/docs/latest/api/events.html#emitteremiteventname-args
+[ecodes]: https://en.wikipedia.org/wiki/Exit_status
 
 [nicholaswmin]: https://github.com/nicholaswmin
 [license]: https://spdx.org/licenses/MIT-0.html
