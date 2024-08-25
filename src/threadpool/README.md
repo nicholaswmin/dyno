@@ -12,7 +12,7 @@ npm i https://github.com/nicholaswmin/threadpool
 
 ## Run
 
-Run `thread.js` in `4` threads, sending `ping`/`pong`s between them:
+Sending `ping`/`pong`s between the primary and 4 threads:
 
 ```js
 // primary.js
