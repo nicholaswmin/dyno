@@ -111,6 +111,7 @@ messages.
 #### `primary.on(eventName, callbackFn)`
 
 Listen for a primary event.  
+
 `callbackFn` argument has the emmited `data`.
 
 #### `primary.emit(eventName, data)`
