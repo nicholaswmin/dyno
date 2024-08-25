@@ -76,11 +76,13 @@ Creates a pool.
 
 #### `pool.threads`
 
-Array of threads. 
+Array of `threads`. 
 
 #### `async pool.start()`
 
 Starts the pool.
+
+Returns array of `threads`.
 
 #### `async pool.stop()`
 
