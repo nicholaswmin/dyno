@@ -2,7 +2,7 @@
   "name": "threadpool",
   "version": "0.1.0",
   "type": "module",
-  "description": "tiny threadpool",
+  "description": "tiny threadpool with EventEmitter IPC",
   "main": "index.js",
   "scripts": {
     "test": "NODE_ENV=test node --test test/index.test.js",
