@@ -70,7 +70,7 @@ Starts the pool
 |--------------	|---------------------------------------------	|---------------------	|
 | `modulePath` 	| file path of per-thread code                	| current file path   	|
 | `size`       	| number of threads                           	| available CPU cores 	|
-| `env`        	| Environment key-value pairs for each thread 	| undefined           	|
+| `env`        	| Environment key-value pairs for each thread 	| current env. vars    	|
 
 #### `pool.stop()`
 
