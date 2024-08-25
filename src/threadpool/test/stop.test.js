@@ -12,7 +12,7 @@ test('#stop()', { timeout: 2000 }, async t => {
   cp.forked = () => cp.fork.mock.calls.map(call => call.result)
   t.afterEach(() => pool.stop())
 
-  await t.test('threads exit normally', async t => {    
+  await t.test('exits normally', async t => {    
     t.before(() => {
       cp.fork.mock.resetCalls()
       pool = new Threadpool(task('ok.js'))
@@ -21,21 +21,21 @@ test('#stop()', { timeout: 2000 }, async t => {
       return pool.start()
     })
 
-    await t.test('resolves an array of exit codes: 0', async t => {   
+    await t.test('resolves array of exit codes: 0', async t => {   
       const exitCodes = await pool.stop()
       
       t.assert.strictEqual(exitCodes.length, pool.size)
       t.assert.ok(exitCodes.every(code => code === 0), 'some exit codes !== 0')
     })
 
-    await t.test('all threads eventually exit', t => {          
+    await t.test('all threads exit', t => {          
       t.assert.strictEqual(cp.forked().filter(dead).length, pool.size)
       t.assert.strictEqual(cp.forked().filter(alive).length, 0)
     })
   })
 
   
-  await t.test('threads have SIGTERM handlers that never exit', async t => {
+  await t.test('SIGTERM handler never exits', async t => {
     t.before(() => {
       cp.fork.mock.resetCalls()
       pool = new Threadpool(task('lag-exit.js'))
@@ -43,21 +43,21 @@ test('#stop()', { timeout: 2000 }, async t => {
       return pool.start()
     })
     
-    await t.test('resolves an array of exit codes: 1', async t => {   
+    await t.test('resolves array of exit codes: 1', async t => {   
       const exitCodes = await pool.stop()
 
       t.assert.strictEqual(exitCodes.length, pool.size)
       t.assert.ok(exitCodes.every(code => code === 1), 'some exit codes !== 1')
     })
     
-    await t.test('all threads eventually exit', async t => {     
+    await t.test('all threads exit', async t => {     
       t.assert.strictEqual(cp.forked().filter(dead).length, pool.size)
       t.assert.strictEqual(cp.forked().filter(alive).length, 0)
     })
   })
   
   
-  await t.test('threads exit with code: 1 in SIGTERM cleanups', async t => {
+  await t.test('exits code: 1 in SIGTERM handler', async t => {
     t.before(() => {
       cp.fork.mock.resetCalls()
       pool = new Threadpool(task('exit-err.js'))
@@ -72,7 +72,7 @@ test('#stop()', { timeout: 2000 }, async t => {
       t.assert.ok(exitCodes.every(code => code === 1), 'some exit codes !== 1')
     })
     
-    await t.test('all threads eventually exit', t => {      
+    await t.test('all threads exit', t => {      
       t.assert.strictEqual(cp.forked().filter(dead).length, pool.size)
       t.assert.strictEqual(cp.forked().filter(alive).length, 0)
     })

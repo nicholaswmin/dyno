@@ -22,7 +22,7 @@ test('#start()', { timeout: 2000 }, async t => {
       return pool.start()
     })
     
-    await t.test('all connected and running', t => {
+    await t.test('all running ok', t => {
       t.assert.strictEqual(cp.instances().filter(connected).length, pool.size)
     })
 
@@ -35,7 +35,7 @@ test('#start()', { timeout: 2000 }, async t => {
     })
   })
   
-  t.test('thread throws an exception on startup', async t => {
+  t.test('throws startup exception', async t => {
     t.beforeEach(() => {
       cp.fork.mock.resetCalls()
 
@@ -54,7 +54,7 @@ test('#start()', { timeout: 2000 }, async t => {
     })
   })
   
-  await t.test('thread spawns with blocked event loop', async t => {
+  await t.test('blocks the event loop', async t => {
     t.before(() => {
       cp.fork.mock.resetCalls()
       pool = new Threadpool(task('blocked-loop.js'))
@@ -66,12 +66,12 @@ test('#start()', { timeout: 2000 }, async t => {
       })
     })
 
-    await t.test('all threads eventually exit', t => {     
+    await t.test('all threads exit', t => {     
       t.assert.strictEqual(cp.instances().filter(alive).length, 0)
     })
   })
   
-  await t.test('thread encounters a runtime error', async t => {  
+  await t.test('throws runtime error', async t => {  
     t.before(() => {
       cp.fork.mock.resetCalls()
       pool = new Threadpool(task('run-err.js'))
@@ -81,15 +81,15 @@ test('#start()', { timeout: 2000 }, async t => {
 
     const [ err ] = await once(pool, 'thread-error')
 
-    await t.test('emits a "thread-error" event', t => {
+    await t.test('emits "thread-error" event', t => {
       t.assert.ok(err, 'error event passed a null/falsy error argument')
     })
     
-    await t.test('with an error argument', t => {
+    await t.test('has error argument', t => {
       t.assert.ok(err instanceof Error, 'argument is not an Error instance')
     })
     
-    await t.test('error message includes the thread error message', t => {
+    await t.test('is the thread error', t => {
       t.assert.ok(
         err.message.includes('Runtime Error'), 
         `err.message is: "${err.message}" instead of "Runtime Error"`
