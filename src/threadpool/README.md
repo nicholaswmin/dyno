@@ -75,15 +75,17 @@ Creates a pool.
 
 #### `async pool.start()`
 
-Starts the pool and returns it.
+Starts the pool
 
 #### `async pool.stop()`
 
-Stops the pool and returns an array of thread [exit codes][ecodes].  
+Stops the pool.   
+
+Returns array of thread [exit codes][ecodes].  
 
 #### `pool.ping(data)`
 
-Emits a `ping` event to a thread, in [round-robin][rr]
+Emits a `ping` event to a thread, in [round-robin][rr].
 
 | name         	| description           | default         	   |
 |--------------	|---------------------- |--------------------  |
