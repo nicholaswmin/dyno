@@ -90,7 +90,7 @@ thread and the primary process.
 #### `thread.on(eventName, callbackFn)`
 
 Listen for a thread event.  
-`callbackFn` 1st-argument has the emmited `data`.
+`callbackFn` has the emmited `data`.
 
 #### `thread.emit(eventName, data)`
 
@@ -110,7 +110,7 @@ of `thread`-to-`primary` messages.
 #### `primary.on(eventName, callbackFn)`
 
 Listen for a primary event.  
-`callbackFn` 1st-argument has the emmited `data`.
+`callbackFn` argument has the emmited `data`.
 
 #### `primary.emit(eventName, data)`
 
