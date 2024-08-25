@@ -10,7 +10,7 @@
 npm i https://github.com/nicholaswmin/threadpool
 ```
 
-## Run
+## Example
 
 Sending `ping`/`pong`s between the primary and 4 threads:
 
