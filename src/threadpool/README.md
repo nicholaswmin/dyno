@@ -95,8 +95,8 @@ Emitted when a runtime error is encountered in a thread.
 
 - Blocking the event loop on startup might cause an internal "ready" handshake 
   to time out.
-- Threads with delayed `SIGTERM` handlers after calling `pool.stop()` 
-  are [`SIGKILL`][sigkill]-ed.
+- Threads with delayed `SIGTERM` handlers after calling `pool.stop()` are 
+  killed by `SIGKILL`.
 - Based on [`child_process.fork()`][cp-fork]. Technically it's *multiprocessing* 
   rather than *multithreading*.  
 
@@ -128,7 +128,6 @@ The [MIT-0][license] License
 
 [threadpool]: https://en.wikipedia.org/wiki/Thread_pool
 [cp-fork]: https://nodejs.org/api/child_process.html#child_processforkmodulepath-args-options
-[sigkill]: https://www.gnu.org/software/libc/manual/html_node/Termination-Signals.html#index-SIGKILL
 [ee]: https://nodejs.org/docs/latest/api/events.html#emitteremiteventname-args
 
 [nicholaswmin]: https://github.com/nicholaswmin
