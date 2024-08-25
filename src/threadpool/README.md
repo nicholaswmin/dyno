@@ -147,7 +147,8 @@ Emit an event to the primary.
 - [Blocking the event loop][ee-block] on startup will trip a thread `SIGKILL`.
 - Delayed cleanups in `SIGTERM` handlers will trip a thread `SIGKILL`.
 - A Thread dying will trip a `stop()` shutdown.
-- Based on [`child_process.fork()`][fork] so technically it's *multiprocessing*.
+- Based on [`child_process.fork()`][fork] so technically
+  it's [*multiprocessing*][child-p].
 
 ## Test 
 
@@ -190,6 +191,7 @@ The [MIT-0][license] License
 [ee-block]: https://nodejs.org/en/learn/asynchronous-work/dont-block-the-event-loop
 [rr]: https://en.wikipedia.org/wiki/Round-robin_scheduling
 [zombie]: https://en.wikipedia.org/wiki/Zombie_process
+[child-p]: https://en.wikipedia.org/wiki/Child_process
 
 [nicholaswmin]: https://github.com/nicholaswmin
 [license]: ./LICENSE
