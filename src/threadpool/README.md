@@ -95,9 +95,8 @@ Emitted when a runtime error is encountered in a thread.
   time-out.
 - Threads with delayed cleanups after calling `pool.stop()` 
   are [`SIGKILL`][sigkill]-ed.
-
-Based on [`child_process.fork()`][cp-fork].  
-Technically it's *multiprocessing* rather than *multithreading*.  
+- Based on [`child_process.fork()`][cp-fork]. Technically it's *multiprocessing* 
+  rather than *multithreading*.  
 
 ## Test 
 
