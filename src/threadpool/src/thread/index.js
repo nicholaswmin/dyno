@@ -43,13 +43,15 @@ class Thread extends EventEmitter {
   
   async kill() {
     this.bus.stop()
-
-    return await Promise.race([
+    
+    await Promise.race([
       this.#attemptForceKill(),
       this.#attemptGraceKill()
     ])
-    .finally(this.#abortForceKill.bind(this))
-    .then(res => this.exitCode)
+
+    this.#abortForceKill()
+
+    return this.exitCode
   }
   
   emit(...args) {
@@ -61,39 +63,40 @@ class Thread extends EventEmitter {
   
   on(...args) {
     this.bus.on(...args)
-
     super.on(...args)
     
     return this
   }
 
-  async #attemptForceKill() {
-    return this.#forceKillTimer 
-      ? emitWarning('#attemptForceKill called twice')
-      : new Promise((resolve, reject) => {
-        this.#forceKillTimer = setTimeout(() => {
-          this.#forceKillTimer = null
-
-          return this.#forceKill()
-            .then(this.#onceDead.bind(this))
-            .catch(reject.bind(this))
-        }, this.killTimeout)
-      })
+  #attemptForceKill() {
+    return new Promise((resolve, reject) => {
+      this.#forceKillTimer = setTimeout(() => {
+        this.#forceKillTimer = null
+        emitWarning(`${this.pid} SIGTERM timed out. Attempting SIGKILL ...`)
+        
+        return this.#forceKill()
+          .then(this.#onceDead.bind(this))
+          .then(() => emitWarning(`${this.pid} killed by SIGKILL`))
+          .then(resolve)
+          .catch(reject.bind(this))
+      }, this.killTimeout)
+    })
   }
   
-  async #abortForceKill() {
+  #abortForceKill() {
     clearTimeout(this.#forceKillTimer)
+
     this.#forceKillTimer = null
   }
 
-  async #forceKill() {
+  #forceKill() {
     queueMicrotask(() => this.cp.kill('SIGKILL'))
 
-    return await this.#onceDead()
+    return this.#onceDead()
   }
   
-  #attemptGraceKill(signal) {
-    queueMicrotask(() => this.cp.kill(signal))
+  #attemptGraceKill() {
+    queueMicrotask(() => this.cp.kill())
 
     return this.#onceDead()
   }
