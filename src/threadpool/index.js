@@ -1,6 +1,7 @@
 import cp from 'node:child_process'
 import { availableParallelism } from 'node:os'
 import { EventEmitter, once } from 'node:events'
+import { emitWarning } from 'node:process'
 
 import { Thread } from './src/thread/index.js'
 import { PrimaryBus, ThreadBus } from './src/bus/index.js'
@@ -15,6 +16,7 @@ class Threadpool extends EventEmitter {
   static killTimeout = 300
   
   #threadEvents = ['pong']
+  #starting = false
   #stopping = false
   #nextIndex = 0
   
@@ -63,6 +65,11 @@ class Threadpool extends EventEmitter {
   }
   
   async start() {
+    if (this.#stopping)
+      return emitWarning('cannot start() again, startup still in progress.')
+
+    this.#starting = true
+
     const forks = []
 
     for (let i = 0; i < this.size; i++) {
@@ -74,10 +81,15 @@ class Threadpool extends EventEmitter {
 
     this.threads = Object.freeze(forks)
 
+    this.#starting = false
+
     return this
   }
 
   async stop() {
+    if (this.#stopping)
+      return emitWarning('cannot stop() again, shutdown still in progress.')
+
     this.#stopping = true
 
     const alive = thread => thread.alive, 
