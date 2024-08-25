@@ -35,7 +35,7 @@ test('#start()', { timeout: 2000 }, async t => {
     })
   })
   
-  t.test('thread fails to spawn', async t => {
+  t.test('thread throws an exception on startup', async t => {
     t.beforeEach(() => {
       cp.fork.mock.resetCalls()
 
@@ -43,7 +43,9 @@ test('#start()', { timeout: 2000 }, async t => {
     })
     
     await t.test('start() promise rejects', async t => {
-      await t.assert.rejects(() => pool.start())
+      await t.assert.rejects(() => pool.start(), {
+        message: /Failed to send SIGKILL/
+      })
     })
     
     await t.test('all threads exit', async t => {  
@@ -59,7 +61,9 @@ test('#start()', { timeout: 2000 }, async t => {
     })
     
     await t.test('function call rejects', async t => {   
-      await t.assert.rejects(pool.start.bind(pool))
+      await t.assert.rejects(pool.start.bind(pool), {
+        message: /SIGKILL succeeded/
+      })
     })
 
     await t.test('all threads eventually exit', t => {     

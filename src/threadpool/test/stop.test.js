@@ -5,7 +5,7 @@ import path from 'node:path'
 import { task, alive, dead } from './utils/utils.js'
 import { Threadpool } from '../index.js'
 
-test('#stop()', { timeout: 3000 }, async t => {
+test('#stop()', { timeout: 2000 }, async t => {
   let pool = null 
 
   cp.fork   = t.mock.fn(cp.fork)
@@ -21,7 +21,7 @@ test('#stop()', { timeout: 3000 }, async t => {
       return pool.start()
     })
 
-    await t.test('resolves an array of exit codes: one', async t => {   
+    await t.test('resolves an array of exit codes: 0', async t => {   
       const exitCodes = await pool.stop()
       
       t.assert.strictEqual(exitCodes.length, pool.size)
@@ -35,7 +35,7 @@ test('#stop()', { timeout: 3000 }, async t => {
   })
 
   
-  await t.test('threads have a SIGTERM handlers that never exits', async t => {
+  await t.test('threads have SIGTERM handlers that never exit', async t => {
     t.before(() => {
       cp.fork.mock.resetCalls()
       pool = new Threadpool(task('lag-exit.js'))
@@ -57,7 +57,7 @@ test('#stop()', { timeout: 3000 }, async t => {
   })
   
   
-  await t.test('threads exit with non-zero during cleanups', async t => {
+  await t.test('threads exit with code: 1 in SIGTERM cleanups', async t => {
     t.before(() => {
       cp.fork.mock.resetCalls()
       pool = new Threadpool(task('exit-err.js'))
