@@ -86,7 +86,7 @@ Returns array of `threads`.
 
 #### `async pool.stop()`
 
-Sends a [`SIGTERM`][sigterm] signal to each thread.
+Sends a [`SIGTERM`][signals] signal to each thread.
 
 Returns array of [exit codes][ecodes].  
 
