@@ -95,9 +95,13 @@ Emitted when a runtime error is encountered in a thread.
 
 ## Thread API
 
-#### `thread.on(eventName, callbackFn)`
+#### `thread.on(eventName, listener)`
 
 Listen for events emitted from the thread.
+
+#### `emitter.off(eventName, listener)`
+
+Remove the listener of a given event.
 
 #### `thread.emit(eventName, data)`
 
@@ -107,7 +111,7 @@ Emit an event to the thread.
 
 > The exported `primary` is meant to be used in the thread file.  
 >
-> It's  an [EventEmitter][ee] which allows sending/receiving of 
+> It's an [EventEmitter][ee] which allows sending/receiving of 
 *thread-to-primary* messages.
 
 #### `primary.on(eventName, callbackFn)`
