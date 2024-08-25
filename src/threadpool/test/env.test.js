@@ -6,7 +6,7 @@ import { task, connected, alive, dead } from './utils/utils.js'
 
 import { Threadpool } from '../index.js'
 
-test('#start() .env parameters', { timeout: 2000 }, async t => {
+test('Thread environment variables', { timeout: 2000 }, async t => {
   let pool = null, 
       env = null
 

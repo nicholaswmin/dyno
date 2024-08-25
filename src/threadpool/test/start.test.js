@@ -13,7 +13,7 @@ test('#start()', { timeout: 2000 }, async t => {
   t.afterEach(() => pool.stop())
   
 
-  await t.test('all threads spawn', async t => {
+  await t.test('threads spawn normally', async t => {
     t.before(() => {
       cp.fork.mock.resetCalls()
 
@@ -35,7 +35,7 @@ test('#start()', { timeout: 2000 }, async t => {
     })
   })
   
-  t.test('throws startup exception', async t => {
+  t.test('thread throws startup exception', async t => {
     t.beforeEach(() => {
       cp.fork.mock.resetCalls()
 
@@ -54,7 +54,7 @@ test('#start()', { timeout: 2000 }, async t => {
     })
   })
   
-  await t.test('blocks the event loop', async t => {
+  await t.test('thread event loop blocked', async t => {
     t.before(() => {
       cp.fork.mock.resetCalls()
       pool = new Threadpool(task('blocked-loop.js'))
@@ -71,7 +71,7 @@ test('#start()', { timeout: 2000 }, async t => {
     })
   })
   
-  await t.test('throws runtime error', async t => {  
+  await t.test('thread throws runtime error', async t => {  
     t.before(() => {
       cp.fork.mock.resetCalls()
       pool = new Threadpool(task('run-err.js'))
@@ -96,7 +96,7 @@ test('#start()', { timeout: 2000 }, async t => {
       )
     })
 
-    await t.test('all threads eventually exit', t => {          
+    await t.test('all threads exit', t => {          
       t.assert.strictEqual(cp.instances().filter(dead).length, pool.size)
       t.assert.strictEqual(cp.instances().filter(alive).length, 0)
     })
