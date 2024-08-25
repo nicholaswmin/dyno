@@ -173,7 +173,7 @@ node --run pingpong
 
 ## License 
 
-The [MIT-0][license] License 
+The [MIT "No attribution"][license] License 
 
 
 [test-badge]: https://github.com/nicholaswmin/threadpool/actions/workflows/test.yml/badge.svg
