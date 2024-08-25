@@ -162,7 +162,7 @@ node --run test
 node --run test:coverage
 ```
 
-Run `ping`/`pong` example:
+### Example
 
 ```bash 
 node --run pingpong
