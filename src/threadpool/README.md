@@ -58,9 +58,10 @@ node primary.js
 
 ## API
 
-### `new Threadpool(path, size, env)`
+#### `new Threadpool(path, size, env)`
 
 Creates a pool.  
+
 
 | name         	| description                         | default         	   |
 |--------------	|------------------------------------ |--------------------  |
@@ -68,15 +69,15 @@ Creates a pool.
 | `size`       	| number of threads                   | available cores      |
 | `env`        	| thread environment key-value pairs  | current [env.][env]	 |
 
-### `async pool.start()`
+#### `async pool.start()`
 
 Starts the pool and returns it.
 
-### `async pool.stop()`
+#### `async pool.stop()`
 
 Stops the pool and returns an array of thread [exit codes][ecodes].  
 
-### `pool.ping(data)`
+#### `pool.ping(data)`
 
 Emits a `ping` event to a thread, in round-robin
 
@@ -84,21 +85,21 @@ Emits a `ping` event to a thread, in round-robin
 |--------------	|---------------------- |--------------------  |
 | `data`      	| optional event data   | `{}`                 |
 
-### `pool.threads`
+#### `pool.threads`
 
 Array of running threads.  
 
-### `event: 'thread-error'` 
+#### `event: 'thread-error'` 
 
 Emitted when a runtime error is encountered in a thread.
 
 ## Thread API
 
-### `thread.on(eventName, callbackFn)`
+#### `thread.on(eventName, callbackFn)`
 
 Listen for events emitted from the thread.
 
-### `thread.emit(eventName, data)`
+#### `thread.emit(eventName, data)`
 
 Emit an event to the thread.
 
@@ -109,11 +110,11 @@ Emit an event to the thread.
 > It's  an [EventEmitter][ee] which allows sending/receiving of 
 *thread-to-primary* messages.
 
-### `primary.on(eventName, callbackFn)`
+#### `primary.on(eventName, callbackFn)`
 
 Listen for events emitted from the primary.
 
-### `primary.emit(eventName, data)`
+#### `primary.emit(eventName, data)`
 
 Emit an event to the primary.
 
