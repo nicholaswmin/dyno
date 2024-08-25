@@ -62,9 +62,9 @@ node primary.js
 
 ## API
 
-#### `pool.start(path, size, env)`
+#### `new Threadpool(path, size, env)`
 
-Starts the pool.  
+Creates a pool.  
 
 
 | name         	| description                         | default         	 |
@@ -72,6 +72,10 @@ Starts the pool.
 | `path`      	| thread file path                    | current file path  |
 | `size`       	| number of threads                   | available cores    |
 | `env`        	| thread environment key-value pairs  | current env.    	 |
+
+#### `pool.start()`
+
+Starts the pool and returns it.
 
 #### `pool.stop()`
 
