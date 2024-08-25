@@ -62,7 +62,7 @@ node primary.js
 
 ## API
 
-### `pool.start(modulePath, size, env)`
+#### `pool.start(modulePath, size, env)`
 
 Starts the pool
 
@@ -72,23 +72,22 @@ Starts the pool
 | `size`       | number of threads                           |
 | `env`        | Environment key-value pairs for each thread |
 
-### `pool.stop()`
+#### `pool.stop()`
 
 Stops the pool, returns an array of thread exit codes
 
-### `pool.threads`
+#### `pool.threads`
 
-Array of threads
-
-Threads have an [EventEmitter][ee]-like API which allows sending messages
+Array of threads with an [EventEmitter][ee]-like API for sending messages  
 between a thread and the parent/primary process.
 
-See the example above for usage info.
+See example above.
 
-#### `pool.on('thread-error', callback)`
+### Events
 
-The `thread-error` event is emitted if a runtime error is encountered in 
-a thread.
+#### `thread-error` 
+
+Emitted when a runtime error is encountered in a thread.
 
 ## Gotchas 
 
