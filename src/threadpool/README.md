@@ -2,7 +2,7 @@
 
 # :thread: threadpool
 
-> zero-dependencies [threadpool][threadpool] with event-emitting threads
+> tiny [threadpool][threadpool] with event-emitting threads
 
 ## Install
 
@@ -12,7 +12,7 @@ npm i https://github.com/nicholaswmin/threadpool
 
 ## Example
 
-Sending `ping`/`pong`s between the primary and 4 threads:
+`ping`/`pong`s between the primary and some threads:
 
 ```js
 import { Threadpool } from '@nicholaswmin/threadpool'
