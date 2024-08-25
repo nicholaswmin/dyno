@@ -10,20 +10,18 @@ import { anObject, anInteger, aString } from './src/validate/index.js'
 class Threadpool extends EventEmitter {
   static readyTimeout = 300
   static killTimeout = 300
-  
-  #threadEvents = ['pong']
+
   #starting = false
   #stopping = false
   #nextIndex = 0
   
   get #started() {
-    return this.threads.length === this.size &&
-      this.threads.some(t => t.exitCode === null)
+    return this.threads.some(t => t.alive) && !this.#stopping
   }
 
   constructor(
     modulePath = process.argv.at(-1), 
-    size = availableParallelism(), 
+    size = availableParallelism() - 1,  
     parameters = {}) {
     super()
 
@@ -88,12 +86,15 @@ class Threadpool extends EventEmitter {
 
     this.#stopping = true
 
-    const alive = thread => thread.alive, 
-          kill  = thread => thread.kill(),
-          kills = this.threads.filter(alive)
+    const alive = this.threads.filter(thread => thread.alive), 
+          exits = []
     
-    return Promise.all(kills.map(t => t.kill()))
-      .finally(() => this.#stopping = false)
+    for (const thread of alive)
+      exits.push(await thread.kill())
+
+    this.#stopping = false
+
+    return exits
   }
   
   ping(data = {}) {
@@ -109,9 +110,8 @@ class Threadpool extends EventEmitter {
       killTimeout: this.killTimeout
     })
 
-    this.#threadEvents.forEach(e => thread.on(e, d => this.emit(e, d)))
-
     thread.once('thread-error', this.#onThreadError.bind(this))
+    thread.on('pong', (...args) => this.emit('pong', ...args))
 
     thread.stdout.on('data', data => console.log(data.toString()))    
     thread.stderr.on('data', data => {
@@ -127,10 +127,9 @@ class Threadpool extends EventEmitter {
     return thread
   }
   
-  
   // @FIXME emit error instead stop remapping
   async #onThreadError(err) {
-    if (!this.#started || this.#stopping)
+    if (!this.#started) 
       return 
     
     await this.stop()
