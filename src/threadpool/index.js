@@ -67,7 +67,8 @@ class Threadpool extends EventEmitter {
 
     for (let i = 0; i < this.size; i++) {
       forks.push(await this.#forkThread(this.modulePath, {
-        env: {  ...process.env, ...this.parameters, index: i  }
+        stdio: ['ipc', 'pipe', 'pipe'],
+        env: { ...process.env, ...this.parameters, index: i }
       }))
     }
 

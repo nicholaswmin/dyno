@@ -81,10 +81,19 @@ test('#start()', { timeout: 2000 }, async t => {
 
     const [ err ] = await once(pool, 'thread-error')
 
-    await t.test('with an error argument', async t => {    
-      await t.test('an instance of Error', t => {
-        t.assert.ok(err instanceof Error, 'argument is not Error instance')
-      })
+    await t.test('emits a "thread-error" event', t => {
+      t.assert.ok(err, 'error event passed a null/falsy error argument')
+    })
+    
+    await t.test('with an error argument', t => {
+      t.assert.ok(err instanceof Error, 'argument is not an Error instance')
+    })
+    
+    await t.test('error message includes the thread error message', t => {
+      t.assert.ok(
+        err.message.includes('Runtime Error'), 
+        `err.message is: "${err.message}" instead of "Runtime Error"`
+      )
     })
 
     await t.test('all threads eventually exit', t => {          

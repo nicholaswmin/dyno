@@ -114,21 +114,20 @@ class Thread extends EventEmitter {
   }
   
   #addEndListeners(ee) {
-    const self = this
-
     const onError = err => 
-      self.off('exit', onExit)
+      this.off('exit', onExit)
         .emit('thread-error', err)
     
     const onExit = (code, signal) => {
-      const err = code ||  signal === 'SIGKILL' ? 'SIGKILLed' : null
-      
+      const err = new Error(this.#stderr || signal) || null
+
       if (err)
-        this.off('thread-error', onError).emit('thread-error', new Error(err))
+        this.off('error', onError)
+          .emit('thread-error', err)
     }
 
     if (ee.stderr)
-      ee.stderr.on('data', data => this.#stderr += data.toString())
+      ee.stderr.on('data', data => this.#stderr += data.toString().trim())
 
     ee.once('exit', onExit).once('error', onError)
   }
