@@ -1,5 +1,5 @@
 import './args.test.js'
-import './stop.test.js'
 import './start.test.js'
-import './events.test.js'
-import './parameters.test.js'
+import './stop.test.js'
+import './emit.test.js'
+import './env.test.js'
