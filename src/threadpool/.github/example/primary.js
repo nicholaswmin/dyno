@@ -1,5 +1,5 @@
 import { join } from 'node:path'
-import { Threadpool } from '../../../index.js'
+import { Threadpool } from '../../index.js'
 
 const path = join(import.meta.dirname, 'thread.js')
 const pool = await (new Threadpool(path, 4)).start()
