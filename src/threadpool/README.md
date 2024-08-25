@@ -118,10 +118,10 @@ Emit an event to the primary
 
 ## Gotchas 
 
-- Blocking the event loop on startup might cause an internal `'ready'` 
-  handshake to time out.
-- Threads with `SIGTERM` handlers must exit promptly otherwise they are killed 
-  by `SIGKILL`.
+- Avoid blocking the event loop on startup which might trip the timeouts of 
+  the internal `'ready'` handshake.
+- Avoid delayed cleanups in `SIGTERM` handlers otherwise the thread will be 
+  killed with `SIGKILL`.
 - Based on [`child_process.fork()`][cp-fork] so tchnically it's *multiprocessing* 
   rather than *multithreading*.  
 
