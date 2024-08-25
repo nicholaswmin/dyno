@@ -96,7 +96,7 @@ Emits a `'ping'` event to a thread, in [round-robin][rr].
 
 ### Events
 
-#### `Event`: `'thread-error'` 
+#### `'thread-error'` 
 
 Emitted when a runtime error is encountered in a thread.
 
