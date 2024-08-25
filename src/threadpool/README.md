@@ -99,7 +99,7 @@ Emitted when a runtime error is encountered in a thread.
 
 Listen for events emitted from the thread.
 
-#### `emitter.off(eventName, listener)`
+#### `thread.off(eventName, listener)`
 
 Remove the listener of a given event.
 
