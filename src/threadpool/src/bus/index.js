@@ -98,17 +98,17 @@ class PrimaryBus extends Bus {
         }
 
         const onTimeout = () => 
-          exit(new Error(`${errmsg} Cleanup by SIGKILL timed-out.`))
+          exit(new Error(`${errmsg} SIGKILL cleanup timed-out.`))
 
         const onExitEvent = () => 
-          exit(new Error(`${errmsg} Cleanup by SIGKILL succeeded.`))
+          exit(new Error(`${errmsg} SIGKILL cleanup succeeded.`))
 
         const sigkillTimer = setTimeout(onTimeout, this.killTimeout)
 
         this.cp.once('exit', onExitEvent)
         
         if (!this.cp.kill(9))
-          reject(new Error(`${errmsg} Failed to send SIGKILL cleanup signal.`))
+          reject(new Error(`${errmsg} SIGKILL cleanup failed.`))
       }, this.readyTimeout)
 
       this.on('ready-pong', err => {

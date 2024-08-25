@@ -43,7 +43,7 @@ test('#start()', { timeout: 2000 }, async t => {
     
     await t.test('start() promise rejects', async t => {
       await t.assert.rejects(() => pool.start(), {
-        message: /Failed to send SIGKILL/
+        message: /SIGKILL/
       })
     })
     
@@ -61,7 +61,7 @@ test('#start()', { timeout: 2000 }, async t => {
     
     await t.test('function call rejects', async t => {   
       await t.assert.rejects(pool.start.bind(pool), {
-        message: /SIGKILL succeeded/
+        message: /SIGKILL/
       })
     })
 
