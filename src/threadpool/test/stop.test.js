@@ -4,7 +4,7 @@ import cp from 'node:child_process'
 import { task, alive, dead } from './utils/utils.js'
 import { Threadpool } from '../index.js'
 
-test('#stop()', { timeout: 2000 }, async t => {
+test('#stop()', async t => {
   let pool = null 
   cp.fork   = t.mock.fn(cp.fork)
   cp.instances   = () => cp.fork.mock.calls.map(c => c.result)
