@@ -87,13 +87,19 @@ Emits a `ping` event to a thread, in round-robin
 
 #### `pool.threads`
 
-Array of running threads.  
+Array of threads.  
 
 #### `Event`: `'thread-error'` 
 
 Emitted when a runtime error is encountered in a thread.
 
 ## Thread API
+
+#### `thread.exitCode`
+
+- `null` if thread is running
+- `0` if exited with zero 
+- `1` if thread threw exception or killed with anything other than `SIGTERM`.
 
 #### `thread.on(eventName, listenerFn)`
 
