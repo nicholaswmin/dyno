@@ -2,7 +2,7 @@
 
 # :thread: threadpool
 
-> zero-dependecies [threadpool][threadpool] with event-emitting threads
+> zero-dependencies [threadpool][threadpool] with event-emitting threads
 
 ## Install
 
