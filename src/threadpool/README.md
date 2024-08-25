@@ -2,7 +2,7 @@
 
 # :thread: threadpool
 
-> tiny thread pool with [`EventEmitter`][ee] IPC
+> tiny thread pool with [`EventEmitter`][ee] [IPC][ipc]
 
 ## Install
 
@@ -145,7 +145,7 @@ The [MIT-0][license] License
 [dep-badge]: https://img.shields.io/badge/dependencies-0-b.svg
 [dep-url]: https://blog.author.io/npm-needs-a-personal-trainer-537e0f8859c6
 
-[threadpool]: https://en.wikipedia.org/wiki/Thread_pool
+[ipc]: https://en.wikipedia.org/wiki/Inter-process_communication
 [cp-fork]: https://nodejs.org/api/child_process.html#child_processforkmodulepath-args-options
 [ee]: https://nodejs.org/docs/latest/api/events.html#emitteremiteventname-args
 [ecodes]: https://en.wikipedia.org/wiki/Exit_status
