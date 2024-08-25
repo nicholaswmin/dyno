@@ -93,11 +93,11 @@ Emitted when a runtime error is encountered in a thread.
 
 ## Gotchas 
 
-- Blocking the event loop on startup might cause an internal "ready" handshake 
-  to time out.
-- Threads with `SIGTERM` cleanup handlers must exit promptly otherwise they are 
-  killed by `SIGKILL`.
-- Based on [`child_process.fork()`][cp-fork]. Technically it's *multiprocessing* 
+- Blocking the event loop on startup might cause an internal `'ready'` 
+  handshake to time out.
+- Threads with `SIGTERM` handlers must exit promptly otherwise they are killed 
+  by `SIGKILL`.
+- Based on [`child_process.fork()`][cp-fork] so tchnically it's *multiprocessing* 
   rather than *multithreading*.  
 
 ## Test 
