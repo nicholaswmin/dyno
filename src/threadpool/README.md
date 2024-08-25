@@ -2,8 +2,7 @@
 
 # :thread: threadpool
 
-> tiny thread pool with [`EventEmitter`][ee] [IPC][ipc] and 
-> robust startup & shutdown
+> thread pool with robust startup/shutdown, plus an [`EventEmitter`][ee] [IPC]
 
 ## Install
 
