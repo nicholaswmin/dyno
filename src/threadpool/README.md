@@ -85,12 +85,7 @@ Returns array of thread [exit codes][ecodes].
 
 #### `pool.ping(data)`
 
-Emits a `ping` event to a thread, in [round-robin][rr].
-
-| name         	| description           | default         	   |
-|--------------	|---------------------- |--------------------  |
-| `data`      	| optional event data   | `{}`                 |
-
+Emits a `ping` event to a thread, in [round-robin][rr] with optional event data.
 #### `pool.threads`
 
 Array of threads.  
