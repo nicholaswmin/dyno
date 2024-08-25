@@ -66,7 +66,7 @@ class Threadpool extends EventEmitter {
   
   async start() {
     if (this.#stopping)
-      return emitWarning('cannot start() again, startup still in progress.')
+      return emitWarning('start() ignored, startup in progress.')
 
     this.#starting = true
 
@@ -88,7 +88,7 @@ class Threadpool extends EventEmitter {
 
   async stop() {
     if (this.#stopping)
-      return emitWarning('cannot stop() again, shutdown still in progress.')
+      return emitWarning('stop() ignored, shutdown in progress.')
 
     this.#stopping = true
 
