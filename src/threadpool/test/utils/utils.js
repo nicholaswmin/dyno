@@ -4,25 +4,11 @@ import { promisify } from 'node:util'
 
 // general
 
-const mock = (testContext, fn) => {
-  fn = testContext.mock.fn(fn)
-  fn.results = () => fn.mock.calls.map(call => call.result)
-  fn.reset = () => { fn.mock.resetCalls() }
-  
-  Object.defineProperty(fn, 'results', {
-    get() {
-      return fn.mock.calls.map(call => call.result)
-    }
-  })
-
-  return fn
-}
-
 const task = filename => join(import.meta.dirname, `../task/${filename}`)
 
-const execCommand = async (command, timeout = 1000) => {
+const execRootCommand = async (command, cutoffMs = 1000) => {
   const ctrl = new AbortController()
-  setTimeout(() => ctrl.abort(), timeout)
+  setTimeout(() => ctrl.abort(), cutoffMs)
   
   let out = null
   
@@ -65,6 +51,6 @@ const sigkilled = child => child.signalCode === 'SIGKILL'
 
 export { 
   // general
-  mock, task, execCommand,
+  task, execRootCommand,
   // array filters
   connected, alive, dead, exitZero, exitNonZero, sigkilled }
