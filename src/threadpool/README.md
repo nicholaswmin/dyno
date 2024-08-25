@@ -91,8 +91,8 @@ Emitted when a runtime error is encountered in a thread.
 
 ## Gotchas 
 
-- Blocking the event-loop on startup might cause an internal handshake to 
-  time-out.
+- Blocking the event loop on startup might cause an internal "ready" handshake 
+  to time out.
 - Threads with delayed `SIGTERM` handlers after calling `pool.stop()` 
   are [`SIGKILL`][sigkill]-ed.
 - Based on [`child_process.fork()`][cp-fork]. Technically it's *multiprocessing* 

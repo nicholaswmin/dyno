@@ -10,8 +10,8 @@ import {
 } from './src/validate/index.js'
 
 class Threadpool extends EventEmitter {
-  static readyTimeout = 500
-  static killTimeout = 500
+  static readyTimeout = 150
+  static killTimeout = 150
   
   #threadEvents = ['pong']
   #stopping = false
