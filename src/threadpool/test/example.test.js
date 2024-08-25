@@ -1,34 +1,17 @@
 import test from 'node:test'
-import { join } from 'node:path'
-import { promisify } from 'node:util'
-import { execFile } from 'node:child_process'
+
+import { execCommand } from './utils/utils.js'
+
+const command = `node --run pingpong`
 
 test('README example: pingpong', async t => {
   let out = null
 
   t.before(async () => {
-    const ctrl = new AbortController()
-    setTimeout(() => ctrl.abort(), 1 * 1000)
-    
-    try {
-      out = await promisify(execFile)(
-        'node', [ '--no-warnings', '--run', 'pingpong' ], 
-        { 
-          cwd: join(import.meta.dirname, '../'), 
-          stdio: 'pipe', 
-          encoding: 'utf8',
-          signal: ctrl.signal
-        }
-      )
-    } catch (err) {
-      if (err.code !== 'ABORT_ERR')
-        throw err
-      
-      out = err
-    }
+    out = await execCommand(command)
   })
   
-  await t.test('Running "node --run pingpong"', async t => {
+  await t.test(`Running "${command}"`, async t => {
     await t.test('logs in stdout', t => {
       t.assert.ok(out, 'did not create any output')
       t.assert.ok(out.stdout, `nothing logged in stdout`)
