@@ -147,8 +147,8 @@ Emit an event to the primary.
 - [Blocking the event loop][ee-block] on startup will trip a thread `SIGKILL`.
 - Delayed cleanups in `SIGTERM` handlers will trip a thread `SIGKILL`.
 - A Thread dying will trip a `stop()` shutdown.
-- Based on [`child_process.fork()`][fork] so technically
-  it's [*multi-processing*][child-p], not multi-threading.
+- Based on [`fork()`][fork] so technically it's [*multi-processing*][child-p],  
+  not multi-threading.
 
 ## Test 
 
