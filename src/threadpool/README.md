@@ -89,7 +89,7 @@ Emits a `ping` event to a thread, in round-robin
 
 Array of running threads.  
 
-#### `event: 'thread-error'` 
+#### `Event:`: `'thread-error'` 
 
 Emitted when a runtime error is encountered in a thread.
 
