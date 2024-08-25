@@ -95,6 +95,19 @@ Emitted when a runtime error is encountered in a thread.
 
 ## Thread API
 
+#### `thread.pid`
+
+Thread's [Process ID][pid]
+
+#### `thread.alive`
+
+`true` if process is running, `false` otherwise
+
+
+#### `thread.alive`
+
+`true` if process is dead, `false` otherwise
+
 #### `thread.exitCode`
 
 - `null` if thread is running
@@ -173,7 +186,9 @@ The [MIT-0][license] License
 [env]: https://nodejs.org/api/process.html#processenv
 [ee]: https://nodejs.org/docs/latest/api/events.html#emitteremiteventname-args
 [ecodes]: https://en.wikipedia.org/wiki/Exit_status
+[pid]: https://en.wikipedia.org/wiki/Process_identifier
 [ee-block]: https://nodejs.org/en/learn/asynchronous-work/dont-block-the-event-loop
 [mprocessing]: https://en.wikipedia.org/wiki/Multiprocessing
+
 [nicholaswmin]: https://github.com/nicholaswmin
 [license]: ./LICENSE
