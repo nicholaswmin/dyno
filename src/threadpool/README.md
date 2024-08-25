@@ -62,13 +62,13 @@ node primary.js
 
 ## API
 
-#### `pool.start(modulePath, size, env)`
+#### `pool.start(path, size, env)`
 
 Starts the pool
 
 | name         	| description                                 	| default             	|
 |--------------	|---------------------------------------------	|---------------------	|
-| `modulePath` 	| file path of per-thread code                	| current file path   	|
+| `path`      	| file path of per-thread code                	| current file path   	|
 | `size`       	| number of threads                           	| available CPU cores 	|
 | `env`        	| Environment key-value pairs for each thread 	| current env. vars    	|
 
