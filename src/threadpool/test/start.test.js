@@ -34,7 +34,7 @@ test('#start()', { timeout: 2000 }, async t => {
     })
   })
   
-  t.test('thread throws startup exception', async t => {
+  t.test('threads throw startup exception', async t => {
     t.beforeEach(() => {
       cp.fork.mock.resetCalls()
 
@@ -53,7 +53,7 @@ test('#start()', { timeout: 2000 }, async t => {
     })
   })
   
-  await t.test('thread event loop blocked', async t => {
+  await t.test('threads with blocked event loop', async t => {
     t.before(() => {
       cp.fork.mock.resetCalls()
       pool = new Threadpool(task('blocked-loop.js'))
@@ -70,7 +70,7 @@ test('#start()', { timeout: 2000 }, async t => {
     })
   })
   
-  await t.test('thread throws runtime error', async t => {  
+  await t.test('threads throw runtime error', async t => {  
     t.before(() => {
       cp.fork.mock.resetCalls()
       pool = new Threadpool(task('run-err.js'))

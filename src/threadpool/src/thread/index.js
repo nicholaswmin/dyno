@@ -72,11 +72,11 @@ class Thread extends EventEmitter {
     return new Promise((resolve, reject) => {
       this.#forceKillTimer = setTimeout(() => {
         this.#forceKillTimer = null
-        emitWarning(`${this.pid} SIGTERM timed out. Attempting SIGKILL ...`)
+        emitWarning(`${this.pid} SIGTERM timeout. Attempting SIGKILL.`, 'kill')
         
         return this.#forceKill()
           .then(this.#onceDead.bind(this))
-          .then(() => emitWarning(`${this.pid} killed by SIGKILL`))
+          .then(() => emitWarning(`${this.pid} killed by SIGKILL`, 'kill'))
           .then(resolve)
           .catch(reject.bind(this))
       }, this.killTimeout)

@@ -91,7 +91,7 @@ class PrimaryBus extends Bus {
         const self = this
         const errmsg = 'thread did not reply to "ready-ping" within timeout.'
 
-        this.emitWarning(errmsg)
+        this.emitWarning(errmsg, 'handshake')
         
         const exit = err => {
           clearTimeout(sigkillTimer)
@@ -129,7 +129,7 @@ class ThreadBus extends Bus {
     this.pid = process.pid
     this.error = false
     this.readyTimeoutTimer = setTimeout(() => {
-      this.emitWarning(`thread did not receive "ready-ping" within timeout`)
+      this.emitWarning(`did not get "ready-ping" within timeout`, 'handshake')
       process.exit(1)
     }, validateInteger(readyTimeout, 'readyTimeout'))
 
