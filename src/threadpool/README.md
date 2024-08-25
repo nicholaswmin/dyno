@@ -120,8 +120,8 @@ Emit an event to the primary.
   the internal `'ready'` handshake.
 - Avoid delayed cleanups in `SIGTERM` handlers otherwise the thread will be 
   killed with `SIGKILL`.
-- Based on [`child_process.fork()`][cp-fork] so tchnically it's *multiprocessing* 
-  rather than *multithreading*.  
+- Based on [`child_process.fork()`][cp-fork] so technically 
+  it's *multiprocessing* rather than *multithreading*.  
 
 ## Test 
 
