@@ -63,11 +63,11 @@ node primary.js
 Creates a pool.  
 
 
-| name         	| description                         | default         	 |
-|--------------	|------------------------------------ |-----------------	 |
-| `path`      	| thread file path                    | current file path  |
-| `size`       	| number of threads                   | available cores    |
-| `env`        	| thread environment key-value pairs  | current env.    	 |
+| name         	| description                         | default         	   |
+|--------------	|------------------------------------ |--------------------  |
+| `path`      	| thread file path                    | current file path    |
+| `size`       	| number of threads                   | available cores      |
+| `env`        	| thread environment key-value pairs  | current [env.][env]	 |
 
 #### `async pool.start()`
 
@@ -146,6 +146,7 @@ The [MIT-0][license] License
 
 [ipc]: https://en.wikipedia.org/wiki/Inter-process_communication
 [cp-fork]: https://nodejs.org/api/child_process.html#child_processforkmodulepath-args-options
+[env]: https://nodejs.org/api/process.html#processenv
 [ee]: https://nodejs.org/docs/latest/api/events.html#emitteremiteventname-args
 [ecodes]: https://en.wikipedia.org/wiki/Exit_status
 [ee-block]: https://nodejs.org/en/learn/asynchronous-work/dont-block-the-event-loop
