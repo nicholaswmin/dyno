@@ -2,7 +2,7 @@
 
 # :thread: threadpool
 
-> tiny thread pool with robust start/stop & an [`EventEmitter`][ee]-like [IPC]
+> tiny thread pool with [zombie guards][zg] & an [`EventEmitter`][ee]-like [IPC]
 
 ## Install
 
@@ -189,6 +189,7 @@ The [MIT-0][license] License
 [pid]: https://en.wikipedia.org/wiki/Process_identifier
 [ee-block]: https://nodejs.org/en/learn/asynchronous-work/dont-block-the-event-loop
 [rr]: https://en.wikipedia.org/wiki/Round-robin_scheduling
+[zg]: https://en.wikipedia.org/wiki/Zombie_process
 
 [nicholaswmin]: https://github.com/nicholaswmin
 [license]: ./LICENSE
