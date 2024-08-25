@@ -151,7 +151,7 @@ Emit an event to the primary.
   after a set timeout.
 - Runtime exceptions trigger a `stop()`; a shutdown of all running threads.
 - Based on [`fork()`][fork] so technically it's [*multi-processing*][child-p],
-  with each "thread" spawning as an isolated [V8][v8] instance. 
+  each "thread" being an isolated [V8][v8] instance. 
 
 ## Test 
 
