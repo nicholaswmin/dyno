@@ -81,10 +81,7 @@ Stops the pool and returns an array of thread [exit codes][ecodes].
 
 #### `pool.threads`
 
-Array of threads.  
-
-Each thread has an [EventEmitter][ee]-like API for sending messages between a 
-thread and the primary process.
+Array of running threads.  
 
 #### `thread.on(eventName, callbackFn)`
 
