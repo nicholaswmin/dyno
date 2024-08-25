@@ -148,7 +148,7 @@ Emit an event to the primary.
 - Delayed cleanups in `SIGTERM` handlers will trip a thread `SIGKILL`.
 - Dead threads cause the entire process to exit with `code: 1`.
 - Based on [`child_process.fork()`][cp-fork] so technically 
-  it's *multiprocessing* rather than *multithreading*.  
+  it's *multiprocessing*.
 
 ## Test 
 
