@@ -1,7 +1,7 @@
 import { EventEmitter, once } from 'node:events'
 import { emitWarning } from 'node:process'
 import { PrimaryBus } from '../bus/index.js'
-import { anInteger } from '../validate/index.js'
+import { isInteger } from '../validate/index.js'
 
 class Thread extends EventEmitter {
   #stderr = ''
@@ -33,8 +33,8 @@ class Thread extends EventEmitter {
     this.cp  = cp
     this.bus = new PrimaryBus(cp, { readyTimeout, killTimeout })
     
-    this.readyTimeout = readyTimeout
-    this.killTimeout = killTimeout
+    this.readyTimeout = isInteger(readyTimeout, 'readyTimeout')
+    this.killTimeout = isInteger(killTimeout, 'killTimeout')
     
     Object.assign(this, cp)
 

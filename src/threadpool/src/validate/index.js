@@ -1,6 +1,6 @@
 import { ChildProcess } from 'node:child_process'
 
-const aChildProcess = (v, name) => {
+const isChildProcess = (v, name) => {
   if (typeof v !== 'object')
     throw new TypeError(`${name} must be an object, is: ${typeof v}`)
 
@@ -10,7 +10,7 @@ const aChildProcess = (v, name) => {
   return v
 }
 
-const anInteger = (v, name) => {
+const isInteger = (v, name) => {
   if (typeof v === 'undefined')
     throw new RangeError(`${name} must be an integer, is: undefined`)
 
@@ -29,7 +29,7 @@ const anInteger = (v, name) => {
   return v
 }
   
-const anObject = (v, name) => {
+const isObject = (v, name) => {
   if (typeof v === 'undefined')
     return v
 
@@ -45,7 +45,7 @@ const anObject = (v, name) => {
   return v
 }
   
-const aString = (v, name) => {
+const isString = (v, name) => {
   if (typeof v === 'undefined' || v === null)
     return v
 
@@ -58,4 +58,4 @@ const aString = (v, name) => {
   return v
 }
 
-export { aChildProcess, anInteger, anObject, aString }
+export { isChildProcess, isObject, isInteger, isString }

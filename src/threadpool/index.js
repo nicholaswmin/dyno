@@ -5,7 +5,7 @@ import { emitWarning, argv } from 'node:process'
 
 import { Thread } from './src/thread/index.js'
 import { PrimaryBus, ThreadBus } from './src/bus/index.js'
-import { anObject, anInteger, aString } from './src/validate/index.js'
+import { isObject, isInteger, isString } from './src/validate/index.js'
 
 class Threadpool extends EventEmitter {
   static readyTimeout = 300
@@ -25,27 +25,27 @@ class Threadpool extends EventEmitter {
 
     Object.defineProperties(this, {
       readyTimeout: {
-        value: anInteger(Threadpool.readyTimeout, 'readyTimeout'),
+        value: isInteger(Threadpool.readyTimeout, 'readyTimeout'),
         writable : false, enumerable : false, configurable : false
       },
 
       killTimeout: {
-        value: anInteger(Threadpool.killTimeout, 'killTimeout'),
+        value: isInteger(Threadpool.killTimeout, 'killTimeout'),
         writable : false, enumerable : false, configurable : false
       },
 
       path: {
-        value: aString(path, 'path'),
+        value: isString(path, 'path'),
         writable : false, enumerable : false, configurable : false
       },
 
       size: {
-        value: anInteger(size, 'size'),
+        value: isInteger(size, 'size'),
         writable : false, enumerable : false, configurable : false
       },
       
       env: {
-        value: anObject(env, 'env'),
+        value: isObject(env, 'env'),
         writable : false, enumerable : false, configurable : false
       },
 
