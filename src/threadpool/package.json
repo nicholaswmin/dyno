@@ -4,9 +4,6 @@
   "type": "module",
   "description": "tiny threadpool",
   "main": "index.js",
-  "directories": {
-    "test": "test"
-  },
   "scripts": {
     "test": "NODE_ENV=test node --test test/index.test.js",
     "test:coverage": "NODE_ENV=test node --test --experimental-test-coverage test/index.test.js"
@@ -21,8 +18,7 @@
   "keywords": [
     "thread-pool",
     "nodejs",
-    "javascript",
-    "multithreading"
+    "javascript"
   ],
   "author": "@nicholaswmin",
   "license": "MIT",
