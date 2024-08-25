@@ -19,9 +19,9 @@ messaging between the primary and 4 threads:
 
 import { Threadpool } from '@nicholaswmin/threadpool'
 
-const pool = await (new Threadpool('thread.js', 4)).start()
+const pool = new Threadpool('thread.js', 4)
 
-for (const thread of pool.threads)
+for (const thread of await pool.start())
   thread.on('pong', () => {
     console.log('🏓 pong')
 

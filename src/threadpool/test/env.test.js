@@ -4,7 +4,7 @@ import { task, connected, alive, dead } from './utils/utils.js'
 
 import { Threadpool } from '../index.js'
 
-test('Thread environment variables', { timeout: 2000 }, async t => {
+test('thread env. vars', { timeout: 2000 }, async t => {
   let pool = null, 
       env = null
 
@@ -34,7 +34,7 @@ test('Thread environment variables', { timeout: 2000 }, async t => {
     env = message[1]
   })
 
-  await t.test('passes parameters', async t => {
+  await t.test('passes env', async t => {
     t.assert.ok(Object.hasOwn(env, 'FOO'), 'missing thread env. var "FOO"')
     t.assert.deepStrictEqual(env.FOO, 'BAR')
   })
