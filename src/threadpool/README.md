@@ -51,9 +51,7 @@ then run:
 node primary.js
 ```
 
-logs:
-
-```
+```bash
 # ping 🏓
 # 🏓 pong
 # ping 🏓
