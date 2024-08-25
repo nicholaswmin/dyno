@@ -95,7 +95,7 @@ Listen for events emitted from the thread.
 
 Emit an event to the thread.
 
-## Primary API
+### Primary API
 
 > The exported `primary` is meant to be used in the thread file.  
 >
