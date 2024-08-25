@@ -1,15 +1,11 @@
 import cp from 'node:child_process'
 import { availableParallelism } from 'node:os'
-import { EventEmitter, once } from 'node:events'
+import { EventEmitter } from 'node:events'
 import { emitWarning } from 'node:process'
 
 import { Thread } from './src/thread/index.js'
 import { PrimaryBus, ThreadBus } from './src/bus/index.js'
-import { 
-  validateObject, 
-  validateInteger, 
-  validateString 
-} from './src/validate/index.js'
+import { anObject, anInteger, aString } from './src/validate/index.js'
 
 class Threadpool extends EventEmitter {
   static readyTimeout = 300
@@ -33,27 +29,27 @@ class Threadpool extends EventEmitter {
 
     Object.defineProperties(this, {
       readyTimeout: {
-        value: validateInteger(Threadpool.readyTimeout, 'readyTimeout'),
+        value: anInteger(Threadpool.readyTimeout, 'readyTimeout'),
         writable : false, enumerable : false, configurable : false
       },
 
       killTimeout: {
-        value: validateInteger(Threadpool.killTimeout, 'killTimeout'),
+        value: anInteger(Threadpool.killTimeout, 'killTimeout'),
         writable : false, enumerable : false, configurable : false
       },
 
       modulePath: {
-        value: validateString(modulePath, 'modulePath'),
+        value: aString(modulePath, 'modulePath'),
         writable : false, enumerable : false, configurable : false
       },
 
       size: {
-        value: validateInteger(size, 'size'),
+        value: anInteger(size, 'size'),
         writable : false, enumerable : false, configurable : false
       },
       
       parameters: {
-        value: validateObject(parameters, 'parameters'),
+        value: anObject(parameters, 'parameters'),
         writable : false, enumerable : false, configurable : false
       },
 
