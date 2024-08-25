@@ -85,7 +85,7 @@ class PrimaryBus extends Bus {
     return new Promise((resolve, reject) => {
       let readyTimer = setTimeout(() => {
         const self = this
-        const errmsg = 'thread did not reply to "ready-ping" within timeout.'
+        const errmsg = 'no "ready-ping" within timeout. Sending SIGKILL.'
 
         this.emitWarning(errmsg, 'handshake')
         
@@ -125,7 +125,7 @@ class ThreadBus extends Bus {
     this.pid = process.pid
     this.error = false
     this.readyTimeoutTimer = setTimeout(() => {
-      this.emitWarning(`did not get "ready-ping" within timeout`, 'handshake')
+      this.emitWarning(`"ready-ping" timeout, exiting with: 1`, 'handshake')
       process.exit(1)
     }, isInteger(readyTimeout, 'readyTimeout'))
 
