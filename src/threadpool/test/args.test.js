@@ -65,7 +65,7 @@ test('#constructor()', async t => {
       })
     })
     
-    await t.test('as 0', async t => {
+    await t.test('as zero', async t => {
       await t.test('throws RangeError', t => {
         t.assert.throws(() => new Threadpool(null, 0), { 
           name: 'RangeError'
