@@ -31,7 +31,7 @@ for (const thread of pool.threads)
 pool.threads.at(0).emit('ping')
 ```
 
-and in `thread.js`:
+and:
 
 ```js
 // thread.js 
