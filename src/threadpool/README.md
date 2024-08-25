@@ -12,7 +12,7 @@ npm i https://github.com/nicholaswmin/threadpool
 
 ## Example
 
-`ping`/`pong`s between the primary and some threads:
+messaging between the primary and 4 threads:
 
 ```js
 import { Threadpool } from '@nicholaswmin/threadpool'
