@@ -64,7 +64,8 @@ node primary.js
 
 #### `pool.start(path, size, env)`
 
-Starts the pool
+Starts the pool.  
+
 
 | name         	| description                         | default         	 |
 |--------------	|------------------------------------ |-----------------	 |
@@ -74,7 +75,8 @@ Starts the pool
 
 #### `pool.stop()`
 
-Stops the pool, returns an array of thread exit codes
+Stops the pool.  
+Returns an array of thread exit codes
 
 #### `pool.threads`
 
