@@ -127,15 +127,18 @@ class Threadpool extends EventEmitter {
 
     this.#threadEvents.forEach(e => thread.on(e, d => this.emit(e, d)))
 
-    if (thread.stdout)
-      thread.stdout.on('data', data => console.log(data.toString))
-    
-    if (thread.stderr)
-      thread.stderr.on('data', data => console.error(data.toString))
-    
     thread.once('thread-error', this.#onThreadError.bind(this))
-      
-    await thread.bus.isReady()
+
+    thread.stdout.on('data', data => console.log(data.toString()))    
+    thread.stderr.on('data', data => {
+      const message = data.toString().trim()
+
+      message.toLowerCase().includes('simulated') 
+        ? console.log('simulated test error was thrown')
+        : console.error(message)
+    })
+        
+    await thread.bus.attemptReadyHandshake()
 
     return thread
   }
@@ -159,5 +162,6 @@ const primary = process.env.index
     readyTimeout: Threadpool.readyTimeout 
   }) 
   : false
+
 
 export { Threadpool, primary }

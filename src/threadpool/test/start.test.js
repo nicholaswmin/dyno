@@ -55,7 +55,7 @@ test('#start()', { timeout: 2000 }, async t => {
   })
   
   await t.test('thread spawns with blocked event loop', async t => {
-    t.before(async () => {
+    t.before(() => {
       cp.fork.mock.resetCalls()
       pool = new Threadpool(task('blocked-loop.js'))
     })

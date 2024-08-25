@@ -7,8 +7,6 @@ import {
   validateInteger
 } from '../validate/index.js'
 
-EventEmitter.maxListeners = 50
-
 class Bus extends EventEmitter {
   #emittedWarnings = {}
 
@@ -84,7 +82,7 @@ class PrimaryBus extends Bus {
     this.cp.send(Object.values({ ...args, pid: process.pid }))
   }
   
-  isReady() {
+  attemptReadyHandshake() {
     if (this.ready) 
       return resolve()
 

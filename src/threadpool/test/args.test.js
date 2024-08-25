@@ -34,9 +34,33 @@ test('#constructor()', async t => {
   
   
   await t.test('pool size provided', async t => {
-    await t.test('as not a positive integer', async t => {
+    await t.test('as a string', async t => {
       await t.test('throws RangeError', t => {
         t.assert.throws(() => new Threadpool(null, 'abc'), { 
+          name: 'RangeError'
+        })
+      })
+    })
+    
+    await t.test('as a positive fractional number', async t => {
+      await t.test('throws RangeError', t => {
+        t.assert.throws(() => new Threadpool(null, 3.1), { 
+          name: 'RangeError'
+        })
+      })
+    })
+    
+    await t.test('as a negative integer', async t => {
+      await t.test('throws RangeError', t => {
+        t.assert.throws(() => new Threadpool(null, -3), { 
+          name: 'RangeError'
+        })
+      })
+    })
+    
+    await t.test('as 0', async t => {
+      await t.test('throws RangeError', t => {
+        t.assert.throws(() => new Threadpool(null, 0), { 
           name: 'RangeError'
         })
       })
