@@ -1,7 +1,7 @@
 import { EventEmitter, once } from 'node:events'
 import { emitWarning } from 'node:process'
 import { PrimaryBus } from '../bus/index.js'
-import { isInteger } from '../validate/index.js'
+import { isChildProcess, isInteger } from '../validate/index.js'
 
 class Thread extends EventEmitter {
   #stderr = ''
@@ -19,23 +19,38 @@ class Thread extends EventEmitter {
   get signalCode() { return this.cp.signalCode      }
   get connected()  { return this.cp.connected       }
 
-  // @REVIEW not needed
-  // set so `Object.assign` doesnt throw for lacking setters of above.
-  #x = null
-  set pid(pid)             { return this.#x = pid       }
-  set exitCode(code)       { return this.#x = code      }
-  set signalCode(signal)   { return this.#x = signal    }
-  set connected(connected) { return this.#x = connected }
+  // @TODO check if we can ditch these
+  // These setters only exist for `Object.assign(this, cp)` below
+  set pid(pid)             {}
+  set exitCode(code)       {}
+  set signalCode(signal)   {}
+  set connected(connected) {}
   
   constructor(cp, { readyTimeout, killTimeout }) {
     super()
 
-    this.cp  = cp
-    this.bus = new PrimaryBus(cp, { readyTimeout, killTimeout })
-    
-    this.readyTimeout = isInteger(readyTimeout, 'readyTimeout')
-    this.killTimeout = isInteger(killTimeout, 'killTimeout')
-    
+    Object.defineProperties(this, {
+      cp: {
+        value: isChildProcess(cp, 'cp'),
+        writable : false, enumerable : false, configurable : false
+      },
+
+      bus: {
+        value: new PrimaryBus(cp, { readyTimeout, killTimeout }),
+        writable : false, enumerable : false, configurable : false
+      },
+
+      readyTimeout: {
+        value: isInteger(readyTimeout, 'readyTimeout'),
+        writable : false, enumerable : false, configurable : false
+      },
+
+      killTimeout: {
+        value: isInteger(killTimeout, 'killTimeout'),
+        writable : false, enumerable : false, configurable : false
+      }
+    })
+
     Object.assign(this, cp)
 
     this.#addErrorListeners(this.cp)
@@ -103,7 +118,7 @@ class Thread extends EventEmitter {
   
   #onceDead() {
     return Promise.race(['exit', 'error']
-      .map(e => once(this.cp, e)))
+      .map(eventName => once(this.cp, eventName)))
   }
   
   #computeExitCode() {
