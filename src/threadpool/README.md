@@ -77,6 +77,14 @@ Starts the pool and returns it.
 
 Stops the pool and returns an array of thread [exit codes][ecodes].  
 
+#### `pool.ping(data)`
+
+Emits a `ping` event to a thread, in round-robin
+
+| name         	| description       | default         	   |
+|--------------	|------------------ |--------------------  |
+| `data`      	| any event data    | `{}`                 |
+
 #### `pool.threads`
 
 Array of running threads.  
