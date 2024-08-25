@@ -7,7 +7,7 @@ import { Threadpool } from '../index.js'
 
 EventEmitter.defaultMaxListeners = 50
 
-test('#ping() events', { timeout: 2000 }, async t => {
+test('#ping()', { timeout: 2000 }, async t => {
   let pool = null
 
   t.beforeEach(() => pool = new Threadpool(task('pong.js'), 10))
