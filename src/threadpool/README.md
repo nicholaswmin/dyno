@@ -15,7 +15,6 @@ npm i https://github.com/nicholaswmin/threadpool
 Sending `ping`/`pong`s between the primary and 4 threads:
 
 ```js
-// primary.js
 import { Threadpool } from '@nicholaswmin/threadpool'
 
 const pool = await (new Threadpool('thread.js', 4)).start()
@@ -35,7 +34,6 @@ setTimeout(() => pool.stop(), 3 * 1000)
 and in `thread.js`:
 
 ```js
-// thread.js
 import { primary } from '@nicholaswmin/threadpool'
 
 primary.on('ping', () => {
