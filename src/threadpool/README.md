@@ -130,8 +130,8 @@ Emit an event to the thread.
 
 ## Primary API
 
-> The exported `primary` is an [EventEmitter][ee] for sending/receiving  
-> *thread-to-primary* messages.  
+> Exported `primary` is an [EventEmitter][ee] for *thread -> primary* messaging.    
+
 > Meant to be used in the thread file.
 
 #### `primary.on(eventName, listenerFn)`
