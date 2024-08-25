@@ -83,7 +83,7 @@ Stops the pool and returns an array of thread [exit codes][ecodes].
 
 #### `pool.ping(data)`
 
-Emits a `ping` event to a thread, in round-robin
+Emits a `ping` event to a thread, in [round-robin][rr]
 
 | name         	| description           | default         	   |
 |--------------	|---------------------- |--------------------  |
@@ -192,7 +192,7 @@ The [MIT-0][license] License
 [ecodes]: https://en.wikipedia.org/wiki/Exit_status
 [pid]: https://en.wikipedia.org/wiki/Process_identifier
 [ee-block]: https://nodejs.org/en/learn/asynchronous-work/dont-block-the-event-loop
-[mprocessing]: https://en.wikipedia.org/wiki/Multiprocessing
+[rr]: https://en.wikipedia.org/wiki/Round-robin_scheduling
 
 [nicholaswmin]: https://github.com/nicholaswmin
 [license]: ./LICENSE
