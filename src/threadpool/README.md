@@ -86,9 +86,9 @@ Returns array of `threads`.
 
 #### `async pool.stop()`
 
-Stops the pool.   
+Sends a [`SIGTERM`][sigterm] signal to each thread.
 
-Returns array of thread [exit codes][ecodes].  
+Returns array of [exit codes][ecodes].  
 
 #### `pool.ping()`
 
@@ -146,10 +146,12 @@ Emit an event to the primary.
 
 ## Gotchas 
 
-- [Blocking the event loop][ee-block] on startup will trip a thread `SIGKILL`.
-- Delayed cleanups in `SIGTERM` handlers will trip a thread `SIGKILL`.
-- Exceptions will trip a `stop()` shutdown of all running threads.
-- Based on [`fork()`][fork] so technically it's [*multi-processing*][child-p].
+- Threads which [block their startup][ee-block] or 
+  [delay their termination][node-signals] are issued a [`SIGKILL`][signals] 
+  after a set timeout.
+- Runtime exceptions trigger a `stop()`; a shutdown of all running threads.
+- Based on [`fork()`][fork] so technically it's [*multi-processing*][child-p],
+  with each "thread" spawning as an isolated [V8][v8] instance. 
 
 ## Test 
 
@@ -188,11 +190,13 @@ node --run pingpong
 [env]: https://nodejs.org/api/process.html#processenv
 [ee]: https://nodejs.org/docs/latest/api/events.html#emitteremiteventname-args
 [ecodes]: https://en.wikipedia.org/wiki/Exit_status
+[signals]: https://www.gnu.org/software/libc/manual/html_node/Termination-Signals.html
 [pid]: https://en.wikipedia.org/wiki/Process_identifier
 [ee-block]: https://nodejs.org/en/learn/asynchronous-work/dont-block-the-event-loop
 [rr]: https://en.wikipedia.org/wiki/Round-robin_scheduling
 [zombie]: https://en.wikipedia.org/wiki/Zombie_process
 [child-p]: https://en.wikipedia.org/wiki/Child_process
+[v8]: https://v8.dev/
 
 [nicholaswmin]: https://github.com/nicholaswmin
 [license]: ./LICENSE
