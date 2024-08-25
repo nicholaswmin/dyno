@@ -1,14 +1,12 @@
 import test from 'node:test'
-import { execRootCommand } from './utils/utils.js'
+import { run } from './utils/utils.js'
 
 const command = `node --run pingpong`
 
 test('README example: ping/pong', async t => {
   let out = null
 
-  t.before(async () => {
-    out = await execCommand(command)
-  })
+  t.before(async () => out = await run(command))
   
   await t.test(`Running "${command}"`, async t => {
     await t.test('logs only in stdout', t => {

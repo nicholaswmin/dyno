@@ -6,7 +6,7 @@ import { promisify } from 'node:util'
 
 const task = filename => join(import.meta.dirname, `../task/${filename}`)
 
-const execRootCommand = async (command, cutoffMs = 1000) => {
+const run = async (command, cutoffMs = 1000) => {
   const ctrl = new AbortController()
   setTimeout(() => ctrl.abort(), cutoffMs)
   
@@ -51,6 +51,6 @@ const sigkilled = child => child.signalCode === 'SIGKILL'
 
 export { 
   // general
-  task, execRootCommand,
+  task, run,
   // array filters
   connected, alive, dead, exitZero, exitNonZero, sigkilled }
