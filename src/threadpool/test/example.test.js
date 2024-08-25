@@ -1,6 +1,5 @@
 import test from 'node:test'
-
-import { execCommand } from './utils/utils.js'
+import { execRootCommand } from './utils/utils.js'
 
 const command = `node --run pingpong`
 
