@@ -121,7 +121,7 @@ Emit an event to the primary.
 - Avoid delayed cleanups in `SIGTERM` handlers otherwise the thread will be 
   killed with `SIGKILL`.
 - Dead threads, either because of runtime errors or spawn errors cause 
-  the entire process to exit 1.
+  the entire process to exit with `exit code: 1`.
 - Based on [`child_process.fork()`][cp-fork] so technically 
   it's *multiprocessing* rather than *multithreading*.  
 
