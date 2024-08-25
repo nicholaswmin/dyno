@@ -94,7 +94,7 @@ Listen for a thread event.
 
 #### `thread.emit(eventName, data)`
 
-Emit an event to the thread
+Emit an event to the thread.
 
 ### Events
 
@@ -102,10 +102,11 @@ Emit an event to the thread
 
 Emitted when a runtime error is encountered in a thread.
 
-## Primary Bus API
+## Primary API
 
-The exported `primary` is an [EventEmitter][ee] which allows sending/receiving 
-of `thread`-to-`primary` messages.
+The exported `primary`, meant to be used in the thread file, is 
+an [EventEmitter][ee] which allows sending/receiving of `thread`-to-`primary`
+messages.
 
 #### `primary.on(eventName, callbackFn)`
 
@@ -114,7 +115,7 @@ Listen for a primary event.
 
 #### `primary.emit(eventName, data)`
 
-Emit an event to the primary
+Emit an event to the primary.
 
 ## Gotchas 
 
