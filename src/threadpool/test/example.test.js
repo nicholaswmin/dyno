@@ -4,7 +4,7 @@ import { execCommand } from './utils/utils.js'
 
 const command = `node --run pingpong`
 
-test('README example: pingpong', async t => {
+test('README example: ping/pong', async t => {
   let out = null
 
   t.before(async () => {
