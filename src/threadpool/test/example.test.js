@@ -37,15 +37,21 @@ test('example: pingpong', async t => {
     t.assert.ok(!out.stderr, `logged in stderr: ${out.stderr}`)
   })
   
-  await t.test('logs at least 3 "ping"s', async t => {
+  await t.test('logs "ping"s', async t => {
     const pings = out.stdout.split('ping').length
 
-    t.assert.ok(pings > 3, `found: ${pings} "ping" in stdout, must be >= 3`)
+    await t.test('at least 3', async t => {
+      const pings = out.stdout.split('ping').length
+  
+      t.assert.ok(pings > 3, `found: ${pings} "ping" in stdout, must be >= 3`)
+    })
   })
   
-  await t.test('logs at least 3 "pong"s', async t => {
-    const pongs = out.stdout.split('pong').length
-
-    t.assert.ok(pongs > 3, `found: ${pongs} "pong" in stdout, must be >= 3`)
+  await t.test('logs "pong"s', async t => {
+    await t.test('at least 3', async t => {
+      const pongs = out.stdout.split('pong').length
+  
+      t.assert.ok(pongs > 3, `found: ${pongs} "pong" in stdout, must be >= 3`)
+    })
   })
 })
