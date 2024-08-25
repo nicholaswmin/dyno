@@ -89,14 +89,19 @@ class Threadpool extends EventEmitter {
   
   ping(data = {}) {
     if (!this.pingSetup) {
-      this.pongCount = 0
+      this._pCount = 0
+      this._pRTT = 0
+
       this.threads.forEach(thread => {
-        thread.on('pong', data => ++this.pongCount)
+        thread.on('pong', data => {
+          this._pRTT = performance.now() - data.start
+          ++this._pCount
+        })
       })
       
       setInterval(() => {
-        console.log('Pong rate:', this.pongCount, 'pongs per second')
-        this.pongCount = 0
+        console.log('Pongs:', this._pCount, '/ sec.', 'RTT:', this._pRTT, 'ms')
+        this._pCount = 0
       }, 1000)
       
       this.pingSetup = true
@@ -104,7 +109,7 @@ class Threadpool extends EventEmitter {
     
     const thread = this.threads[++this.#nextIndex % this.threads.length]
 
-    thread.emit('ping', data)
+    thread.emit('ping', { start: performance.now() })
   }
   
   async #forkThread (modulepath, args) {
