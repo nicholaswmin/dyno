@@ -116,12 +116,9 @@ Emit an event to the primary.
 
 ## Gotchas 
 
-- Avoid blocking the event loop on startup which might trip the timeouts of 
-  the internal `'ready'` handshake.
-- Avoid delayed cleanups in `SIGTERM` handlers otherwise the thread will be 
-  killed with `SIGKILL`.
-- Dead threads, either because of runtime errors or spawn errors cause 
-  the entire process to exit with `exit code: 1`.
+- Blocking the event loop on startup will trip a thread `SIGKILL`.
+- Delayed cleanups in `SIGTERM` handlers will trip a thread `SIGKILL`.
+- Dead threads cause the entire process to exit with `code: 1`.
 - Based on [`child_process.fork()`][cp-fork] so technically 
   it's *multiprocessing* rather than *multithreading*.  
 
