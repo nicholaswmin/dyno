@@ -164,4 +164,4 @@ The [MIT-0][license] License
 [ee-block]: https://nodejs.org/en/learn/asynchronous-work/dont-block-the-event-loop
 [mprocessing]: https://en.wikipedia.org/wiki/Multiprocessing
 [nicholaswmin]: https://github.com/nicholaswmin
-[license]: https://spdx.org/licenses/MIT-0.html
+[license]: ./LICENSE
