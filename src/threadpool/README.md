@@ -15,6 +15,7 @@ npm i https://github.com/nicholaswmin/threadpool
 messaging between the primary and 4 threads:
 
 ```js
+// primary.js
 import { Threadpool } from '@nicholaswmin/threadpool'
 
 const pool = await (new Threadpool('thread.js', 4)).start()
@@ -32,6 +33,7 @@ pool.threads.at(0).emit('ping')
 and in `thread.js`:
 
 ```js
+// thread.js
 import { primary } from '@nicholaswmin/threadpool'
 
 primary.on('ping', () => {
