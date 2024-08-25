@@ -49,7 +49,11 @@ then run:
 
 ```bash
 node primary.js
+```
 
+logs:
+
+```
 # ping 🏓
 # 🏓 pong
 # ping 🏓
