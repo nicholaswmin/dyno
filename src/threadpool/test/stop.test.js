@@ -6,16 +6,15 @@ import { Threadpool } from '../index.js'
 
 test('#stop()', { timeout: 2000 }, async t => {
   let pool = null 
-
   cp.fork   = t.mock.fn(cp.fork)
-  cp.forked = () => cp.fork.mock.calls.map(call => call.result)
+  cp.instances   = () => cp.fork.mock.calls.map(c => c.result)
   t.afterEach(() => pool.stop())
 
+  
   await t.test('threads exit normally', async t => {    
     t.before(() => {
       cp.fork.mock.resetCalls()
       pool = new Threadpool(task('ok.js'))
-      pool.on('error', () => {})
 
       return pool.start()
     })
@@ -28,8 +27,8 @@ test('#stop()', { timeout: 2000 }, async t => {
     })
 
     await t.test('all threads exit', t => {          
-      t.assert.strictEqual(cp.forked().filter(dead).length, pool.size)
-      t.assert.strictEqual(cp.forked().filter(alive).length, 0)
+      t.assert.strictEqual(cp.instances().filter(dead).length, pool.size)
+      t.assert.strictEqual(cp.instances().filter(alive).length, 0)
     })
   })
 
@@ -50,8 +49,8 @@ test('#stop()', { timeout: 2000 }, async t => {
     })
     
     await t.test('all threads exit', async t => {     
-      t.assert.strictEqual(cp.forked().filter(dead).length, pool.size)
-      t.assert.strictEqual(cp.forked().filter(alive).length, 0)
+      t.assert.strictEqual(cp.instances().filter(dead).length, pool.size)
+      t.assert.strictEqual(cp.instances().filter(alive).length, 0)
     })
   })
   
@@ -72,8 +71,8 @@ test('#stop()', { timeout: 2000 }, async t => {
     })
     
     await t.test('all threads exit', t => {      
-      t.assert.strictEqual(cp.forked().filter(dead).length, pool.size)
-      t.assert.strictEqual(cp.forked().filter(alive).length, 0)
+      t.assert.strictEqual(cp.instances().filter(dead).length, pool.size)
+      t.assert.strictEqual(cp.instances().filter(alive).length, 0)
     })
   })
 })
