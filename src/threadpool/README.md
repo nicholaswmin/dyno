@@ -87,13 +87,34 @@ Array of threads.
 Each thread has an [EventEmitter][ee]-like API for sending messages between a 
 thread and the primary process.
 
-See example above for usage details.
+#### `thread.on(eventName, callbackFn)`
+
+Listen for a thread event.  
+`callbackFn` 1st-argument has the emmited `data`.
+
+#### `thread.emit(eventName, data)`
+
+Emit an event to the thread
 
 ### Events
 
 #### `thread-error` 
 
 Emitted when a runtime error is encountered in a thread.
+
+## Primary Bus API
+
+The exported `primary` is an [EventEmitter][ee] which allows sending/receiving 
+of `thread`-to-`primary` messages.
+
+#### `primary.on(eventName, callbackFn)`
+
+Listen for a primary event.  
+`callbackFn` 1st-argument has the emmited `data`.
+
+#### `primary.emit(eventName, data)`
+
+Emit an event to the primary
 
 ## Gotchas 
 
