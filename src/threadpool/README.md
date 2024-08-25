@@ -142,6 +142,12 @@ node --run test
 node --run test:coverage
 ```
 
+Run `ping`/`pong` example:
+
+```bash 
+node --run example
+```
+
 ## Authors
 
 [@nicholaswmin][nicholaswmin]
