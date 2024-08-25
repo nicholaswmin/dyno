@@ -11,11 +11,6 @@ class Thread extends EventEmitter {
   #dead = false
   #alive = true
 
-  // @REVIEW not needed, 
-  // set so `Object.assign` doesnt throw for lacking 
-  // setters of below.
-  #x = null
- 
   get pid()        { return this.cp.pid             }
   get dead()       { return this.exitCode !== null  }
   get alive()      { return !this.dead              }
@@ -26,6 +21,7 @@ class Thread extends EventEmitter {
 
   // @REVIEW not needed
   // set so `Object.assign` doesnt throw for lacking setters of above.
+  #x = null
   set pid(pid)             { return this.#x = pid       }
   set exitCode(code)       { return this.#x = code      }
   set signalCode(signal)   { return this.#x = signal    }
@@ -42,7 +38,7 @@ class Thread extends EventEmitter {
     
     Object.assign(this, cp)
 
-    this.#addEndListeners(this.cp)
+    this.#addErrorListeners(this.cp)
   }
   
   async kill() {
@@ -113,7 +109,7 @@ class Thread extends EventEmitter {
         ? this.cp.signalCode === 'SIGKILL' ? 1 : 0 : null
   }
   
-  #addEndListeners(ee) {
+  #addErrorListeners(ee) {
     const onError = err => 
       this.off('exit', onExit)
         .emit('thread-error', err)
