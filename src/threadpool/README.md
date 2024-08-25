@@ -2,7 +2,7 @@
 
 # :thread: threadpool
 
-> tiny [threadpool][threadpool] with event-emitting threads
+> tiny [threadpool][threadpool] with [`EventEmitter`][ee] IPC
 
 ## Install
 
@@ -153,6 +153,6 @@ The [MIT-0][license] License
 [cp-fork]: https://nodejs.org/api/child_process.html#child_processforkmodulepath-args-options
 [ee]: https://nodejs.org/docs/latest/api/events.html#emitteremiteventname-args
 [ecodes]: https://en.wikipedia.org/wiki/Exit_status
-
+[mprocessing]: https://en.wikipedia.org/wiki/Multiprocessing
 [nicholaswmin]: https://github.com/nicholaswmin
 [license]: https://spdx.org/licenses/MIT-0.html
