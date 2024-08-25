@@ -71,13 +71,13 @@ Creates a pool.
 | `size`       	| number of threads                   | available cores    |
 | `env`        	| thread environment key-value pairs  | current env.    	 |
 
-#### `pool.start()`
+#### `async pool.start()`
 
 Starts the pool and returns it.
 
-#### `pool.stop()`
+#### `async pool.stop()`
 
-Stops the pool and returns an array of thread [exit codes][ecodes].
+Stops the pool and returns an array of thread [exit codes][ecodes].  
 
 #### `pool.threads`
 
