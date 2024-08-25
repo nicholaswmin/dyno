@@ -190,6 +190,7 @@ node --run pingpong
 [env]: https://nodejs.org/api/process.html#processenv
 [ee]: https://nodejs.org/docs/latest/api/events.html#emitteremiteventname-args
 [ecodes]: https://en.wikipedia.org/wiki/Exit_status
+[node-signals]: https://nodejs.org/api/process.html#signal-events
 [signals]: https://www.gnu.org/software/libc/manual/html_node/Termination-Signals.html
 [pid]: https://en.wikipedia.org/wiki/Process_identifier
 [ee-block]: https://nodejs.org/en/learn/asynchronous-work/dont-block-the-event-loop
