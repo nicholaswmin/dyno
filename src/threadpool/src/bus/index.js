@@ -1,18 +1,14 @@
 import { EventEmitter } from 'node:events'
 import { emitWarning } from 'node:process'
 
-import { 
-  validateChildProcess, 
-  validateString,
-  validateInteger
-} from '../validate/index.js'
+import { aChildProcess, aString, anInteger } from '../validate/index.js'
 
 class Bus extends EventEmitter {
   #emittedWarnings = {}
 
   constructor(name = 'bus') {
     super()
-    this.name = validateString(name, 'name')
+    this.name = aString(name, 'name')
     this.stopped = false
   }
   
@@ -29,7 +25,7 @@ class Bus extends EventEmitter {
   }
 
   emitWarning(text = '', type) {
-    validateString(text, 'text')
+    aString(text, 'text')
 
     if (typeof text !== 'string' || !text.length)
       throw new RangeError('arg. "text" must be a string with length')
@@ -46,10 +42,10 @@ class Bus extends EventEmitter {
 class PrimaryBus extends Bus {
   constructor(cp, { readyTimeout, killTimeout }) {
     super('primary')
-    this.readyTimeout = validateInteger(readyTimeout, 'readyTimeout')
-    this.killTimeout = validateInteger(killTimeout, 'killTimeout')
+    this.readyTimeout = anInteger(readyTimeout, 'readyTimeout')
+    this.killTimeout = anInteger(killTimeout, 'killTimeout')
     this.ready = false
-    this.cp = validateChildProcess(cp, 'cp')
+    this.cp = aChildProcess(cp, 'cp')
     
     this.on('ready-ping', args => this.ready = true)
 
@@ -131,7 +127,7 @@ class ThreadBus extends Bus {
     this.readyTimeoutTimer = setTimeout(() => {
       this.emitWarning(`did not get "ready-ping" within timeout`, 'handshake')
       process.exit(1)
-    }, validateInteger(readyTimeout, 'readyTimeout'))
+    }, anInteger(readyTimeout, 'readyTimeout'))
 
     process.on('message', args => {
       if (!this.canListen())

@@ -1,6 +1,6 @@
 import { ChildProcess } from 'node:child_process'
 
-const validateChildProcess = (v, name) => {
+const aChildProcess = (v, name) => {
   if (typeof v !== 'object')
     throw new TypeError(`${name} must be an object, is: ${typeof v}`)
 
@@ -10,7 +10,7 @@ const validateChildProcess = (v, name) => {
   return v
 }
 
-const validateInteger = (v, name) => {
+const anInteger = (v, name) => {
   if (typeof v === 'undefined')
     throw new RangeError(`${name} must be an integer, is: undefined`)
 
@@ -29,7 +29,7 @@ const validateInteger = (v, name) => {
   return v
 }
   
-const validateObject = (v, name) => {
+const anObject = (v, name) => {
   if (typeof v === 'undefined')
     return v
 
@@ -45,7 +45,7 @@ const validateObject = (v, name) => {
   return v
 }
   
-const validateString = (v, name) => {
+const aString = (v, name) => {
   if (typeof v === 'undefined' || v === null)
     return v
 
@@ -58,9 +58,4 @@ const validateString = (v, name) => {
   return v
 }
 
-export { 
-  validateChildProcess, 
-  validateInteger, 
-  validateObject, 
-  validateString 
-}
+export { aChildProcess, anInteger, anObject, aString }

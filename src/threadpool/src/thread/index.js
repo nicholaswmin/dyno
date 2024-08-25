@@ -1,7 +1,7 @@
 import { EventEmitter, once } from 'node:events'
 import { emitWarning } from 'node:process'
 import { PrimaryBus } from '../bus/index.js'
-import { validateInteger } from '../validate/index.js'
+import { anInteger } from '../validate/index.js'
 
 class Thread extends EventEmitter {
   #stderr = ''
