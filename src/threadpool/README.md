@@ -80,8 +80,8 @@ Stops the pool, returns an array of thread exit codes
 
 Array of threads.  
 
-Each thread has an [EventEmitter][ee]-like API for sending messages  
-between a thread and the parent/primary process.
+Each thread has an [EventEmitter][ee]-like API for sending messages between a 
+thread and the parent/primary process.
 
 See example above.
 
