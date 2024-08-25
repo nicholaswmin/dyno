@@ -1,6 +1,5 @@
 import test from 'node:test'
 import cp from 'node:child_process'
-import path from 'node:path'
 
 import { task, alive, dead } from './utils/utils.js'
 import { Threadpool } from '../index.js'

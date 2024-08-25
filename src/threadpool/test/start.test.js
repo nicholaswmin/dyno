@@ -1,6 +1,5 @@
 import test from 'node:test'
 import cp from 'node:child_process'
-import path from 'node:path'
 import { once } from 'node:events'
 import { task, connected, alive, dead } from './utils/utils.js'
 

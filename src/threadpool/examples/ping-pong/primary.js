@@ -13,4 +13,4 @@ for (const thread of pool.threads)
 
 pool.threads.at(0).emit('ping')
 
-setTimeout(() => pool.stop(), 3 * 1000)
+setTimeout(() => pool.stop(), 1 * 1000)
