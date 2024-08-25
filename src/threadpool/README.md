@@ -99,8 +99,9 @@ Emitted when a runtime error is encountered in a thread.
 
 ## Primary API
 
-The exported `primary` is meant to be used in the thread file.  
-It's  an [EventEmitter][ee] which allows sending/receiving of 
+> The exported `primary` is meant to be used in the thread file.  
+>
+> It's  an [EventEmitter][ee] which allows sending/receiving of 
 *thread-to-primary* messages.
 
 #### `primary.on(eventName, callbackFn)`
