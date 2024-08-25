@@ -152,6 +152,8 @@ class ThreadBus extends Bus {
       this.error = error.toString()
       throw error
     })
+    
+    this.on('ping', () => setImmediate(() => this.emit('pong')))
   }
   
   stop() {
