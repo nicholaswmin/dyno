@@ -3,7 +3,7 @@ import { join } from 'node:path'
 import { promisify } from 'node:util'
 import { execFile } from 'node:child_process'
 
-test('example: pingpong', async t => {
+test('README example: pingpong', async t => {
   let out = null
 
   t.before(async () => {
@@ -28,30 +28,33 @@ test('example: pingpong', async t => {
     }
   })
   
-  await t.test('logs in stdout', t => {
-    t.assert.ok(out, 'has no output')
-    t.assert.ok(out.stdout, 'nothing logged in stdout')
-  })
-  
-  await t.test('does not log in stderr', t => {
-    t.assert.ok(!out.stderr, `logged in stderr: ${out.stderr}`)
-  })
-  
-  await t.test('logs "ping"s', async t => {
-    const pings = out.stdout.split('ping').length
-
-    await t.test('at least 3', async t => {
+  await t.test('Running "node --run pingpong"', async t => {
+    await t.test('logs in stdout', t => {
+      t.assert.ok(out, 'did not create any output')
+      t.assert.ok(out.stdout, `nothing logged in stdout`)
+    })
+    
+    await t.test('does not log in stderr', t => {
+      t.assert.ok(!out.stderr, `logged in stderr: ${out.stderr}`)
+    })
+    
+    
+    await t.test('logs "ping"s', async t => {
       const pings = out.stdout.split('ping').length
   
-      t.assert.ok(pings > 3, `found: ${pings} "ping" in stdout, must be >= 3`)
+      await t.test('at least 3', t => {
+        const pings = out.stdout.split('ping').length
+    
+        t.assert.ok(pings > 3, `found: ${pings} "ping" in stdout, must be >= 3`)
+      })
     })
-  })
-  
-  await t.test('logs "pong"s', async t => {
-    await t.test('at least 3', async t => {
-      const pongs = out.stdout.split('pong').length
-  
-      t.assert.ok(pongs > 3, `found: ${pongs} "pong" in stdout, must be >= 3`)
+    
+    await t.test('logs "pong"s', async t => {
+      await t.test('at least 3', t => {
+        const pongs = out.stdout.split('pong').length
+    
+        t.assert.ok(pongs > 3, `found: ${pongs} "pong" in stdout, must be >= 3`)
+      })
     })
   })
 })
