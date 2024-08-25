@@ -26,6 +26,10 @@ for (const thread of pool.threads)
 
     thread.emit('ping')
   })
+
+pool.threads.at(0).emit('ping')
+
+setTimeout(() => pool.stop(), 3 * 1000)
 ```
 
 and in `thread.js`:
@@ -39,10 +43,6 @@ primary.on('ping', () => {
 
   setTimeout(() => primary.emit('pong'), 50)
 })
-
-primary.emit('pong')
-
-setTimeout(() => process.disconnect(), 1000)
 ```
 
 then run:

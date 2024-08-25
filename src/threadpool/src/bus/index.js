@@ -25,7 +25,7 @@ class Bus extends EventEmitter {
 
   canEmit() {
     if (this.stopped)
-      this.emitWarning('cannot emit(), Bus was stopped')
+      return false
 
     return !this.stopped
   }
