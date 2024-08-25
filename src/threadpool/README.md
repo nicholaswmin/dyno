@@ -2,7 +2,7 @@
 
 # :thread: threadpool
 
-> tiny, [robust][zombie] thread pool with an [`EventEmitter`][ee]-like [IPC]
+> tiny thread pool with an [`EventEmitter`][ee]-like [IPC]
 
 ## Install
 
