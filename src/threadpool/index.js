@@ -87,11 +87,11 @@ class Threadpool extends EventEmitter {
       .finally(() => this.#stopping = false)
   }
   
-  ping() {
+  ping(data = {}) {
     if (!this.pingSetup) {
       this.pongCount = 0
       this.threads.forEach(thread => {
-        thread.on('pong', () => ++this.pongCount)
+        thread.on('pong', data => ++this.pongCount)
       })
       
       setInterval(() => {
@@ -104,7 +104,7 @@ class Threadpool extends EventEmitter {
     
     const thread = this.threads[++this.#nextIndex % this.threads.length]
 
-    thread.emit('ping', {})
+    thread.emit('ping', data)
   }
   
   async #forkThread (modulepath, args) {
