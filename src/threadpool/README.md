@@ -77,8 +77,7 @@ Starts the pool and returns it.
 
 #### `pool.stop()`
 
-Stops the pool.  
-Returns an array of thread [exit codes][ecodes].
+Stops the pool and returns an array of thread [exit codes][ecodes].
 
 #### `pool.threads`
 
@@ -90,7 +89,6 @@ thread and the primary process.
 #### `thread.on(eventName, callbackFn)`
 
 Listen for a thread event.  
-`callbackFn` has the emmited `data`.
 
 #### `thread.emit(eventName, data)`
 
@@ -111,8 +109,6 @@ messages.
 #### `primary.on(eventName, callbackFn)`
 
 Listen for a primary event.  
-
-`callbackFn` argument has the emmited `data`.
 
 #### `primary.emit(eventName, data)`
 
