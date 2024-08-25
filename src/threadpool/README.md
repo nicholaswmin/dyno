@@ -2,7 +2,7 @@
 
 # :thread: threadpool
 
-> tiny [threadpool][threadpool] with [`EventEmitter`][ee] IPC
+> tiny thread pool with [`EventEmitter`][ee] IPC
 
 ## Install
 
