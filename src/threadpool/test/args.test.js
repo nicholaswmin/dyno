@@ -2,9 +2,17 @@ import test from 'node:test'
 import { Threadpool } from '../index.js'
 
 test('#constructor()', async t => {
-  await t.test('no arguments provided', async t => {
+  await t.test('all arguments provided in valid format', async t => {
     await t.test('does not throw', t => {
+      t.assert.doesNotThrow(() => new Threadpool('task.js', 4, { foo: 'bar' }))
+      t.assert.ok(() => new Threadpool('task.js', 4, { foo: 'bar' }))
+    })
+  })
+
+  await t.test('no arguments provided', async t => {
+    await t.test('instantiates', t => {
       t.assert.doesNotThrow(() => new Threadpool())
+      t.assert.ok(() => new Threadpool())
     })
 
     await t.test('uses defaults', async t => {
