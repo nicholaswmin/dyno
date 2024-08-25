@@ -36,12 +36,12 @@ test('#start() .env parameters', { timeout: 2000 }, async t => {
     env = message[1]
   })
 
-  await t.test('passes parameters,', async t => {
-    t.assert.ok(Object.hasOwn(env, 'FOO'), 'missing FOO env. var on threads')
+  await t.test('passes parameters', async t => {
+    t.assert.ok(Object.hasOwn(env, 'FOO'), 'missing thread env. var "FOO"')
     t.assert.deepStrictEqual(env.FOO, 'BAR')
   })
 
-  await t.test('passes a spawn index relative to its siblings', t => {
+  await t.test('passes a spawn index', t => {
     t.assert.strictEqual(typeof +env.INDEX, 'number')
   })
 })
