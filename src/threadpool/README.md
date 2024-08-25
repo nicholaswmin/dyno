@@ -81,9 +81,9 @@ Stops the pool and returns an array of thread [exit codes][ecodes].
 
 Emits a `ping` event to a thread, in round-robin
 
-| name         	| description       | default         	   |
-|--------------	|------------------ |--------------------  |
-| `data`      	| any event data    | `{}`                 |
+| name         	| description           | default         	   |
+|--------------	|---------------------- |--------------------  |
+| `data`      	| optional event data   | `{}`                 |
 
 #### `pool.threads`
 
