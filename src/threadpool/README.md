@@ -73,6 +73,11 @@ Creates a pool.
 | `size`       	| number of threads                   | available cores      |
 | `env`        	| thread environment key-value pairs  | current [env.][env]	 |
 
+
+#### `pool.threads`
+
+Array of threads. 
+
 #### `async pool.start()`
 
 Starts the pool
@@ -83,12 +88,9 @@ Stops the pool.
 
 Returns array of thread [exit codes][ecodes].  
 
-#### `pool.ping(data)`
+#### `pool.ping()`
 
-Emits a `'ping'` event to a thread, in [round-robin][rr] with optional event data.
-#### `pool.threads`
-
-Array of threads.  
+Emits a `'ping'` event to a thread, in [round-robin][rr]. 
 
 #### `Event`: `'thread-error'` 
 
@@ -103,7 +105,6 @@ Thread's [Process ID][pid]
 #### `thread.alive`
 
 `true` if process is running, `false` otherwise
-
 
 #### `thread.alive`
 
