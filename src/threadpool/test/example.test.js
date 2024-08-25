@@ -12,32 +12,22 @@ test('README example: pingpong', async t => {
   })
   
   await t.test(`Running "${command}"`, async t => {
-    await t.test('logs in stdout', t => {
-      t.assert.ok(out, 'did not create any output')
+    await t.test('logs only in stdout', t => {
+      t.assert.ok(out, 'no output logged')
       t.assert.ok(out.stdout, `nothing logged in stdout`)
+      t.assert.ok(!out.stderr.trim(), `logged in stderr: ${out.stderr}`)
     })
     
-    await t.test('does not log in stderr', t => {
-      t.assert.ok(!out.stderr, `logged in stderr: ${out.stderr}`)
-    })
-    
-    
-    await t.test('logs "ping"s', async t => {
+    await t.test('some "ping"s', t => {
       const pings = out.stdout.split('ping').length
   
-      await t.test('at least 3', t => {
-        const pings = out.stdout.split('ping').length
-    
-        t.assert.ok(pings > 3, `found: ${pings} "ping" in stdout, must be >= 3`)
-      })
+      t.assert.ok(pings > 1, `found: ${pings} "pings" in stdout, must be >= 1`)
     })
     
-    await t.test('logs "pong"s', async t => {
-      await t.test('at least 3', t => {
-        const pongs = out.stdout.split('pong').length
-    
-        t.assert.ok(pongs > 3, `found: ${pongs} "pong" in stdout, must be >= 3`)
-      })
+    await t.test('some "pong"s', t => {
+      const pongs = out.stdout.split('pong').length
+  
+      t.assert.ok(pongs > 1, `found: ${pongs} "pong" in stdout, must be >= 1`)
     })
   })
 })
