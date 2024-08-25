@@ -78,7 +78,9 @@ Stops the pool, returns an array of thread exit codes
 
 #### `pool.threads`
 
-Array of threads with an [EventEmitter][ee]-like API for sending messages  
+Array of threads.  
+
+Each thread has an [EventEmitter][ee]-like API for sending messages  
 between a thread and the parent/primary process.
 
 See example above.
