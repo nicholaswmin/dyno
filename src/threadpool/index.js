@@ -116,7 +116,7 @@ class Threadpool extends EventEmitter {
       const message = data.toString().trim()
 
       message.toLowerCase().includes('simulated') 
-        ? console.log('simulated test error was thrown')
+        ? console.log('info: simulated test error thrown')
         : console.error(message)
     })
         
@@ -136,13 +136,11 @@ class Threadpool extends EventEmitter {
   }
 }
 
-
 const primary = process.env.index 
   ? new ThreadBus({ 
     killTimeout: Threadpool.killTimeout, 
     readyTimeout: Threadpool.readyTimeout 
   }) 
   : false
-
 
 export { Threadpool, primary }
