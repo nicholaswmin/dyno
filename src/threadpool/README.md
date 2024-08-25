@@ -81,6 +81,12 @@ Stops the pool and returns an array of thread [exit codes][ecodes].
 
 Array of running threads.  
 
+#### `event: 'thread-error'` 
+
+Emitted when a runtime error is encountered in a thread.
+
+### Thread API
+
 #### `thread.on(eventName, callbackFn)`
 
 Listen for events emitted from the thread.
@@ -88,12 +94,6 @@ Listen for events emitted from the thread.
 #### `thread.emit(eventName, data)`
 
 Emit an event to the thread.
-
-### Events
-
-#### `thread-error` 
-
-Emitted when a runtime error is encountered in a thread.
 
 ## Primary API
 
