@@ -83,6 +83,11 @@ between a thread and the parent/primary process.
 
 See the example above for usage info.
 
+#### `pool.on('thread-error', callback)`
+
+The `thread-error` event is emitted if a runtime error is encountered in 
+a thread.
+
 ## Gotchas 
 
 - "threads" are based on [`child_process.fork()`][cp-fork], so technically 
