@@ -85,7 +85,7 @@ Array of running threads.
 
 #### `thread.on(eventName, callbackFn)`
 
-Listen for a thread event.  
+Listen for events emitted from the thread.
 
 #### `thread.emit(eventName, data)`
 
@@ -105,7 +105,7 @@ It's  an [EventEmitter][ee] which allows sending/receiving of
 
 #### `primary.on(eventName, callbackFn)`
 
-Listen for a primary event.  
+Listen for events emitted from the primary.
 
 #### `primary.emit(eventName, data)`
 
