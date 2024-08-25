@@ -80,7 +80,7 @@ Array of threads.
 
 #### `async pool.start()`
 
-Starts the pool
+Starts the pool.
 
 #### `async pool.stop()`
 
