@@ -88,25 +88,6 @@ class Threadpool extends EventEmitter {
   }
   
   ping(data = {}) {
-    if (!this.pingSetup) {
-      this._pCount = 0
-      this._pRTT = 0
-
-      this.threads.forEach(thread => {
-        thread.on('pong', data => {
-          this._pRTT = performance.now() - data.start
-          ++this._pCount
-        })
-      })
-      
-      setInterval(() => {
-        console.log('Pongs:', this._pCount, '/ sec.', 'RTT:', this._pRTT, 'ms')
-        this._pCount = 0
-      }, 1000)
-      
-      this.pingSetup = true
-    }
-    
     const thread = this.threads[++this.#nextIndex % this.threads.length]
 
     thread.emit('ping', { start: performance.now() })
