@@ -1,10 +1,9 @@
 import { join } from 'node:path'
 import { Threadpool } from '../../index.js'
 
-const path = join(import.meta.dirname, 'thread.js')
-const pool = await (new Threadpool(path, 4)).start()
+const pool = new Threadpool(join(import.meta.dirname, 'thread.js'), 4)
 
-for (const thread of pool.threads)
+for (const thread of await pool.start())
   thread.on('pong', () => {
     console.log('🏓 pong')
 
