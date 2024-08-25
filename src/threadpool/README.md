@@ -78,7 +78,7 @@ Stops the pool, returns an array of thread exit codes
 
 Array of threads
 
-Threads have an [Event-Emitter][ee]-like API which allows sending messages
+Threads have an [EventEmitter][ee]-like API which allows sending messages
 between a thread and the parent/primary process.
 
 See the example above for usage info.
