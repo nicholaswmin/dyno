@@ -1,15 +1,15 @@
 import { EventEmitter, once } from 'node:events'
+import { emitWarning } from 'node:process'
 import { PrimaryBus } from '../bus/index.js'
 import { validateInteger } from '../validate/index.js'
 
 class Thread extends EventEmitter {
-  #exitTimer = null
+  #stderr = ''
+  #forceKillTimer = null
 
   #pid = null
   #dead = false
   #alive = true
-  
-  #stderr = ''
 
   // @REVIEW not needed, 
   // set so `Object.assign` doesnt throw for lacking 
@@ -31,30 +31,29 @@ class Thread extends EventEmitter {
   set signalCode(signal)   { return this.#x = signal    }
   set connected(connected) { return this.#x = connected }
   
-  constructor(cp) {
+  constructor(cp, { readyTimeout, killTimeout }) {
     super()
-    this.cp = cp
-  
-    this.exitTimeout = 200
 
-    this.bus = new PrimaryBus(cp)
-
+    this.cp  = cp
+    this.bus = new PrimaryBus(cp, { readyTimeout, killTimeout })
+    
+    this.readyTimeout = readyTimeout
+    this.killTimeout = killTimeout
+    
     Object.assign(this, cp)
 
     this.#addEndListeners(this.cp)
   }
   
-  async exit() {
+  async kill() {
     this.bus.stop()
 
-    const [ winner ] = await Promise.race([
-      this.#startExitTimeout(),
-      this.#startExitAttempt()
-    ]).finally(this.#abortExitTimer.bind(this))
-
-    return ['EXIT_TIMEOUT'].includes(winner) 
-      ? this.#forceKill().then(() => 1)
-      : winner
+    return await Promise.race([
+      this.#attemptForceKill(),
+      this.#attemptGraceKill()
+    ])
+    .finally(this.#abortForceKill.bind(this))
+    .then(res => this.exitCode)
   }
   
   emit(...args) {
@@ -71,43 +70,41 @@ class Thread extends EventEmitter {
     
     return this
   }
+
+  async #attemptForceKill() {
+    return this.#forceKillTimer 
+      ? emitWarning('#attemptForceKill called twice')
+      : new Promise((resolve, reject) => {
+        this.#forceKillTimer = setTimeout(() => {
+          this.#forceKillTimer = null
+
+          return this.#forceKill()
+            .then(this.#onceDead.bind(this))
+            .catch(reject.bind(this))
+        }, this.killTimeout)
+      })
+  }
   
+  async #abortForceKill() {
+    clearTimeout(this.#forceKillTimer)
+    this.#forceKillTimer = null
+  }
+
   async #forceKill() {
     queueMicrotask(() => this.cp.kill('SIGKILL'))
 
     return await this.#onceDead()
   }
   
-  async #startExitAttempt() {
-    queueMicrotask(() => this.cp.send('exit'))
+  #attemptGraceKill(signal) {
+    queueMicrotask(() => this.cp.kill(signal))
 
-    return await this.#onceDead()
+    return this.#onceDead()
   }
   
   #onceDead() {
-    this.cp.removeAllListeners()
-
-    return Promise.race([
-      'exit', 
-      'error'
-    ].map(e => once(this.cp, e)))
-  }
-  
-  async #startExitTimeout() {
-    return new Promise(resolve => 
-      this.#exitTimer = setTimeout(() => 
-        resolve(['EXIT_TIMEOUT']), 
-        validateInteger(this.exitTimeout, 'exitTimeout')
-      )
-    )
-  }
-  
-  async #abortExitTimer() {
-    clearTimeout(this.#exitTimer)
-
-    this.#exitTimer = null
-    
-    return this
+    return Promise.race(['exit', 'error']
+      .map(e => once(this.cp, e)))
   }
   
   #computeExitCode() {
@@ -119,18 +116,20 @@ class Thread extends EventEmitter {
   #addEndListeners(ee) {
     const self = this
 
-    ee.stderr.on('data', data => 
-      this.#stderr += data.toString()) 
-
     const onError = err => 
       self.off('exit', onExit)
-        .emit('end', err)
+        .emit('thread-error', err)
     
-    const onExit = () =>
-      self.off('error', onError)
-          .emit('end', this.exitCode > 0 
-        ? new Error(this.#stderr) : null)
-    
+    const onExit = (code, signal) => {
+      const err = code ||  signal === 'SIGKILL' ? 'SIGKILLed' : null
+      
+      if (err)
+        this.off('thread-error', onError).emit('thread-error', new Error(err))
+    }
+
+    if (ee.stderr)
+      ee.stderr.on('data', data => this.#stderr += data.toString())
+
     ee.once('exit', onExit).once('error', onError)
   }
 }

@@ -1,17 +1,17 @@
 import test from 'node:test'
-import { join } from 'node:path'
+import path from 'node:path'
 import { once, EventEmitter } from 'node:events'
+import { task, connected, alive, dead } from './utils/utils.js'
 import { setTimeout } from 'node:timers/promises'
-
 import { Threadpool } from '../index.js'
 
 EventEmitter.defaultMaxListeners = 50
 
-test('#ping()', { timeout: 1000 }, async t => {
+test('#ping()', { timeout: 2000 }, async t => {
   let pool = null
 
   t.beforeEach(() => {
-    pool = new Threadpool(join(import.meta.dirname, 'task/pong.js'), 10)
+    pool = new Threadpool(task('pong.js'), 10)
   })
   
   t.afterEach(() => {

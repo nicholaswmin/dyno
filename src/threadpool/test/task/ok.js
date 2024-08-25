@@ -1,11 +1,8 @@
-// runs ok & exits when asked to
+// - runs ok & exits when asked to
+// - sends back its ENV variables when asked to 
+import { primary } from '../../index.js'
 
 process.on('message', message => {  
-  message === 'env' ? process.connected ? process.send({
-    env: process.env,
-    spawnIndex: +process.env.index,
-    parameters: JSON.parse(process.env.parameters || null)
-  }) : 0 : 0
-  
-  message === 'exit' ? setImmediate(() => process.exit(0)) : 0
+  if (message === 'env')
+    return process.send(['env', process.env])
 })

@@ -8,10 +8,10 @@ test('#constructor()', async t => {
     })
 
     await t.test('uses defaults', async t => {
-      const { task, size } = new Threadpool()
+      const { modulePath, size } = new Threadpool()
 
-      await t.test('task set to current file path', t => {
-        t.assert.strictEqual(task, process.argv.at(-1))
+      await t.test('module path set to current file path', t => {
+        t.assert.strictEqual(modulePath, process.argv.at(-1))
       })
 
       await t.test('pool size set to a positive integer', t => {
@@ -21,7 +21,8 @@ test('#constructor()', async t => {
     })
   })
   
-  await t.test('task is provided', async t => {
+  
+  await t.test('module path is provided', async t => {
     await t.test('empty', async t => {
       await t.test('throws a RangeError', t => {
         t.assert.throws(() => new Threadpool(null, 'abc'), { 
@@ -31,7 +32,8 @@ test('#constructor()', async t => {
     })
   })
   
-  await t.test('thread count provided', async t => {
+  
+  await t.test('pool size provided', async t => {
     await t.test('as not a positive integer', async t => {
       await t.test('throws RangeError', t => {
         t.assert.throws(() => new Threadpool(null, 'abc'), { 
@@ -40,6 +42,7 @@ test('#constructor()', async t => {
       })
     })
   })
+  
   
   await t.test('parameters set', async t => {
     await t.test('as a non-object', async t => {

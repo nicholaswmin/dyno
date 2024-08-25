@@ -11,6 +11,12 @@ const validateChildProcess = (v, name) => {
 }
 
 const validateInteger = (v, name) => {
+  if (typeof v === 'undefined')
+    throw new RangeError(`${name} must be an integer, is: undefined`)
+
+  if (v === null)
+    throw new TypeError(`${name} must be an integer, is: null`)
+
   if (!Number.isInteger(v))
     throw new RangeError(`${name} must be an integer, has decimals: ${v}`)
 

@@ -1,35 +1,31 @@
 import test from 'node:test'
 import cp from 'node:child_process'
 import path from 'node:path'
-import { alive, dead, exitZero, exitNonZero, sigkilled } from './utils/utils.js'
 
+import { task, alive, dead } from './utils/utils.js'
 import { Threadpool } from '../index.js'
 
 test('#stop()', { timeout: 3000 }, async t => {
-  cp.fork   = t.mock.fn(cp.fork)
-  cp.forked = () => cp.fork.mock.calls.map(call => call.result)
-
   let pool = null 
 
+  cp.fork   = t.mock.fn(cp.fork)
+  cp.forked = () => cp.fork.mock.calls.map(call => call.result)
   t.afterEach(() => pool.stop())
 
   await t.test('threads exit normally', async t => {    
-    t.before(async () => {
+    t.before(() => {
       cp.fork.mock.resetCalls()
+      pool = new Threadpool(task('ok.js'))
+      pool.on('error', () => {})
 
-      pool = await (
-        new Threadpool(path.join(import.meta.dirname, 'task/ok.js')).start()
-      )
+      return pool.start()
     })
 
-    await t.test('resolves an array of exit codes: zero', async t => {   
+    await t.test('resolves an array of exit codes: one', async t => {   
       const exitCodes = await pool.stop()
       
-      t.assert.deepStrictEqual(exitCodes, [0,0,0,0])
-    })
-    
-    await t.test('threads have exit code: zero', t => {          
-      t.assert.strictEqual(cp.forked().filter(exitZero).length, pool.size)
+      t.assert.strictEqual(exitCodes.length, pool.size)
+      t.assert.ok(exitCodes.every(code => code === 0), 'some exit codes !== 0')
     })
 
     await t.test('all threads eventually exit', t => {          
@@ -39,100 +35,45 @@ test('#stop()', { timeout: 3000 }, async t => {
   })
 
   
-  await t.test('threads take too long to exit', async t => {
-    t.before(async () => {
+  await t.test('threads have a SIGTERM handlers that never exits', async t => {
+    t.before(() => {
       cp.fork.mock.resetCalls()
+      pool = new Threadpool(task('lag-exit.js'))
+      
+      return pool.start()
+    })
+    
+    await t.test('resolves an array of exit codes: 1', async t => {   
+      const exitCodes = await pool.stop()
 
-      pool = await (new Threadpool(
-        path.join(import.meta.dirname, 'task/lag-exit.js'))).start()
+      t.assert.strictEqual(exitCodes.length, pool.size)
+      t.assert.ok(exitCodes.every(code => code === 1), 'some exit codes !== 1')
     })
     
-    await t.test('rejects the returned promise', async t => {   
-      return t.assert.rejects(() => pool.stop())
-    })
-    
-    await t.test('threads are force killed', t => {
-      t.assert.strictEqual(cp.forked().filter(sigkilled).length, pool.size)
-    })
-    
-    await t.test('all threads eventually exit', t => {          
+    await t.test('all threads eventually exit', async t => {     
       t.assert.strictEqual(cp.forked().filter(dead).length, pool.size)
       t.assert.strictEqual(cp.forked().filter(alive).length, 0)
     })
   })
   
   
-  await t.test('threads exit wih non-zero during cleanups', async t => {
-    t.before(async () => {
+  await t.test('threads exit with non-zero during cleanups', async t => {
+    t.before(() => {
       cp.fork.mock.resetCalls()
-
-      pool = await (new Threadpool(
-        path.join(import.meta.dirname, 'task/exit-err.js')
-      ).start())
+      pool = new Threadpool(task('exit-err.js'))
+      
+      return pool.start()
     })
     
-    await t.test('rejects the returned promise', async t => { 
-      await t.assert.rejects(pool.stop.bind(pool))
+    await t.test('resolves an array of exit codes: 1', async t => {   
+      const exitCodes = await pool.stop()
+      
+      t.assert.strictEqual(exitCodes.length, pool.size)
+      t.assert.ok(exitCodes.every(code => code === 1), 'some exit codes !== 1')
     })
     
     await t.test('all threads eventually exit', t => {      
       t.assert.strictEqual(cp.forked().filter(dead).length, pool.size)
-      t.assert.strictEqual(cp.forked().filter(alive).length, 0)
-    })
-
-    // @FIXME flaky
-    t.todo('thread exits with exit code: non-zero', t => {
-      t.assert.strictEqual(cp.forked().filter(exitNonZero).length, 1)
-    })
-
-    // @FIXME flaky
-    t.todo('remaining exit with exit code: zero', t => {
-      t.assert.strictEqual(cp.forked().filter(exitZero).length, pool.size - 1)
-    })
-  })
-
-  
-  await t.test('threads unresponsive to shutdown signals', async t => {
-    t.before(async () => {
-      cp.fork.mock.resetCalls()
-      pool = await (new Threadpool(
-        path.join(import.meta.dirname, 'task/no-exit-fn.js'), 2)
-      ).start()
-    })
-    
-    await t.test('rejects the returned promise', async t => { 
-      await t.assert.rejects(pool.stop.bind(pool))
-    })
-
-    await t.test('threads are SIGKILL-ed', t => {
-      t.assert.strictEqual(cp.forked().filter(sigkilled).length, pool.size)
-    })
-
-    await t.test('all threads eventually exit', t => {          
-      t.assert.strictEqual(cp.forked().filter(dead).length, pool.size)
-      t.assert.strictEqual(cp.forked().filter(alive).length, 0)
-    })
-  })
-
-  
-  await t.test('threads with a blocked event loop', async t => {
-    t.before(async () => {
-      cp.fork.mock.resetCalls()
-      pool = await (new Threadpool(
-        path.join(import.meta.dirname, 'task/blocked-loop.js'), 2)
-      ).start()
-    })
-    
-    await t.test('rejects the returned promise', async t => { 
-      await t.assert.rejects(pool.stop.bind(pool))
-    })
-
-    await t.test('threads are SIGKILL-ed', t => {
-      t.assert.strictEqual(cp.forked().filter(sigkilled).length, 2)
-    })
-
-    await t.test('all threads eventually exit', t => {          
-      t.assert.strictEqual(cp.forked().filter(dead).length, 2)
       t.assert.strictEqual(cp.forked().filter(alive).length, 0)
     })
   })

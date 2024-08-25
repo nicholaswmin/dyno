@@ -2,7 +2,7 @@
 
 # :thread: threadpool
 
-> a [threadpool][threadpool] that's easy to talk to  
+> a [threadpool][threadpool] with event-emitter threads
 
 ## Install
 
@@ -58,11 +58,40 @@ node primary.js
 # ...
 ```
 
+## API
+
+#### `pool.start(modulePath, size, env)`
+
+Starts the pool
+
+| name         | description                                 |
+|--------------|---------------------------------------------|
+| `modulePath` | file path of per-thread code                |
+| `size`       | number of threads                           |
+| `env`        | Environment key-value pairs for each thread |
+
+#### `pool.stop()`
+
+Stops the pool, returns an array of thread exit codes
+
+#### `pool.threads`
+
+Array of threads
+
+Threads have an [Event-Emitter][ee]-like API which allows sending messages
+between a thread and the parent/primary process.
+
+See the example above for usage info.
+
 ## Gotchas 
 
-- "threads" are based on [`child_process.fork()`][cp-fork], 
-  so technically it's multiprocessing
-- a thread must exit within `200ms`, otherwise it gets [`SIGKILL`][sigkill]-ed.
+- "threads" are based on [`child_process.fork()`][cp-fork], so technically 
+  it's multiprocessing rather than multithreading.
+- Avoid blocking the event-loop, especially on startup.  
+  Internally, a `ready` handshake takes place to confirm a succesful spawn.  
+  A blocked loop means the handshake might time-out.
+- Avoid long cleanups after calling `pool.stop()`.  
+  Threads that take a long time to exit are [`SIGKILL`][sigkill]-ed.
 
 ## Test 
 
@@ -93,6 +122,7 @@ The [MIT-0][license] License
 [threadpool]: https://en.wikipedia.org/wiki/Thread_pool
 [cp-fork]: https://nodejs.org/api/child_process.html#child_processforkmodulepath-args-options
 [sigkill]: https://www.gnu.org/software/libc/manual/html_node/Termination-Signals.html#index-SIGKILL
+[ee]: https://nodejs.org/docs/latest/api/events.html#emitteremiteventname-args
 
 [nicholaswmin]: https://github.com/nicholaswmin
 [license]: https://spdx.org/licenses/MIT-0.html

@@ -1,6 +1,7 @@
-// throws exception on-`spawn`
-// 
-// this is not entirely true, 
-// it has "spawned" by this time.
+// throws synchronous exception on-load
+// on every other thread
 
-throw new Error('simulated spawn error')
+import { primary } from '../../index.js'
+
+if (+process.env.index % 2 === 0)
+  throw new Error('Simulated Error for error-handling tests.')

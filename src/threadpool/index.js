@@ -4,34 +4,53 @@ import { EventEmitter, once } from 'node:events'
 import { Thread } from './src/thread/index.js'
 import { PrimaryBus, ThreadBus } from './src/bus/index.js'
 import { 
-  validateInteger, 
   validateObject, 
+  validateInteger, 
   validateString 
 } from './src/validate/index.js'
 
 class Threadpool extends EventEmitter {
+  static readyTimeout = 500
+  static killTimeout = 500
+  
+  #threadEvents = ['pong']
+  #stopping = false
   #nextIndex = 0
+  
+  get #started() {
+    return this.threads.length === this.size &&
+      this.threads.some(t => t.exitCode === null)
+  }
 
-  constructor(task = process.argv.at(-1), size = 4, parameters = {}) {
+  constructor(modulePath = process.argv.at(-1), size = 4, parameters = {}) {
     super()
 
     Object.defineProperties(this, {
-      task: {
-        value: validateString(task, 'task'),
+      readyTimeout: {
+        value: validateInteger(Threadpool.readyTimeout, 'readyTimeout'),
         writable : false, enumerable : false, configurable : false
       },
+
+      killTimeout: {
+        value: validateInteger(Threadpool.killTimeout, 'killTimeout'),
+        writable : false, enumerable : false, configurable : false
+      },
+
+      modulePath: {
+        value: validateString(modulePath, 'modulePath'),
+        writable : false, enumerable : false, configurable : false
+      },
+
       size: {
         value: validateInteger(size, 'size'),
         writable : false, enumerable : false, configurable : false
       },
+      
       parameters: {
         value: validateObject(parameters, 'parameters'),
         writable : false, enumerable : false, configurable : false
       },
-      exitTimeout: {
-        value: validateInteger(50, 'exitTimeout'),
-        writable : false, enumerable : false, configurable : false
-      },
+
       threads: {
         value: [], 
         writable : true, enumerable : true, configurable : false
@@ -40,75 +59,76 @@ class Threadpool extends EventEmitter {
   }
   
   async start() {
-    const spawns = Array.from({
-      length: this.size 
-    }, (_, index) => this.#fork(this.task, { 
-      parameters: this.parameters, index
-    }))
+    const forks = []
 
-    this.threads = Object.freeze(await Promise.all(spawns))
-    
+    for (let i = 0; i < this.size; i++) {
+      forks.push(await this.#forkThread(this.modulePath, {
+        env: {  ...process.env, ...this.parameters, index: i  }
+      }))
+    }
+
+    this.threads = Object.freeze(forks)
+
     return this
   }
-  
-  async stop() {
-    const exitCodes = await this.#exit()
-    const isNonZero = code => code > 0
 
-    return exitCodes.some(isNonZero) ? (() => {
-        throw new Error('nonzero exits')
-      })() : exitCodes
+  async stop() {
+    this.#stopping = true
+
+    const alive = thread => thread.alive, 
+          kill  = thread => thread.kill(),
+          kills = this.threads.filter(alive)
+    
+    return Promise.all(kills.map(t => t.kill()))
+      .finally(() => this.#stopping = false)
   }
   
   ping() {
     const thread = this.threads[++this.#nextIndex % this.threads.length]
 
-    thread.emit('ping')
+    thread.emit('ping', {})
   }
   
-  async #fork (task, { parameters, index }) {
-    const fork = cp.fork(task, ['child'], {
-      stdio: ['ipc', null, 'pipe'],
-        env: { 
-          ...process.env, 
-          parameters: JSON.stringify(parameters), 
-          index 
-      }
+  async #forkThread (modulepath, args) {
+    const thread = new Thread(
+      cp.fork(modulepath, args), {
+      readyTimeout: this.readyTimeout,
+      killTimeout: this.killTimeout
     })
-      
-    await Promise.race([ 
-      once(fork, 'error'),
-      once(fork, 'spawn') 
-    ])
-    .then(([err]) => err 
-      ? Promise.reject(err) 
-      : null
-    )
+
+    this.#threadEvents.forEach(e => thread.on(e, d => this.emit(e, d)))
+
+    if (thread.stdout)
+      thread.stdout.on('data', data => console.log(data.toString))
     
-    return (new Thread(fork))
-      .once('end', this.#onThreadEnd.bind(this))
-      .on('pong', this.#onThreadPong.bind(this))
-  } 
-  
-  async #exit() {
-    const isAlive = thread => thread.alive, 
-          exit    = thread => thread.exit()
+    if (thread.stderr)
+      thread.stderr.on('data', data => console.error(data.toString))
+    
+    thread.once('thread-error', this.#onThreadError.bind(this))
+      
+    await thread.bus.isReady()
 
-    return Promise.all(this.threads.filter(isAlive).map(exit))
+    return thread
   }
   
-  async #onThreadEnd(err) {
-    if (err) 
-      await this.stop()
-
-    this.emit('thread:end', err)
-  }
   
-  async #onThreadPong(args) {
-    this.emit('pong', args)
+  // @FIXME emit error instead stop remapping
+  async #onThreadError(err) {
+    if (!this.#started || this.#stopping)
+      return 
+    
+    await this.stop()
+
+    this.emit('thread-error', err)
   }
 }
 
-const primary = process.env.index ? new ThreadBus() : {}
+
+const primary = process.env.index 
+  ? new ThreadBus({ 
+    killTimeout: Threadpool.killTimeout, 
+    readyTimeout: Threadpool.readyTimeout 
+  }) 
+  : false
 
 export { Threadpool, primary }
