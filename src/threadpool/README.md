@@ -90,13 +90,13 @@ a thread.
 
 ## Gotchas 
 
-- "threads" are based on [`child_process.fork()`][cp-fork], so technically 
-  it's multiprocessing rather than multithreading.
-- Avoid blocking the event-loop, especially on startup.  
-  Internally, a `ready` handshake takes place to confirm a succesful spawn.  
-  A blocked loop means the handshake might time-out.
-- Avoid long cleanups after calling `pool.stop()`.  
-  Threads that take a long time to exit are [`SIGKILL`][sigkill]-ed.
+- Blocking the event-loop on startup might cause an internal handshake to 
+  time-out.
+- Threads with delayed cleanups after calling `pool.stop()` 
+  are [`SIGKILL`][sigkill]-ed.
+
+Based on [`child_process.fork()`][cp-fork].  
+Technically it's *multiprocessing* rather than *multithreading*.  
 
 ## Test 
 
