@@ -60,7 +60,7 @@ node primary.js
 
 ## API
 
-#### `pool.start(modulePath, size, env)`
+### `pool.start(modulePath, size, env)`
 
 Starts the pool
 
@@ -70,11 +70,11 @@ Starts the pool
 | `size`       | number of threads                           |
 | `env`        | Environment key-value pairs for each thread |
 
-#### `pool.stop()`
+### `pool.stop()`
 
 Stops the pool, returns an array of thread exit codes
 
-#### `pool.threads`
+### `pool.threads`
 
 Array of threads
 
