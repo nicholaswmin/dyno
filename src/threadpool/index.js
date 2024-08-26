@@ -11,8 +11,8 @@ class Threadpool extends EventEmitter {
   static readyTimeout = 300
   static killTimeout = 300
 
-  #nextIndex = 0
-  
+  #pingCounter = 0
+
   #starting = false
   #stopping = false  
 
@@ -96,9 +96,9 @@ class Threadpool extends EventEmitter {
   }
   
   ping(data = {}) {
-    const thread = this.threads[++this.#nextIndex % this.threads.length]
+    const next = this.threads[++this.#pingCounter % this.threads.length]
 
-    thread.emit('ping', { start: performance.now() })
+    next.emit('ping', data)
   }
   
   async #forkThread (path, args) {

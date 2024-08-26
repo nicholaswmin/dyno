@@ -128,7 +128,7 @@ class ThreadBus extends Bus {
       this.emitWarning(`"ready-ping" timeout, exiting with: 1`, 'handshake')
       process.exit(1)
     }, isInteger(readyTimeout, 'readyTimeout'))
-
+    
     process.on('message', args => {
       if (!this.canListen())
         return
