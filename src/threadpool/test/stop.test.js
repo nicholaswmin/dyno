@@ -31,31 +31,32 @@ test('#stop()', async t => {
       t.assert.strictEqual(cp.instances().filter(alive).length, 0)
     })
   })
-
   
-  await t.test('thread SIGTERM handler never exits', async t => {
+  
+  
+  await t.test('threads cleanup in SIGTERM handler & exit: 0', async t => {    
     t.before(() => {
       cp.fork.mock.resetCalls()
-      pool = new Threadpool(task('lag-exit.js'))
-      
+      pool = new Threadpool(task('exit-ok.js'))
+
       return pool.start()
     })
-    
-    await t.test('resolves array of exit codes: 1', async t => {   
-      const exitCodes = await pool.stop()
 
+    await t.test('resolves array of exit codes: 0', async t => {   
+      const exitCodes = await pool.stop()
+      
       t.assert.strictEqual(exitCodes.length, pool.size)
-      t.assert.ok(exitCodes.every(code => code === 1), 'some exit codes !== 1')
+      t.assert.ok(exitCodes.every(code => code === 0), 'some exit codes !== 0')
     })
-    
-    await t.test('all threads exit', async t => {     
+
+    await t.test('all threads exit', t => {          
       t.assert.strictEqual(cp.instances().filter(dead).length, pool.size)
       t.assert.strictEqual(cp.instances().filter(alive).length, 0)
     })
   })
+
   
-  
-  await t.test('thread SIGTERM handler exits with code: 1', async t => {
+  await t.test('threads cleanup in SIGTERM handler & exit: 1', async t => {    
     t.before(() => {
       cp.fork.mock.resetCalls()
       pool = new Threadpool(task('exit-err.js'))
@@ -71,6 +72,28 @@ test('#stop()', async t => {
     })
     
     await t.test('all threads exit', t => {      
+      t.assert.strictEqual(cp.instances().filter(dead).length, pool.size)
+      t.assert.strictEqual(cp.instances().filter(alive).length, 0)
+    })
+  })
+  
+  
+  await t.test('threads cleanup in SIGTERM handler but never exit', async t => {    
+    t.before(() => {
+      cp.fork.mock.resetCalls()
+      pool = new Threadpool(task('exit-never.js'))
+      
+      return pool.start()
+    })
+    
+    await t.test('resolves array of exit codes: 1', async t => {   
+      const exitCodes = await pool.stop()
+
+      t.assert.strictEqual(exitCodes.length, pool.size)
+      t.assert.ok(exitCodes.every(code => code === 1), 'some exit codes !== 1')
+    })
+    
+    await t.test('all threads exit', async t => {     
       t.assert.strictEqual(cp.instances().filter(dead).length, pool.size)
       t.assert.strictEqual(cp.instances().filter(alive).length, 0)
     })
