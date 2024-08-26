@@ -21,7 +21,7 @@ test('#constructor()', async t => {
         t.assert.strictEqual(path, process.argv.at(-1))
       })
 
-      await t.test('pool size set to a positive integer', t => {
+      await t.test('pool size set to positive integer', t => {
         t.assert.ok(size > 0, 'thread size is: <= 0')
         t.assert.ok(Number.isInteger(size), 'thread size !== integer')
       })
@@ -31,7 +31,7 @@ test('#constructor()', async t => {
   
   await t.test('path is provided', async t => {
     await t.test('empty', async t => {
-      await t.test('throws a RangeError', t => {
+      await t.test('throws RangeError', t => {
         t.assert.throws(() => new Threadpool(null, 'abc'), { 
           name: 'RangeError' 
         })
