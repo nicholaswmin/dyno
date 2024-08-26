@@ -2,7 +2,7 @@
   "name": "threadpool",
   "version": "0.1.0",
   "type": "module",
-  "description": "tiny threadpool with EventEmitter IPC",
+  "description": "a tiny threadpool with an ergonomic IPC",
   "main": "index.js",
   "scripts": {
     "test": "node --test test/index.test.js",
