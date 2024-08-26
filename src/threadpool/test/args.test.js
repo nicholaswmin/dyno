@@ -30,7 +30,7 @@ test('#constructor()', async t => {
   })
   
   
-  await t.test('path is provided', async t => {
+  await t.test('"path" provided', async t => {
     await t.test('empty', async t => {
       await t.test('throws RangeError', t => {
         t.assert.throws(() => new Threadpool(null, 'a'), { name: 'RangeError' })
@@ -39,7 +39,7 @@ test('#constructor()', async t => {
   })
   
   
-  await t.test('pool size provided', async t => {
+  await t.test('"size" provided', async t => {
     await t.test('as a string', async t => {
       await t.test('throws RangeError', t => {
         t.assert.throws(() => new Threadpool(null, 'a'), { name: 'RangeError' })
@@ -66,7 +66,7 @@ test('#constructor()', async t => {
   })
   
   
-  await t.test('env set', async t => {
+  await t.test('"env" provided', async t => {
     await t.test('as a non-object', async t => {
       await t.test('throws TypeError', t => {
         t.assert.throws(() => new Threadpool(null, 3, 'f'), { 
