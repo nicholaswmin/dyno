@@ -5,8 +5,8 @@
   "description": "tiny threadpool with EventEmitter IPC",
   "main": "index.js",
   "scripts": {
-    "test": "NODE_ENV=test node --test test/index.test.js",
-    "test:coverage": "NODE_ENV=test node --test --experimental-test-coverage test/index.test.js",
+    "test": "node --test test/index.test.js",
+    "test:coverage": "node --test --experimental-test-coverage test/index.test.js",
     "example": "node .github/example/primary.js"
   },
   "engines": {

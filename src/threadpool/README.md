@@ -158,13 +158,13 @@ Emit an event to the primary.
 ## Test 
 
 ```bash 
-node --run test
+NODE_ENV=test node --run test
 ```
 
 ### Coverage 
 
 ```bash
-node --run test:coverage
+NODE_ENV=test node --run test:coverage
 ```
 
 ### Example
