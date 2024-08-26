@@ -56,6 +56,10 @@ class Thread extends EventEmitter {
     this.#addErrorListeners(this.cp)
   }
   
+  ready() {
+    return this.bus.readyHandshake()
+  }
+  
   async kill() {
     this.bus.stop()
     

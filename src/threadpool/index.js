@@ -120,7 +120,7 @@ class Threadpool extends EventEmitter {
         : console.error(message)
     })
         
-    await thread.bus.readyHandshake()
+    await thread.ready()
 
     return thread
   }
