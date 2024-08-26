@@ -114,17 +114,17 @@ Thread's [Process ID][pid]
 
 #### `thread.alive`
 
-`true` if process is running, `false` otherwise
+`true` if thread is running, `false` otherwise
 
 #### `thread.dead`
 
-`true` if process has tereminated, `false` otherwise
+`true` if thread has tereminated, `false` otherwise
 
 #### `thread.exitCode`
 
-- `null` if thread is running
-- `0` if exited with zero 
-- `1` if thread threw exception or killed with anything other than `SIGTERM`.
+- `null`: thread is alive
+- `0`: exited with zero 
+- `1`: thread threw exception or killed with any signal other than `SIGTERM`.
 
 ## Primary API
 
@@ -139,6 +139,29 @@ Listen for events emitted from the primary.
 #### `primary.emit(eventName, data)`
 
 Emit an event to the primary.
+
+## Graceful termination
+
+Threads can listen for `SIGTERM` and perform synchronous cleanups before 
+exiting, like so:
+
+```js
+// thread.js 
+
+import { primary } from '@nicholaswmin/threadpool'
+
+primary.on('ping', () => {
+  console.log('ping 🏓')
+
+  setTimeout(() => primary.emit('pong'), 100)
+})
+
+process.once('SIGTERM', () => {
+  // shut down DB ...
+  // shut down redis ...
+  process.exit(0)
+})
+```
 
 ## Gotchas 
 
