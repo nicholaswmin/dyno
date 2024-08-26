@@ -2,7 +2,7 @@
 
 # :thread: threadpool
 
-> tiny thread pool with [`ergonomic`][ee] [IPC]
+> tiny thread pool with [ergonomic][ee] [IPC]
 
 ## Install
 
