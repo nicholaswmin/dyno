@@ -1,3 +1,6 @@
+// Ping/pong between primary and the threads  
+// Run: `node primary.js`
+
 import { join } from 'node:path'
 import { Threadpool } from '../../index.js'
 
