@@ -98,11 +98,7 @@ Removes listener of given event, across all threads.
 
 #### `pool.emit(eventName, data)`
 
-Emits event to a single thread, chosen in [round-robin][rr].
-
-#### `pool.ping()`
-
-Emits a `'ping'` event to a thread, chosen in [round-robin][rr]. 
+Emits an event to a single thread, chosen in [round-robin][rr].
 
 ### Events
 

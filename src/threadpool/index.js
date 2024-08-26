@@ -148,6 +148,10 @@ class Threadpool extends EventEmitter {
   }
   
   #getNextThread() {
+    this.#nextEmitIndex = this.#nextEmitIndex < Number.MAX_SAFE_INTEGER 
+      ? this.#nextEmitIndex
+      : 0
+
     return this.threads[++this.#nextEmitIndex % this.threads.length]
   }
   
