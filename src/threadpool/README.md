@@ -142,8 +142,8 @@ Emit an event to the primary.
 
 ## Graceful termination
 
-Threads can listen for `SIGTERM` and perform synchronous cleanups before 
-exiting, like so:
+Threads can listen for `SIGTERM` and perform [graceful exit][grace] cleanups,
+like so:
 
 ```js
 // thread.js 
@@ -157,8 +157,9 @@ primary.on('ping', () => {
 })
 
 process.once('SIGTERM', () => {
-  // shut down DB ...
-  // shut down redis ...
+  // shut down DB connection ...
+  // shut down server ...
+  
   process.exit(0)
 })
 ```
@@ -216,7 +217,7 @@ node --run example
 [pid]: https://en.wikipedia.org/wiki/Process_identifier
 [ee-block]: https://nodejs.org/en/learn/asynchronous-work/dont-block-the-event-loop
 [rr]: https://en.wikipedia.org/wiki/Round-robin_scheduling
-[zombie]: https://en.wikipedia.org/wiki/Zombie_process
+[grace]: https://en.wikipedia.org/wiki/Graceful_exit
 [child-p]: https://en.wikipedia.org/wiki/Child_process
 [v8]: https://v8.dev/
 
