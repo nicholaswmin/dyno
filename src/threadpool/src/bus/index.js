@@ -78,7 +78,7 @@ class PrimaryBus extends Bus {
     this.cp.send(Object.values({ ...args, pid: process.pid }))
   }
   
-  attemptReadyHandshake() {
+  readyHandshake() {
     if (this.ready) 
       return resolve()
 
