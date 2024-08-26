@@ -166,12 +166,11 @@ process.once('SIGTERM', () => {
 
 ## Gotchas 
 
-- Threads which [block their startup][ee-block] or 
-  [delay their termination][node-signals] are issued a [`SIGKILL`][signals] 
-  after a set timeout.
+- Threads which [block the event loop][ee-block] or delay their termination 
+  are issued a [`SIGKILL`][signals], after a set timeout.
 - Runtime exceptions trigger a `stop()`; a shutdown of all running threads.
 - Based on [`fork()`][fork] so technically it's [*multi-processing*][child-p],
-  each "thread" being an isolated [V8][v8] instance. 
+  with each "thread" being an isolated [V8][v8] instance. 
 
 ## Test 
 
