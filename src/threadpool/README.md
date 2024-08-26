@@ -169,7 +169,7 @@ node --run test:coverage
 
 ### Example
 
-> Runs above `ping`/`pong` example
+> Run `ping`/`pong` example
 
 ```bash 
 node --run example
