@@ -94,7 +94,7 @@ Listens for an emitted event, across all threads.
 
 #### `pool.off(eventName, listenerFn)`
 
-Removes listener of given event, across all threads.
+Removes a listener of a given event, across all threads.
 
 #### `pool.emit(eventName, data)`
 
