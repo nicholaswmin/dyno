@@ -78,13 +78,13 @@ Creates a pool.
 
 Array of `threads`. 
 
-#### `async pool.start()`
+#### `await pool.start()`
 
 Starts the pool.
 
 Returns array of `threads`.
 
-#### `async pool.stop()`
+#### `await pool.stop()`
 
 Sends a [`SIGTERM`][signals] signal to each thread.
 
