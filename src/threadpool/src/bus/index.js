@@ -62,10 +62,7 @@ class PrimaryBus extends Bus {
         if (!this.isBusMessage(args))
           return
 
-        super.emit(args.at(0), { 
-          ...args.at(1), 
-          pid: args.at(-1) 
-        })
+        super.emit(args.at(0), { ...args.at(1), pid: args.at(-1) })
       })
   }
   
