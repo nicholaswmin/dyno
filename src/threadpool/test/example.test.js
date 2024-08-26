@@ -1,7 +1,7 @@
 import test from 'node:test'
 import { run } from './utils/utils.js'
 
-const command = `node --run pingpong`
+const command = `node --run example`
 
 test('README example: ping/pong', async t => {
   let out = null

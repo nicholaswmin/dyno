@@ -169,8 +169,10 @@ node --run test:coverage
 
 ### Example
 
+> Runs above `ping`/`pong` example
+
 ```bash 
-node --run pingpong
+node --run example
 ```
 
 ## Authors

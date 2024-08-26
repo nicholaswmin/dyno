@@ -7,7 +7,7 @@
   "scripts": {
     "test": "NODE_ENV=test node --test test/index.test.js",
     "test:coverage": "NODE_ENV=test node --test --experimental-test-coverage test/index.test.js",
-    "pingpong": "node .github/example/primary.js"
+    "example": "node .github/example/primary.js"
   },
   "engines": {
     "node": ">=22.6"
