@@ -129,7 +129,7 @@ class PrimaryBus extends Bus {
 
 class ThreadBus extends Bus {
   constructor({ readyTimeout }) {
-    super('child')
+    super('thread')
     this.pid = process.pid
     this.error = false
     this.readyTimeoutTimer = setTimeout(() => {
