@@ -23,6 +23,10 @@ class Bus extends EventEmitter {
 
     return !this.stopped
   }
+  
+  isBusMessage(args) {
+    return args && Array.isArray(args) && args.includes('bus')
+  }
 
   emitWarning(text = '', type) {
     isString(text, 'text')
@@ -50,11 +54,15 @@ class PrimaryBus extends Bus {
     this.on('ready-ping', args => this.ready = true)
 
     if (this.canListen())
-      this.cp.on('message', args => 
+      this.cp.on('message', args => {
+        if (!this.isBusMessage(args))
+          return
+
         super.emit(args.at(0), { 
           ...args.at(1), 
           pid: args.at(-1) 
-        }))
+        })
+      })
   }
   
   canEmit() {
@@ -75,7 +83,9 @@ class PrimaryBus extends Bus {
     if (!this.canEmit())
       return false
 
-    this.cp.send(Object.values({ ...args, pid: process.pid }))
+    this.cp.send(Object.values({ 
+      ...args, from: 'bus', pid: process.pid 
+    }))
   }
   
   readyHandshake() {
@@ -130,6 +140,9 @@ class ThreadBus extends Bus {
     }, isInteger(readyTimeout, 'readyTimeout'))
     
     process.on('message', args => {
+      if (!this.isBusMessage(args))
+        return
+
       if (!this.canListen())
         return
 
@@ -166,7 +179,9 @@ class ThreadBus extends Bus {
     if (!this.canEmit()) 
       return false
     
-    return process.send(Object.values({ ...args,  pid: process.pid }))
+    return process.send(Object.values({ 
+      ...args, from: 'bus', pid: process.pid 
+    }))
   }
 }
 
