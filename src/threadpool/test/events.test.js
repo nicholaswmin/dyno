@@ -23,7 +23,6 @@ test('#on()', { timeout: 500 }, async t => {
 })
 
 
-
 // @FIXME `once()` implementation is wrong, 
 // it sends an event once but from *every* thread, 
 // thus making it non-once.
@@ -49,7 +48,6 @@ test('#once()', { timeout: 1000, todo: true }, async t => {
     t.assert.strictEqual(count, 1)
   })
 })
-
 
 
 test('#off()', { timeout: 500 }, async t => {
