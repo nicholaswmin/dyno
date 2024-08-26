@@ -2,12 +2,6 @@ import test from 'node:test'
 import { Threadpool } from '../index.js'
 
 test('#constructor()', async t => {
-  await t.test('all arguments provided in valid format', async t => {
-    await t.test('instantiates ok', t => {
-      t.assert.doesNotThrow(() => new Threadpool('task.js', 4, { foo: 'bar' }))
-    })
-  })
-
   await t.test('no arguments provided', async t => {
     await t.test('instantiates ok', t => {
       t.assert.doesNotThrow(() => new Threadpool())
@@ -28,13 +22,18 @@ test('#constructor()', async t => {
     })
   })
   
+
+  await t.test('all arguments provided in valid format', async t => {
+    await t.test('instantiates ok', t => {
+      t.assert.doesNotThrow(() => new Threadpool('task.js', 4, { foo: 'bar' }))
+    })
+  })
+  
   
   await t.test('path is provided', async t => {
     await t.test('empty', async t => {
       await t.test('throws RangeError', t => {
-        t.assert.throws(() => new Threadpool(null, 'abc'), { 
-          name: 'RangeError' 
-        })
+        t.assert.throws(() => new Threadpool(null, 'a'), { name: 'RangeError' })
       })
     })
   })
@@ -43,33 +42,25 @@ test('#constructor()', async t => {
   await t.test('pool size provided', async t => {
     await t.test('as a string', async t => {
       await t.test('throws RangeError', t => {
-        t.assert.throws(() => new Threadpool(null, 'abc'), { 
-          name: 'RangeError'
-        })
+        t.assert.throws(() => new Threadpool(null, 'a'), { name: 'RangeError' })
       })
     })
     
     await t.test('as a positive fractional number', async t => {
       await t.test('throws RangeError', t => {
-        t.assert.throws(() => new Threadpool(null, 3.1), { 
-          name: 'RangeError'
-        })
+        t.assert.throws(() => new Threadpool(null, 3.1), { name: 'RangeError' })
       })
     })
     
     await t.test('as a negative integer', async t => {
       await t.test('throws RangeError', t => {
-        t.assert.throws(() => new Threadpool(null, -3), { 
-          name: 'RangeError'
-        })
+        t.assert.throws(() => new Threadpool(null, -3), { name: 'RangeError' })
       })
     })
     
     await t.test('as zero', async t => {
       await t.test('throws RangeError', t => {
-        t.assert.throws(() => new Threadpool(null, 0), { 
-          name: 'RangeError'
-        })
+        t.assert.throws(() => new Threadpool(null, 0), { name: 'RangeError' })
       })
     })
   })
