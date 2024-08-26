@@ -24,6 +24,10 @@ class Bus extends EventEmitter {
     return !this.stopped
   }
   
+  constructBusMessage(...args) {
+    return Object.values({ ...args, from: 'bus', pid: process.pid })
+  }
+  
   isBusMessage(args) {
     return args && Array.isArray(args) && args.includes('bus')
   }
@@ -83,9 +87,7 @@ class PrimaryBus extends Bus {
     if (!this.canEmit())
       return false
 
-    this.cp.send(Object.values({ 
-      ...args, from: 'bus', pid: process.pid 
-    }))
+    this.cp.send(this.constructBusMessage(...args))
   }
   
   readyHandshake() {
@@ -94,14 +96,13 @@ class PrimaryBus extends Bus {
 
     return new Promise((resolve, reject) => {
       let readyTimer = setTimeout(() => {
-        const self = this
         const errmsg = 'no "ready-ping" within timeout. Sending SIGKILL.'
 
         this.emitWarning(errmsg, 'handshake')
         
         const exit = err => {
           clearTimeout(sigkillTimer)
-          self.cp.off('exit', onExitEvent)
+          this.cp.off('exit', onExitEvent)
           reject(err)
         }
 
@@ -116,7 +117,7 @@ class PrimaryBus extends Bus {
         this.cp.once('exit', onExitEvent)
         
         if (!this.cp.kill(9))
-          reject(new Error(`${errmsg} SIGKILL cleanup failed.`))
+          reject(new Error(`${errmsg} SIGKILL cleanup signal failed.`))
       }, this.readyTimeout)
 
       this.on('ready-pong', err => {
@@ -179,9 +180,7 @@ class ThreadBus extends Bus {
     if (!this.canEmit()) 
       return false
     
-    return process.send(Object.values({ 
-      ...args, from: 'bus', pid: process.pid 
-    }))
+    return process.send(this.constructBusMessage(...args))
   }
 }
 
