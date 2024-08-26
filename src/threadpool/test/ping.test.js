@@ -18,7 +18,7 @@ test('#ping()', { timeout: 2000 }, async t => {
     t.beforeEach(() => pool.start())
 
     await t.test('sends back 1 pong', async t => {
-      await new Promise(resolve => pool.once('pong', resolve).ping())
+      await new Promise(resolve => pool.on('pong', resolve).ping())
     })
   })
   

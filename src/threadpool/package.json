@@ -7,7 +7,7 @@
   "scripts": {
     "test": "node --test test/index.test.js",
     "test:coverage": "node --test --experimental-test-coverage test/index.test.js",
-    "example": "node .github/example/primary.js"
+    "example": "node .github/example/ping-pong/primary.js"
   },
   "engines": {
     "node": ">=22.6"

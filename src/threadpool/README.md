@@ -21,14 +21,14 @@ import { Threadpool } from '@nicholaswmin/threadpool'
 
 const pool = new Threadpool('thread.js', 4)
 
-for (const thread of await pool.start())
-  thread.on('pong', () => {
-    console.log('🏓 pong')
+await pool.start()
 
-    thread.emit('ping')
-  })
+pool.on('pong', () => {
+  console.log('🏓 pong')
+  pool.emit('ping')
+})
 
-pool.threads.at(0).emit('ping')
+pool.emit('ping')
 ```
 
 and:
@@ -90,9 +90,25 @@ Sends a [`SIGTERM`][signals] signal to each thread.
 
 Returns array of [exit codes][ecodes].  
 
+#### `pool.on(eventName, listenerFn)`
+
+Listens for an emitted event, across all threads.
+
+#### `pool.once(eventName, listenerFn)`
+
+// @TODO
+
+#### `pool.off(eventName, listenerFn)`
+
+Removes listener of given event, across all threads.
+
+#### `pool.emit(eventName, data)`
+
+Emits event to a single thread, chosen in [round-robin][rr].
+
 #### `pool.ping()`
 
-Emits a `'ping'` event to a thread, in [round-robin][rr]. 
+Emits a `'ping'` event to a thread, chosen in [round-robin][rr]. 
 
 ### Events
 
@@ -110,27 +126,15 @@ Thread's [Process ID][pid]
 
 `true` if process is running, `false` otherwise
 
-#### `thread.alive`
+#### `thread.dead`
 
-`true` if process is dead, `false` otherwise
+`true` if process has tereminated, `false` otherwise
 
 #### `thread.exitCode`
 
 - `null` if thread is running
 - `0` if exited with zero 
 - `1` if thread threw exception or killed with anything other than `SIGTERM`.
-
-#### `thread.on(eventName, listenerFn)`
-
-Listen for events emitted from the thread.
-
-#### `thread.off(eventName, listenerFn)`
-
-Remove the listener of a given event.
-
-#### `thread.emit(eventName, data)`
-
-Emit an event to the thread.
 
 ## Primary API
 

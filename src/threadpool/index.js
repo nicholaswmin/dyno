@@ -11,7 +11,7 @@ class Threadpool extends EventEmitter {
   static readyTimeout = 300
   static killTimeout = 300
 
-  #pingCounter = 0
+  #nextEmitIndex = 0
 
   #starting = false
   #stopping = false  
@@ -95,10 +95,60 @@ class Threadpool extends EventEmitter {
     return exits
   }
   
+  emit(eventName, data) {
+    const next = this.#getNextThread()
+    
+    next.emit(eventName, data)
+
+    super.emit(eventName, data)
+    
+    return this
+  }
+  
+  on(eventName, listener) {
+    this.threads.forEach(thread => thread.bus.on(eventName, listener))
+    
+    super.on(eventName, listener)
+    
+    return this
+  }
+  
+  once(eventName, listener) {
+    // @FIXME requires duduplication between threads, 
+    // otherwise event is not emitted once.
+    // this.threads.forEach(thread => thread.bus.once(eventName, listener))
+    emitWarning('pool.once() does not implement listening across threads yet.')
+
+    super.on(eventName, listener)
+
+    return this
+  }
+  
+  off(eventName, listener) {
+    this.threads.forEach(thread => thread.bus.off(eventName, listener))
+    
+    super.off(eventName, listener)
+    
+    return this
+  }
+  
+  removeAllListeners(eventName) {
+    this.threads.forEach(thread => 
+      thread.bus.removeAllListeners(eventName))
+    
+    super.removeAllListeners(eventName)
+    
+    return this
+  }
+  
   ping(data = {}) {
-    const next = this.threads[++this.#pingCounter % this.threads.length]
+    const next = this.#getNextThread()
 
     next.emit('ping', data)
+  }
+  
+  #getNextThread() {
+    return this.threads[++this.#nextEmitIndex % this.threads.length]
   }
   
   async #forkThread (path, args) {
@@ -109,7 +159,6 @@ class Threadpool extends EventEmitter {
     })
 
     thread.once('thread-error', this.#onThreadError.bind(this))
-    thread.on('pong', (...args) => this.emit('pong', ...args))
 
     thread.stdout.on('data', data => console.log(data.toString()))    
     thread.stderr.on('data', data => {
