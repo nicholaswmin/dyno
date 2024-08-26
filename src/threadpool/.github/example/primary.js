@@ -1,4 +1,4 @@
-// Ping/pong between primary and the threads  
+// send `ping`/`pong` messages between primary and the threads  
 // Run: `node primary.js`
 
 import { join } from 'node:path'
