@@ -74,15 +74,9 @@ Creates a pool.
 | `env`        	| thread environment key-value pairs  | current [env.][env]	 |
 
 
-#### `pool.threads`
-
-Array of `threads`. 
-
 #### `await pool.start()`
 
 Starts the pool.
-
-Returns array of `threads`.
 
 #### `await pool.stop()`
 
@@ -96,7 +90,7 @@ Listens for an emitted event, across all threads.
 
 #### `pool.once(eventName, listenerFn)`
 
-// @TODO
+`@TODO`
 
 #### `pool.off(eventName, listenerFn)`
 
