@@ -12,7 +12,7 @@ npm i https://github.com/nicholaswmin/threadpool
 
 ## Example
 
-> messaging between the [primary][parent-proc] and 4 threads:
+> messaging between the [primary][parent-proc] and `4` threads:
 
 ```js
 // primary.js
