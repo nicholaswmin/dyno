@@ -2,7 +2,7 @@
 import { primary } from '../../index.js'
 
 process.once('SIGTERM', () => {
-  // suppose some cleanups are done here
+  // suppose cleanups done ...
 
   setTimeout(() => process.exit(0))
 })

@@ -1,18 +1,21 @@
 import test from 'node:test'
-import { task } from './utils/utils.js'
+import { join } from 'node:path'
 import { Threadpool } from '../index.js'
+
+const load = filename => join(import.meta.dirname, `./threadfiles/${filename}`)
 
 
 test('#emit()', { timeout: 1000 }, async t => {
-  const pool = new Threadpool(task('pong.js'), 4)
+  const pool = new Threadpool(load('pong.js'), 4)
+  
   const pingpong = (times = 1, pongs = []) => new Promise(resolve => {
     pool.on('pong', arg => pongs.push(arg) === times ? resolve(pongs) : null)
 
     for (let i = 0; i < times; i++) pool.emit('ping', { foo: 'bar' })
   })
-  
+    
   t.after(() => pool.stop())
-  
+
   await t.test('ping/pongs across 4 threads', async t => {    
     const pongs = []
     

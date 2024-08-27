@@ -1,13 +1,14 @@
 import test from 'node:test'
-import { task } from './utils/utils.js'
+import { join } from 'node:path'
 import { Threadpool } from '../index.js'
 
+const load = filename => join(import.meta.dirname, `./threadfiles/${filename}`)
 
 test('#broadcast()', { timeout: 1000 }, async t => {
-  const pool = new Threadpool(task('pong.js'), 4)
+  const pool = new Threadpool(load('pong.js'), 4)
 
   const pingpong = (times = 1, pongs = []) => new Promise(resolve => {
-    pool.on('pong', arg => pongs.push(arg) === Math.floor(times * pool.size) 
+    pool.on('pong', data => pongs.push(data) === Math.floor(times * pool.size) 
       ? resolve(pongs) 
       : null
     )

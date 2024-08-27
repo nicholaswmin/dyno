@@ -1,16 +1,18 @@
 import test from 'node:test'
-import { EventEmitter } from 'node:events'
-
-import { task } from './utils/utils.js'
+import { join } from 'node:path'
 import { Threadpool } from '../index.js'
 
+const alive = cp => !cp.killed
+const dead  = cp =>  cp.killed
+const load  = filename => join(import.meta.dirname, `./threadfiles/${filename}`)
 
 test('#on()', async t => {
-  const pool = new Threadpool(task('pinger.js'))
-  t.before(() => pool.start())
-  t.after(() => pool.stop())
+  const pool = new Threadpool(load('pinger.js'))
 
-  await t.test('listens for event, across threads', (t, done) => {
+  t.before(() => pool.start())
+  t.after(()  => pool.stop())
+
+  await t.test('listens for thread event', (t, done) => {
     const pids = new Map()
 
     pool.on('ping', ({ pid }) => pids.size < pool.size 
@@ -20,14 +22,13 @@ test('#on()', async t => {
   })
 })
 
-
 test('#once()', async t => {
-  const pool = new Threadpool(task('pinger.js'))
+  const pool = new Threadpool(load('pinger.js'))
 
   t.before(() => pool.start())
   t.after(() => pool.stop())
 
-  await t.test('listens for event once, across threads', (t, done) => {
+  await t.test('listens for thread event, once', (t, done) => {
     let timer  = null, 
       calls    = 0,
       listener = () => {
@@ -40,14 +41,13 @@ test('#once()', async t => {
   })
 })
 
-
 test('#off()', async t => {
-  const pool = new Threadpool(task('pinger.js'))
+  const pool = new Threadpool(load('pinger.js'))
 
   t.before(() => pool.start())
   t.after(() => pool.stop())
   
-  await t.test('stops listening for event, across threads', (t, done) => {
+  await t.test('removes specific listeners', (t, done) => {
     let timer = null, listener = () => {
       clearTimeout(timer)
       timer = setTimeout(done, 50)
@@ -58,14 +58,13 @@ test('#off()', async t => {
   })
 })
 
-
 test('#removeAllListeners()', async t => {
-  const pool = new Threadpool(task('pinger.js'))
+  const pool = new Threadpool(load('pinger.js'))
 
   t.before(() => pool.start())
   t.after(() => pool.stop())
   
-  await t.test('stops listening, all listeners, across threads', (t, done) => {
+  await t.test('removes all event listeners', (t, done) => {
     let timer = null, 
       listener1 = () => listener2(), 
       listener2 = () => {

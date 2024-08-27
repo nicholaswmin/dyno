@@ -1,4 +1,4 @@
-// throws synchronous exception on-load
+// throws synchronous exception on-load on 1st thread spawn
 
 import { primary } from '../../index.js'
 

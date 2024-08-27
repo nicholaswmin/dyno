@@ -1,6 +1,8 @@
 import test from 'node:test'
 import { exec } from 'node:child_process'
+import { join } from 'node:path'
 
+const load = filename => join(import.meta.dirname, `./threadfiles/${filename}`)
 
 test('README example', async t => {
   let ctrl = new AbortController(), 

@@ -10,7 +10,7 @@ function fibonacci(n) {
     : fibonacci(n - 1) + fibonacci(n - 2)
 }
 
-fibonacci(1000)
+fibonacci(500)
 
 console.error('THIS SHOULD NEVER LOG')
 

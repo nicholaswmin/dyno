@@ -1,21 +1,24 @@
 import test from 'node:test'
 import cp from 'node:child_process'
-
-import { task, alive, dead } from './utils/utils.js'
+import { join } from 'node:path'
 import { Threadpool } from '../index.js'
+
+const alive = cp => !cp.killed
+const dead  = cp =>  cp.killed
+const load  = filename => join(import.meta.dirname, `./threadfiles/${filename}`)
 
 
 test('#stop()', async t => {
-  let pool = null 
-  cp.fork   = t.mock.fn(cp.fork)
-  cp.instances   = () => cp.fork.mock.calls.map(c => c.result)
-  t.afterEach(() => pool.stop())
+  let pool     = null 
+  cp.fork      = t.mock.fn(cp.fork)
+  cp.instances = () => cp.fork.mock.calls.map(call => call.result)
 
+  t.afterEach(() => pool.stop())
   
   await t.test('threads exit normally', async t => {    
     t.before(() => {
       cp.fork.mock.resetCalls()
-      pool = new Threadpool(task('ok.js'))
+      pool = new Threadpool(load('ok.js'))
 
       return pool.start()
     })
@@ -32,13 +35,12 @@ test('#stop()', async t => {
       t.assert.strictEqual(cp.instances().filter(alive).length, 0)
     })
   })
-  
   
   
   await t.test('threads cleanup in SIGTERM handler & exit: 0', async t => {    
     t.before(() => {
       cp.fork.mock.resetCalls()
-      pool = new Threadpool(task('exit-ok.js'))
+      pool = new Threadpool(load('exit-ok.js'))
 
       return pool.start()
     })
@@ -56,11 +58,11 @@ test('#stop()', async t => {
     })
   })
 
-  
+
   await t.test('threads cleanup in SIGTERM handler & exit: 1', async t => {    
     t.before(() => {
       cp.fork.mock.resetCalls()
-      pool = new Threadpool(task('exit-err.js'))
+      pool = new Threadpool(load('exit-err.js'))
       
       return pool.start()
     })
@@ -82,7 +84,7 @@ test('#stop()', async t => {
   await t.test('threads cleanup in SIGTERM handler but never exit', async t => {    
     t.before(() => {
       cp.fork.mock.resetCalls()
-      pool = new Threadpool(task('exit-never.js'))
+      pool = new Threadpool(load('exit-never.js'))
       
       return pool.start()
     })

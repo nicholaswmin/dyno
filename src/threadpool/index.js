@@ -171,15 +171,21 @@ class Threadpool extends EventEmitter {
 
     return thread
   }
-  
-  // @REVIEW emit error instead stop remapping
-  async #onThreadError(err) {
-    if (!this.#started) 
-      return 
-    
-    await this.stop()
 
-    this.emit('thread-error', err)
+  #onThreadError(err) {
+    return this.#started 
+      ? this.stop()
+        .then(() => {
+          this.emit('pool-error', err)
+        })
+        .catch(nexterr => {
+          this.emit('pool-error', new Error(nexterr, { 
+            cause: err 
+          }))
+          
+          return Promise.resolve()
+        })
+      : false
   }
 }
 

@@ -1,6 +1,7 @@
 import test from 'node:test'
 import { Threadpool } from '../index.js'
 
+
 test('#constructor()', async t => {
   await t.test('no arguments provided', async t => {
     await t.test('instantiates ok', t => {

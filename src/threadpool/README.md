@@ -125,12 +125,15 @@ Sends the event to *every* thread, in [fan-out][fanout]
 
 ### Emitted Events
 
-#### `'thread-error'` 
+#### `'pool-error'` 
 
-Emitted when an uncaught exception is thrown in a thread.   
+Emitted if an uncaught error is thrown in a thread.    
+The error is provided as an `Error` in a `listener` argument.
 
-The exception is provided in an `Error` in the `listener` 
-callback argument.
+A shutdown is attempted before emitting this event.   
+
+If the shutdown fails, the `Error` instance will contain the shutdown error 
+and the `error.cause` will contain the originating thread error.
 
 
 ## Thread API
