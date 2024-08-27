@@ -2,7 +2,7 @@
 
 # :thread: threadpool
 
-> tiny thread pool with [ergonomic IPC](#api)
+> tiny thread pool with [ergonomic IPC](#pooloneventname-listenerfn)
 
 ## Install
 
