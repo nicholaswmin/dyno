@@ -4,7 +4,6 @@ import { parseArgs, styleText } from 'node:util'
 
 let display = ({ type, size, data, pongs }) => {
   console.clear()
-  console.log('\n', '🏓  Benchmark', '\n')
   console.table([{ 
     'type': `${type}`,
     'threads': size, 
