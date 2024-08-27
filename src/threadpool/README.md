@@ -69,7 +69,7 @@ Creates a pool.
 
 | name         | type     | description              | default               |
 |--------------|----------|--------------------------|-----------------------|
-| `modulePath` | `String` | file path of thread code | current path          |
+| `path`       | `String` | file path of thread code | current path          |
 | `size`       | `Number` | number of threads        | available cores       |
 | `env`        | `Object` | Thread env. variables    | primary `process.env` |
 
