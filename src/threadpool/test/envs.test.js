@@ -1,45 +1,28 @@
 import test from 'node:test'
-import cp from 'node:child_process'
-import { task, connected, alive, dead } from './utils/utils.js'
+import { task } from './utils/utils.js'
 
 import { Threadpool } from '../index.js'
 
-test('thread env. vars', { timeout: 2000 }, async t => {
-  let pool = null, 
-      env = null
+test('thread env. vars', async t => {
+  const pool = new Threadpool(task('env.js'), 2, { FOO: 'BAR', BAZ: 'QUUX' })
+  const envs = await pool.start()
+    .then(() => new Promise(resolve => pool.on('pong', resolve).emit('ping')))
+    .finally(pool.stop.bind(pool))
 
-  cp.fork      = t.mock.fn(cp.fork)
-  cp.instances = () => cp.fork.mock.calls.map(c => c.result)
+  
 
-  t.after(()  => pool.stop())
-  t.before(async () => {
-    cp.fork.mock.resetCalls()
-
-    pool = new Threadpool(task('ok.js'), 2, { FOO: 'BAR' })
-
-    await pool.start()
+  await t.test('passes env. vars', async t => {
+    t.assert.ok(Object.hasOwn(envs, 'FOO'), 'missing env. variable "FOO"')
+    t.assert.strictEqual(envs.FOO, 'BAR')
     
-    queueMicrotask(() => cp.instances().at(0).send('env')) 
-
-    const message = await new Promise(resolve => {
-      const onEnv = message => {
-        if (message[0] !== 'env') return
-        cp.instances().at(0).off('message', onEnv)
-        resolve(message)
-      }
-      
-      cp.instances().at(0).on('message', onEnv)
-    })
-    
-    env = message[1]
+    t.assert.ok(Object.hasOwn(envs, 'BAZ'), 'missing env. variable "BAZ"')
+    t.assert.strictEqual(envs.BAZ, 'QUUX')
   })
 
-  await t.test('passes env', async t => {
-    t.assert.ok(Object.hasOwn(env, 'FOO'), 'missing thread env. var "FOO"')
-    t.assert.deepStrictEqual(env.FOO, 'BAR')
-  })
-
+  
+  
   await t.test('passes a spawn index', t => {
-    t.assert.strictEqual(typeof +env.INDEX, 'number')
+    t.assert.ok(Object.hasOwn(envs, 'index'), 'missing env. variable "index"')
+    t.assert.strictEqual(typeof +envs.index, 'number')
   })
 })

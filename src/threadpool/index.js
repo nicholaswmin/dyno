@@ -1,5 +1,5 @@
 import cp from 'node:child_process'
-import { availableParallelism } from 'node:os'
+import { availableParallelism as numCPUs } from 'node:os'
 import { EventEmitter } from 'node:events'
 import { emitWarning, argv } from 'node:process'
 
@@ -20,7 +20,7 @@ class Threadpool extends EventEmitter {
     return this.threads.some(t => t.alive) && !this.#stopping
   }
 
-  constructor(path = argv.at(-1), size = 4,  env = {}) {
+  constructor(path = argv.at(-1), size = numCPUs() - 1,  env = {}) {
     super()
 
     Object.defineProperties(this, {

@@ -3,7 +3,7 @@ import { exec } from 'node:child_process'
 
 const command = `node --no-warnings --run example`
 
-test(`README example`, async t => {
+test('README example', async t => {
   let ac = new AbortController(), 
     { stdout, stderr } = exec(command, { signal: ac.signal })
   

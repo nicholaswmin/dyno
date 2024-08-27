@@ -67,11 +67,11 @@ node primary.js
 Creates a pool.  
 
 
-| name         	| description                         | default         	   |
-|--------------	|------------------------------------ |--------------------  |
-| `path`      	| thread file path                    | current file path    |
-| `size`       	| number of threads                   | available cores      |
-| `env`        	| thread environment key-value pairs  | current [env.][env]	 |
+| name         	| description                      | default         	        |
+|--------------	|--------------------------------- |--------------------      |
+| `path`      	| thread file path                 | current file path        |
+| `size`       	| number of threads                | `available cores` - `1`  |
+| `env`        	| thread environment variables     | current [env.][env]	    |
 
 
 #### `await pool.start()`
@@ -175,13 +175,13 @@ process.once('SIGTERM', () => {
 ## Test 
 
 ```bash 
-NODE_ENV=test node --run test
+node --run test
 ```
 
 ### Coverage 
 
 ```bash
-NODE_ENV=test node --run test:coverage
+node --run test:coverage
 ```
 
 ### Example
