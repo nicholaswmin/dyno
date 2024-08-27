@@ -89,6 +89,9 @@ Returns array of [exit codes][ecodes].
 
 ### Messaging
 
+The messaging system facilitates [IPC (Inter-process Communication)][ipc] 
+under an `EventEmitter`-like API:
+
 #### `pool.on(name, listener)`
 
 Listens for an emitted event, across all threads.
