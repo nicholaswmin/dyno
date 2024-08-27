@@ -123,7 +123,7 @@ Thread's [Process ID][pid]
 #### `thread.exitCode`
 
 - `null`: is alive
-- `0`: exited with zero 
+- `0`: exited with `exit-code: 0` 
 - `1`: threw uncaught exception or killed with any signal other than `SIGTERM`.
 
 ## Primary API
