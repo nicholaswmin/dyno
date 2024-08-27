@@ -89,8 +89,7 @@ Returns array of [exit codes][ecodes].
 
 ### Messaging
 
-The messaging system facilitates [IPC (Inter-process Communication)][ipc] 
-under an `EventEmitter`-like API:
+> facilitates `primary-to-thread` [IPC][ipc]:
 
 #### `pool.on(name, listener)`
 
@@ -144,8 +143,7 @@ Thread's [Process ID][pid]
 
 ## Primary API
 
-> Exported `primary` is an [EventEmitter][ee] for *thread -> primary* messaging.    
-
+> The `primary` is an [EventEmitter][ee] for `thread-to-primary` messaging.      
 > Meant to be used in the thread file.
 
 #### `primary.on(name, listener)`
