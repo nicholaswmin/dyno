@@ -242,10 +242,10 @@ logs:
 ┌────────────┬─────────┬─────────────────┬──────────────┬──────────────┐
 │ type       │ threads │ payload (bytes) │ pings/second │ pongs/second │
 ├────────────┼─────────┼─────────────────┼──────────────┼──────────────┤
-│'broadcast' │ 8       │ 300             │ 44091        │ 44091        │
+│'broadcast' │ 8       │ 300             │ 6638         │ 54091        │
 ┴────────────┴─────────┴─────────────────┴──────────────┴──────────────┘
 
-Elapsed: 9 seconds
+Elapsed: 2 seconds
 ```
  
 > `--type=broadcast`: sends each `ping` to *every* thread  
