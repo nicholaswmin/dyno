@@ -16,7 +16,7 @@ Run a benchmark on `4 threads` and `1000 bytes` of data per event,
 using fan-out:
 
 ```bash
-node --size=4 --data=1000 --type=emit primary.js
+node primary.js
 ```
 
 ## Authors
