@@ -219,32 +219,31 @@ NODE_ENV=test node --run test
 NODE_ENV=test node --run test:coverage
 ```
 
-### Benchmark
+## Benchmark
 
 > Run a [`ping`/`pong` benchmark][benchmark]
 
 ```bash 
-node --run benchmark --size=6 --kb=5 --type=broadcast
+node --run benchmark -- --size=4 --data=2 --type=broadcast
 ```
 
-- across: `6` threads
-- sending: `5kb` of `data` in each ping 
-- using: [`broadcast()`](#pool.broadcast) 
+where:
+
+- `--size=4`: number of threads.
+- `--data=2`: kilobytes of `data` payload per `ping` event.
+- `--type=broadcast`: event dispatch type, can be either:
+  [`broadcast`](#pool.broadcast) or [`emit`](#pool.emit).
+
+logs:
 
 ```text
 Ping/Pong Benchmark
 ┬───────────────┬─────────┬──────────────┬────────────────┬─────────────────┐
 │ type          │ threads │ payload (KB) │ pings per sec. │ pongs per sec.  │
 ┼───────────────┼─────────┼──────────────┼────────────────┼─────────────────┤
-│  broadcast()  │ 20      │ 1            │ 654            │ 13089           │
+│  broadcast()  │ 4       │ 2            │ 9571           │ 38282           │
 ┴───────────────┴─────────┴──────────────┴────────────────┴─────────────────┘
 ```
-
-> `--type` can be either:  
->
-> [`--type=broadcast`](#poolbroadcastname-data)   
-> [`--type=emit`](#poolname-dataemit)
-
 
 ## Authors
 
