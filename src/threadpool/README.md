@@ -115,12 +115,12 @@ Removes all listeners of a given event, across all threads.
 
 #### `pool.emit(name, data)`
 
-Emits an event to a *single* thread, chosen in [round-robin][rr].
+Sends the event to a *single* thread, chosen in [round-robin][rr].
 
 
-#### `pool.emit(name, data)`
+#### `pool.broadcast(name, data)`
 
-Emits an event to *every* thread, in [fan-out][fanout]
+Sends the event to *every* thread, in [fan-out][fanout]
 
 
 ### Emitted Events
