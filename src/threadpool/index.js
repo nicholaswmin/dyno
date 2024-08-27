@@ -9,12 +9,11 @@ import { isObject, isInteger, isString } from './src/validate/index.js'
 
 class Threadpool extends EventEmitter {
   static readyTimeout = 250
-  static killTimeout = 250
+  static killTimeout  = 250
 
-  #nextEmitIndex = 0
-
-  #starting = false
-  #stopping = false  
+  #starting  = false
+  #stopping  = false  
+  #nextIndex = 0
 
   get #started() {
     return this.threads.some(t => t.alive) && !this.#stopping
@@ -95,9 +94,9 @@ class Threadpool extends EventEmitter {
   }
   
   emit(name, data) {
-    const next = this.#getNextThread()
+    const thread = this.#nextThread()
     
-    next.emit(name, data)
+    thread.emit(name, data)
 
     super.emit(name, data)
     
@@ -143,12 +142,11 @@ class Threadpool extends EventEmitter {
     return this
   }
   
-  #getNextThread() {
-    this.#nextEmitIndex = this.#nextEmitIndex < Number.MAX_SAFE_INTEGER 
-      ? this.#nextEmitIndex
-      : 0
+  #nextThread() {
+    this.#nextIndex = this.#nextIndex < Number.MAX_SAFE_INTEGER 
+      ? this.#nextIndex : 0
 
-    return this.threads[++this.#nextEmitIndex % this.threads.length]
+    return this.threads[++this.#nextIndex % this.threads.length]
   }
   
   async #forkThread (path, args) {
