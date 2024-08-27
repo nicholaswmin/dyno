@@ -142,7 +142,7 @@ Emit an event to the primary.
 
 ## Graceful exits
 
-Threads can listen for `SIGTERM` and perform [graceful exits][grace] cleanups,
+Threads can listen for `SIGTERM` and perform [graceful exit][grace] cleanups,
 like so:
 
 ```js
