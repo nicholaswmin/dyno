@@ -213,7 +213,7 @@ const pool = new Threadpool('thread.js')
 > Run a [`ping`/`pong` benchmark][benchmark]
 
 ```bash 
-node --run benchmark -- --size=8 --bytes=300 --type=broadcast
+node --run benchmark -- --size=8 --data=300 --type=broadcast
 ```
 
 where:
