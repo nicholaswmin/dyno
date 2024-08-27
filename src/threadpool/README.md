@@ -45,18 +45,19 @@ primary.on('ping', () => {
 })
 ```
 
-then run:
+then:
 
 ```bash
 node primary.js
 ```
 
+logs:
+
 ```bash
 # ping 🏓
 # 🏓 pong
 # ping 🏓
 # 🏓 pong
-# 
 # ...
 ```
 
@@ -87,9 +88,7 @@ Sends a [`SIGTERM`][signals] signal to each thread.
 Returns array of [exit codes][ecodes].  
 
 
-
 ### Messaging
-
 
 #### `pool.on(eventName, listenerFn)`
 
@@ -113,13 +112,11 @@ Removes all listener of a given event, across all threads.
 Emits an event to a single thread, chosen in [round-robin][rr].
 
 
-
 ### Emitted Events
 
 #### `'thread-error'` 
 
 Emitted when an uncaught exception is thrown in a thread.
-
 
 
 ## Thread API
@@ -178,7 +175,8 @@ The timeouts are in `ms` and can be set like so:
 
 ```js
 // primary.js
-import { Threadpool } from '../index.js'
+
+import { Threadpool } from '@nicholaswmin/threadpool'
 
 Threadpool.readyTimeout = 1000
 Threadpool.killTimeout  = 1000
@@ -190,8 +188,6 @@ const pool = new Threadpool('thread.js')
 
 ## Gotchas 
 
-- Threads which [block the event loop][ee-block] or delay their termination 
-  are issued a [`SIGKILL`][signals] signal, after a set timeout.
 - Runtime exceptions trigger a shutdown of all running threads.
 - Based on [`fork()`][fork] so technically it's [*multi-processing*][child-p],
   with each "thread" being an isolated [V8][v8] instance. 
@@ -199,18 +195,18 @@ const pool = new Threadpool('thread.js')
 ## Test 
 
 ```bash 
-node --run test
+NODE_ENV=test node --run test
 ```
 
 ### Coverage 
 
 ```bash
-node --run test:coverage
+NODE_ENV=test node --run test:coverage
 ```
 
-### Example
+### Running Example
 
-> Run `ping`/`pong` example
+> Run the `ping`/`pong` example
 
 ```bash 
 node --run example
