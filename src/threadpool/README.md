@@ -275,6 +275,6 @@ Ping/Pong Benchmark
 [child-p]: https://en.wikipedia.org/wiki/Child_process
 [v8]: https://v8.dev/
 
-[benchmark]: ./.github/benchmark
+[benchmark]: ./.github/bench
 [nicholaswmin]: https://github.com/nicholaswmin
 [license]: ./LICENSE
