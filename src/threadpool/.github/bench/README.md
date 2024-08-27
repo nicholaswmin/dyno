@@ -3,17 +3,12 @@
 
 Messaging between `primary` & `threads`.
 
-The benchmark schedules a `pong` using [`setImmediate`][setimmediate],  
-in response to a `ping` which uses the same scheduling.
-
-This allows the fastest possible, *non-blocking* `ping`/`pong` cycle.
+Both `ping` and `pong` are scheduled using [`setImmediate`][setimmediate],  
+which allows the fastest possible, *non-blocking* `ping`/`pong` cycle.
 
 IPC via [`process.send`][procsend]
 
 ## Run
-
-Run a benchmark on `4 threads` and `1000 bytes` of data per event,   
-using fan-out:
 
 ```bash
 node primary.js
