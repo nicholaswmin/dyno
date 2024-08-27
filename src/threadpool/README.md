@@ -235,6 +235,7 @@ logs:
 Elapsed: 2 seconds
 ```
 
+> machine: 2022 Macbook Air M2, 24 GB, MacOS Sonoma
 
 ## Test 
 
