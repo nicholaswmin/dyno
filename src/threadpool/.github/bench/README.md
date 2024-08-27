@@ -10,6 +10,15 @@ This allows the fastest possible, *non-blocking* `ping`/`pong` cycle.
 
 IPC via [`process.send`][procsend]
 
+## Run
+
+Run a benchmark on `4 threads` and `1000 bytes` of data per event,   
+using fan-out:
+
+```bash
+node --size=4 --data=1000 --type=emit primary.js
+```
+
 ## Authors
 
 [@nicholaswmin][nicholaswmin]
