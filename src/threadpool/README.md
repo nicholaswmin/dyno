@@ -74,6 +74,8 @@ Creates a pool.
 | `env`        	| thread environment variables     | current [env.][env]	    |
 
 
+### Start/Stop
+
 #### `await pool.start()`
 
 Starts the pool.
@@ -83,6 +85,7 @@ Starts the pool.
 Sends a [`SIGTERM`][signals] signal to each thread.
 
 Returns array of [exit codes][ecodes].  
+
 
 ### Messaging
 
@@ -107,11 +110,13 @@ Removes all listener of a given event, across all threads.
 
 Emits an event to a single thread, chosen in [round-robin][rr].
 
+
 ### Emitted Events
 
 #### `'thread-error'` 
 
 Emitted when an uncaught exception is thrown in a thread.
+
 
 ## Thread API
 
