@@ -84,6 +84,8 @@ Sends a [`SIGTERM`][signals] signal to each thread.
 
 Returns array of [exit codes][ecodes].  
 
+### Messaging
+
 #### `pool.on(eventName, listenerFn)`
 
 Listens for an emitted event, across all threads.
@@ -97,11 +99,15 @@ As soon as the listener fires it is removed.
 
 Removes a listener of a given event, across all threads.
 
+#### `pool.removeAllListeners(eventName)`
+
+Removes all listener of a given event, across all threads.
+
 #### `pool.emit(eventName, data)`
 
 Emits an event to a single thread, chosen in [round-robin][rr].
 
-### Events
+### Emitted Events
 
 #### `'thread-error'` 
 
