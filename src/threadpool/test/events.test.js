@@ -102,3 +102,27 @@ test('#emit()', async t => {
     })
   })
 })
+
+
+test('#emit() ping/pong 1000 times', async t => {
+  const pool = new Threadpool(task('pong.js'), 4), 
+        pongs = []
+  
+  t.before(() => pool.start())
+  t.after(() => pool.stop())
+  
+  await t.test('completes in < 1 second', { timeout: 1 * 1000 }, (t, done) => {    
+    pool.on('pong', data => {
+      pongs.length >= 1000 
+        ? done() 
+        : pongs.push(setImmediate(() => pool.emit('ping')))
+    })
+    
+    pool.emit('ping')
+  })
+  
+  await t.test('completes 1000 ping/pongs', t => {
+    t.assert.ok(pongs.length > 0, 'no pongs received')
+    t.assert.strictEqual(pongs.length, 1000)
+  })
+})
