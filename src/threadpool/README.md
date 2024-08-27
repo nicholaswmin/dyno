@@ -238,6 +238,7 @@ Elapsed: 2 seconds
 ```
  
 > `--type=broadcast`: sends each `ping` to *every* thread  
+>
 > `--type=emit`: sends each `ping` to a *single* thread
 
 
