@@ -248,8 +248,8 @@ logs:
 Elapsed: 9 seconds
 ```
  
-> `broadcast` send a pong to every thread  
-> `emit` sends a pong to a single thread
+> `broadcast` sends a pong to *every* thread  
+> `emit` sends a pong to a *single* thread
 
 ## Authors
 
