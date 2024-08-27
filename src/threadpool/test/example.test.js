@@ -1,20 +1,22 @@
 import test from 'node:test'
 import { exec } from 'node:child_process'
 
-const command = `node --no-warnings --run example`
 
 test('README example', async t => {
-  let ac = new AbortController(), 
-    { stdout, stderr } = exec(command, { signal: ac.signal })
-  
-  t.after(ac.abort.bind(ac))
+  let ctrl = new AbortController(), 
+    { stdout, stderr } = exec('node --no-warnings --run example', { 
+      signal: ctrl.signal 
+    })
+
   t.before(async () => {
     stdout = await new Promise((resolve, reject) => {
-      stdout.on('data', resolve), stderr.on('data', reject)
-    })
+      stdout.on('data', resolve), 
+      stderr.on('data', reject)
+    }).finally(ctrl.abort.bind(ctrl))
   })
 
-  await t.test(`Running "${command}"`, async t => {
+  
+  await t.test('Running "node --run example"', async t => {
     await t.test('logs in stdout', t => {
       t.assert.ok(stdout, 'nothing logged in stdout`')
     })
