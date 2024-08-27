@@ -5,7 +5,6 @@ import { task } from './utils/utils.js'
 import { Threadpool } from '../index.js'
 
 
-
 test('#on()', async t => {
   const pool = new Threadpool(task('pinger.js'), 2)
   t.before(() => pool.start())

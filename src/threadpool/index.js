@@ -8,8 +8,8 @@ import { PrimaryBus, ThreadBus } from './src/bus/index.js'
 import { isObject, isInteger, isString } from './src/validate/index.js'
 
 class Threadpool extends EventEmitter {
-  static readyTimeout = 500
-  static killTimeout = 500
+  static readyTimeout = 200
+  static killTimeout = 200
 
   #nextEmitIndex = 0
 

@@ -4,8 +4,6 @@ import { task, connected, alive, dead } from './utils/utils.js'
 
 import { Threadpool } from '../index.js'
 
-Threadpool.readyTimeout = 150
-Threadpool.killTimeout = 150
 
 test('#start()', async t => {
   let pool       = null
