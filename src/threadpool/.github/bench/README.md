@@ -1,12 +1,12 @@
-# `ping`/`pong` benchmark
+# benchmark
 
 
-A benchmark, demonstrating messaging between threads and the primary.
+Messaging between `primary` & `threads`.
 
-The benchmark schedules a `pong` using `setImmediate` in response to a `ping`,
-which uses the same [`setImmediate`][setimmediate] scheduling.
+The benchmark schedules a `pong` using [`setImmediate`][setimmediate]
+in response to a `ping`, which uses the same `setImmediate` scheduling.
 
-This demonstrates the fastest, *non-blocking* `ping`/`pong` cycle.
+This allows the fastest possible, *non-blocking* `ping`/`pong` cycle.
 
 IPC via [`process.send`][procsend]
 
