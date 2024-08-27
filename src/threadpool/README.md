@@ -12,7 +12,7 @@ npm i https://github.com/nicholaswmin/threadpool
 
 ## Example
 
-> messaging between the primary and 4 threads:
+> messaging between the [primary][parent-proc] and 4 threads:
 
 ```js
 // primary.js
@@ -245,6 +245,7 @@ node --run example
 [dep-url]: https://blog.author.io/npm-needs-a-personal-trainer-537e0f8859c6
 
 [ipc]: https://en.wikipedia.org/wiki/Inter-process_communication
+[parent-proc]: https://en.wikipedia.org/wiki/Parent_process
 [fork]: https://nodejs.org/api/child_process.html#child_processforkmodulepath-args-options
 [env]: https://nodejs.org/api/process.html#processenv
 [ee]: https://nodejs.org/docs/latest/api/events.html#emitteremiteventname-args
