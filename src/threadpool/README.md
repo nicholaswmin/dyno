@@ -89,29 +89,29 @@ Returns array of [exit codes][ecodes].
 
 ### Messaging
 
-#### `pool.on(eventName, listenerFn)`
+#### `pool.on(name, listener)`
 
 Listens for an emitted event, across all threads.
 
-| name         | type       | description       |
-|--------------|------------|-------------------|
-| `eventName`  | `String`   | name of event     |
-| `listenerFn` | `Function` | callback function |
+| name       | type       | description       |
+|------------|------------|-------------------|
+| `name`     | `String`   | name of event     |
+| `listener` | `Function` | callback function |
 
-#### `pool.once(eventName, listenerFn)`
+#### `pool.once(name, listener)`
 
 Listens for an emitted event once, across all threads.  
 As soon as the listener fires it is removed.
 
-#### `pool.off(eventName, listenerFn)`
+#### `pool.off(name, listener)`
 
 Removes a listener of a given event, across all threads.
 
-#### `pool.removeAllListeners(eventName)`
+#### `pool.removeAllListeners(name)`
 
 Removes all listeners of a given event, across all threads.
 
-#### `pool.emit(eventName, data)`
+#### `pool.emit(name, data)`
 
 Emits an event to a single thread, chosen in [round-robin][rr].
 
@@ -122,7 +122,7 @@ Emits an event to a single thread, chosen in [round-robin][rr].
 
 Emitted when an uncaught exception is thrown in a thread.   
 
-The exception is provided in an `Error` in the `listenerFn` 
+The exception is provided in an `Error` in the `listener` 
 callback argument.
 
 
@@ -145,11 +145,11 @@ Thread's [Process ID][pid]
 
 > Meant to be used in the thread file.
 
-#### `primary.on(eventName, listenerFn)`
+#### `primary.on(name, listener)`
 
 Listen for events emitted from the primary.
 
-#### `primary.emit(eventName, data)`
+#### `primary.emit(name, data)`
 
 Emit an event to the primary.
 
