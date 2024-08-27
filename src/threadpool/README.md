@@ -67,12 +67,11 @@ logs:
 
 Creates a pool.  
 
-
-| name         	| description                      | default         	        |
-|--------------	|--------------------------------- |--------------------      |
-| `path`      	| thread file path                 | current file path        |
-| `size`       	| number of threads                | `available cores` - `1`  |
-| `env`        	| thread environment variables     | current [env.][env]	    |
+| name         | type     | description              | default               |
+|--------------|----------|--------------------------|-----------------------|
+| `modulePath` | `String` | file path of thread code | current path          |
+| `size`       | `Number` | number of threads        | available cores       |
+| `env`        | `Object` | Thread env. variables    | primary `process.env` |
 
 
 ### Start/Stop
@@ -93,6 +92,11 @@ Returns array of [exit codes][ecodes].
 #### `pool.on(eventName, listenerFn)`
 
 Listens for an emitted event, across all threads.
+
+| name         | type       | description       |
+|--------------|------------|-------------------|
+| `eventName`  | `String`   | name of event     |
+| `listenerFn` | `Function` | callback function |
 
 #### `pool.once(eventName, listenerFn)`
 
@@ -116,7 +120,10 @@ Emits an event to a single thread, chosen in [round-robin][rr].
 
 #### `'thread-error'` 
 
-Emitted when an uncaught exception is thrown in a thread.
+Emitted when an uncaught exception is thrown in a thread.   
+
+The exception is provided in an `Error` in the `listenerFn` 
+callback argument.
 
 
 ## Thread API
