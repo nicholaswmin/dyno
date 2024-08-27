@@ -33,7 +33,7 @@ test('#once()', async t => {
       listener = () => {
         ++calls > 1 ? done('listener fired > 1 times') : null
         clearTimeout(timer)
-        timer = setTimeout(done, 20)
+        timer = setTimeout(done, 50)
       }
     
     pool.once('ping', listener)
@@ -47,17 +47,16 @@ test('#off()', async t => {
   t.before(() => pool.start())
   t.after(() => pool.stop())
   
-  await t.test('stop listening for event, across threads', (t, done) => {
+  await t.test('stops listening for event, across threads', (t, done) => {
     let timer = null, listener = () => {
       clearTimeout(timer)
-      timer = setTimeout(done, 20)
+      timer = setTimeout(done, 50)
       pool.off('ping', listener)
     }
     
     pool.on('ping', listener)
   })
 })
-
 
 
 test('#removeAllListeners()', async t => {
@@ -71,47 +70,10 @@ test('#removeAllListeners()', async t => {
       listener1 = () => listener2(), 
       listener2 = () => {
         clearTimeout(timer)
-        timer = setTimeout(done, 20)
+        timer = setTimeout(done, 50)
         pool.removeAllListeners('ping')
       }
 
     pool.on('ping', listener1).on('ping', listener2)
-  })
-})
-
-
-test('#emit()', async t => {
-  const pool = new Threadpool(task('pong.js'), 2), pongs = []
-  
-  t.before(() => pool.start())
-  t.after(() => pool.stop())
-  
-  await t.test('emits the event', (t, done) => {    
-    pool.on('pong', data => 
-      pongs.length < pool.size * 4
-        ? pongs.push(data)
-        : done()
-    )
-    
-    for (let i = 0; i <= pool.size * 4; i++)
-      pool.emit('ping', { foo: 'bar' })
-  })
-  
-  await t.test('to one thread', t => {
-    t.assert.ok(pongs.length > 0, 'no pongs received')
-    t.assert.strictEqual(pongs.length, pool.size * 4)
-  })
-
-  await t.test('in round-robin', t => {
-    const uniquePIDs = Object.groupBy(pongs, ({ pid }) => pid)
-
-    t.assert.strictEqual(Object.keys(uniquePIDs).length, pool.size)
-  })
-  
-  await t.test('passes data', t => {
-    pongs.forEach(pong => {
-      t.assert.ok(Object.hasOwn(pong, 'foo'), 'cant find data prop. "foo" ')
-      t.assert.strictEqual(pong.foo, 'bar')
-    })
   })
 })

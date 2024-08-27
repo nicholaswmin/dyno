@@ -2,7 +2,7 @@
   "name": "threadpool",
   "version": "0.1.0",
   "type": "module",
-  "description": "a tiny threadpool with an ergonomic IPC",
+  "description": "tiny threadpool with ergonomic IPC",
   "main": "index.js",
   "scripts": {
     "test": "node --test \"test/*.test.js\"",
@@ -17,9 +17,10 @@
     "url": "git+https://github.com/nicholaswmin/threadpool.git"
   },
   "keywords": [
-    "thread-pool",
-    "nodejs",
-    "javascript"
+    "threadpool",
+    "child-process",
+    "javascript",
+    "nodejs"
   ],
   "author": "@nicholaswmin",
   "license": "MIT",

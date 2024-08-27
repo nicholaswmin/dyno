@@ -94,49 +94,51 @@ class Threadpool extends EventEmitter {
     return exits
   }
   
-  emit(eventName, data) {
+  emit(name, data) {
     const next = this.#getNextThread()
     
-    next.emit(eventName, data)
+    next.emit(name, data)
 
-    super.emit(eventName, data)
+    super.emit(name, data)
     
     return this
   }
   
-  on(eventName, listener) {
-    this.threads.forEach(thread => thread.bus.on(eventName, listener))
-    
-    super.on(eventName, listener)
+  broadcast(name, data) {
+    this.threads.forEach(thread => thread.emit(name, data))
+  }
+  
+  on(name, listener) {
+    this.threads.forEach(thread => thread.bus.on(name, listener))
     
     return this
   }
   
-  once(eventName, listener) {
+  once(name, listener) {
     const once = (...args) => {
-      this.threads.forEach(thread => thread.bus.off(eventName, once))
+      this.threads.forEach(thread => thread.bus.off(name, once))
 
       return listener(...args)
     }
 
-    this.threads.forEach(thread => thread.bus.once(eventName, once))
+    this.threads.forEach(thread => thread.bus.once(name, once))
 
-    super.on(eventName, listener)
+    super.on(name, listener)
 
     return this
   }
   
-  off(eventName, listener) {
-    this.threads.forEach(thread => thread.bus.off(eventName, listener))
+  off(name, listener) {
+    this.threads.forEach(thread => thread.bus.off(name, listener))
     
     return this
   }
   
-  removeAllListeners(eventName) {
+  removeAllListeners(name) {
     this.threads.forEach(thread => 
-      thread.bus.removeAllListeners(eventName))
+      thread.bus.removeAllListeners(name))
     
-    super.removeAllListeners(eventName)
+    super.removeAllListeners(name)
     
     return this
   }
@@ -172,7 +174,7 @@ class Threadpool extends EventEmitter {
     return thread
   }
   
-  // @FIXME emit error instead stop remapping
+  // @REVIEW emit error instead stop remapping
   async #onThreadError(err) {
     if (!this.#started) 
       return 
