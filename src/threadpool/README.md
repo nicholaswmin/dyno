@@ -248,8 +248,8 @@ logs:
 Elapsed: 9 seconds
 ```
  
-> `--type=broadcast`: sends each pong to *every* thread  
-> `--type=emit`: sends each pong to a *single* thread
+> `--type=broadcast`: sends each `ping` to *every* thread  
+> `--type=emit`: sends each `ping` to a *single* thread
 
 ## Authors
 
