@@ -2,7 +2,7 @@
 
 # :thread: threadpool
 
-> tiny thread pool with [ergonomic IPC](#pooloneventname-listenerfn)
+> thread pool with [ergonomic IPC](#messaging)
 
 ## Install
 
@@ -87,7 +87,9 @@ Sends a [`SIGTERM`][signals] signal to each thread.
 Returns array of [exit codes][ecodes].  
 
 
+
 ### Messaging
+
 
 #### `pool.on(eventName, listenerFn)`
 
@@ -111,11 +113,13 @@ Removes all listener of a given event, across all threads.
 Emits an event to a single thread, chosen in [round-robin][rr].
 
 
+
 ### Emitted Events
 
 #### `'thread-error'` 
 
 Emitted when an uncaught exception is thrown in a thread.
+
 
 
 ## Thread API
@@ -124,19 +128,12 @@ Emitted when an uncaught exception is thrown in a thread.
 
 Thread's [Process ID][pid]
 
-#### `thread.alive`
-
-`true` if thread running, `false` otherwise
-
-#### `thread.dead`
-
-`true` if thread terminated, `false` otherwise
-
 #### `thread.exitCode`
 
 - `null`: is alive
 - `0`: exited with `exit-code: 0` 
 - `1`: threw uncaught exception or killed with any signal other than `SIGTERM`.
+
 
 ## Primary API
 
@@ -172,11 +169,30 @@ process.once('SIGTERM', () => {
 })
 ```
 
+### Timeouts
+
+Threads which [block the event loop][ee-block] or delay their termination are 
+issued a [`SIGKILL`][signals] signal, after a set timeout.
+
+The timeouts are in `ms` and can be set like so:
+
+```js
+// primary.js
+import { Threadpool } from '../index.js'
+
+Threadpool.readyTimeout = 1000
+Threadpool.killTimeout  = 1000
+
+const pool = new Threadpool('thread.js')
+
+// some code ...
+```
+
 ## Gotchas 
 
 - Threads which [block the event loop][ee-block] or delay their termination 
   are issued a [`SIGKILL`][signals] signal, after a set timeout.
-- Runtime exceptions trigger a `stop()`; a shutdown of all running threads.
+- Runtime exceptions trigger a shutdown of all running threads.
 - Based on [`fork()`][fork] so technically it's [*multi-processing*][child-p],
   with each "thread" being an isolated [V8][v8] instance. 
 

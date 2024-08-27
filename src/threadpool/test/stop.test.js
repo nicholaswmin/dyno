@@ -4,6 +4,9 @@ import cp from 'node:child_process'
 import { task, alive, dead } from './utils/utils.js'
 import { Threadpool } from '../index.js'
 
+Threadpool.readyTimeout = 150
+Threadpool.killTimeout = 150
+
 test('#stop()', async t => {
   let pool = null 
   cp.fork   = t.mock.fn(cp.fork)
@@ -14,7 +17,7 @@ test('#stop()', async t => {
   await t.test('threads exit normally', async t => {    
     t.before(() => {
       cp.fork.mock.resetCalls()
-      pool = new Threadpool(task('ok.js'))
+      pool = new Threadpool(task('ok.js'), 2)
 
       return pool.start()
     })
@@ -37,7 +40,7 @@ test('#stop()', async t => {
   await t.test('threads cleanup in SIGTERM handler & exit: 0', async t => {    
     t.before(() => {
       cp.fork.mock.resetCalls()
-      pool = new Threadpool(task('exit-ok.js'))
+      pool = new Threadpool(task('exit-ok.js'), 2)
 
       return pool.start()
     })
@@ -59,7 +62,7 @@ test('#stop()', async t => {
   await t.test('threads cleanup in SIGTERM handler & exit: 1', async t => {    
     t.before(() => {
       cp.fork.mock.resetCalls()
-      pool = new Threadpool(task('exit-err.js'))
+      pool = new Threadpool(task('exit-err.js'), 2)
       
       return pool.start()
     })
@@ -81,7 +84,7 @@ test('#stop()', async t => {
   await t.test('threads cleanup in SIGTERM handler but never exit', async t => {    
     t.before(() => {
       cp.fork.mock.resetCalls()
-      pool = new Threadpool(task('exit-never.js'))
+      pool = new Threadpool(task('exit-never.js'), 2)
       
       return pool.start()
     })

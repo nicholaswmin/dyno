@@ -7,7 +7,7 @@ import { Threadpool } from '../index.js'
 
 
 test('#on()', async t => {
-  const pool = new Threadpool(task('pinger.js'), 3)
+  const pool = new Threadpool(task('pinger.js'), 2)
   t.before(() => pool.start())
   t.after(() => pool.stop())
 
@@ -23,7 +23,7 @@ test('#on()', async t => {
 
 
 test('#once()', async t => {
-  const pool = new Threadpool(task('pinger.js'), 3)
+  const pool = new Threadpool(task('pinger.js'), 2)
 
   t.before(() => pool.start())
   t.after(() => pool.stop())
@@ -43,7 +43,7 @@ test('#once()', async t => {
 
 
 test('#off()', async t => {
-  const pool = new Threadpool(task('pinger.js'), 3)
+  const pool = new Threadpool(task('pinger.js'), 2)
 
   t.before(() => pool.start())
   t.after(() => pool.stop())
@@ -62,7 +62,7 @@ test('#off()', async t => {
 
 
 test('#removeAllListeners()', async t => {
-  const pool = new Threadpool(task('pinger.js'), 3)
+  const pool = new Threadpool(task('pinger.js'), 2)
 
   t.before(() => pool.start())
   t.after(() => pool.stop())
@@ -82,7 +82,7 @@ test('#removeAllListeners()', async t => {
 
 
 test('#emit()', async t => {
-  const pool = new Threadpool(task('pong.js'), 3), pongs = []
+  const pool = new Threadpool(task('pong.js'), 2), pongs = []
   
   t.before(() => pool.start())
   t.after(() => pool.stop())
