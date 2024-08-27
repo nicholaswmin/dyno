@@ -104,7 +104,7 @@ Emits an event to a single thread, chosen in [round-robin][rr].
 
 #### `'thread-error'` 
 
-Emitted when a runtime error is encountered in a thread.
+Emitted when an uncaught exception is thrown in a thread.
 
 ## Thread API
 
@@ -114,11 +114,11 @@ Thread's [Process ID][pid]
 
 #### `thread.alive`
 
-`true` if thread is running, `false` otherwise
+`true` if thread running, `false` otherwise
 
 #### `thread.dead`
 
-`true` if thread has tereminated, `false` otherwise
+`true` if thread terminated, `false` otherwise
 
 #### `thread.exitCode`
 
