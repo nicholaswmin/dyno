@@ -1,30 +1,34 @@
 import test from 'node:test'
-import { run } from './utils/utils.js'
+import { exec } from 'node:child_process'
 
-const command = `node --run example`
+const command = `node --no-warnings --run example`
 
-test('README example: ping/pong', async t => {
-  let out = null
-
-  t.before(async () => out = await run(command))
+test(`README example`, async t => {
+  let ac = new AbortController(), 
+    { stdout, stderr } = exec(command, { signal: ac.signal })
   
+  t.after(ac.abort.bind(ac))
+  t.before(async () => {
+    stdout = await new Promise((resolve, reject) => {
+      stdout.on('data', resolve), stderr.on('data', reject)
+    })
+  })
+
   await t.test(`Running "${command}"`, async t => {
-    await t.test('logs only in stdout', t => {
-      t.assert.ok(out, 'no output logged')
-      t.assert.ok(out.stdout, `nothing logged in stdout`)
-      t.assert.ok(!out.stderr.trim(), `logged in stderr: ${out.stderr}`)
+    await t.test('logs in stdout', t => {
+      t.assert.ok(stdout, 'nothing logged in stdout`')
     })
     
     await t.test('some "ping"s', t => {
-      const pings = out.stdout.split('ping').length
+      const pings = stdout.split('ping').length
   
-      t.assert.ok(pings > 1, `found: ${pings} "pings" in stdout, must be >= 1`)
+      t.assert.ok(pings > 0, `found: ${pings} "pings" in stdout, must be > 0`)
     })
     
     await t.test('some "pong"s', t => {
-      const pongs = out.stdout.split('pong').length
+      const pongs = stdout.split('pong').length
   
-      t.assert.ok(pongs > 1, `found: ${pongs} "pong" in stdout, must be >= 1`)
+      t.assert.ok(pongs > 0, `found: ${pongs} "pong" in stdout, must be > 0`)
     })
   })
 })

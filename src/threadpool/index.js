@@ -8,8 +8,8 @@ import { PrimaryBus, ThreadBus } from './src/bus/index.js'
 import { isObject, isInteger, isString } from './src/validate/index.js'
 
 class Threadpool extends EventEmitter {
-  static readyTimeout = 300
-  static killTimeout = 300
+  static readyTimeout = 150
+  static killTimeout = 150
 
   #nextEmitIndex = 0
 
@@ -20,7 +20,7 @@ class Threadpool extends EventEmitter {
     return this.threads.some(t => t.alive) && !this.#stopping
   }
 
-  constructor(path = argv.at(-1), size = availableParallelism(),  env = {}) {
+  constructor(path = argv.at(-1), size = 4,  env = {}) {
     super()
 
     Object.defineProperties(this, {
@@ -85,10 +85,9 @@ class Threadpool extends EventEmitter {
     this.#stopping = true
 
     const alive = this.threads.filter(thread => thread.alive), 
-          exits = []
+          deaths = alive.map(thread => thread.kill())
     
-    for (const thread of alive)
-      exits.push(await thread.kill())
+    const exits = await Promise.all(deaths)
 
     this.#stopping = false
 

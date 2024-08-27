@@ -4,7 +4,5 @@ import { primary } from '../../index.js'
 process.once('SIGTERM', () => {
   // suppose some cleanups are done here
 
-  setTimeout(() => {
-    process.exit(0)
-  }, 5)
+  setTimeout(() => process.exit(0))
 })

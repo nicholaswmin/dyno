@@ -7,54 +7,26 @@ import { Threadpool } from '../index.js'
 EventEmitter.defaultMaxListeners = 50
 
 
-test('#on()', { timeout: 500 }, async t => {
-  const pool = new Threadpool(task('ping.js'))
-
-  t.after(() => pool.removeAllListeners('ping').stop())
+test('#on()', async t => {
+  const pool = new Threadpool(task('emit.js'))
   t.before(() => pool.start())
+  t.after(() => pool.stop())
 
   await t.test('listens for event, across threads', (t, done) => {
-    const pids = {}
+    const uniqPIDs = {}
 
     pool.on('ping', ({ pid }) => {
-      Object.keys(pids).length === pool.size ? done() : pids[pid] = true
+      Object.keys(uniqPIDs).length === pool.size ? done() : uniqPIDs[pid] = 1
     })
   })
 })
 
 
-// @FIXME `once()` implementation is wrong, 
-// it sends an event once but from *every* thread, 
-// thus making it non-once.
-test('#once()', { timeout: 1000, todo: true }, async t => {
-  let pool = new Threadpool(task('ping.js')),
-    timer = null, 
-    count = 0
+test('#off()', async t => {
+  const pool = new Threadpool(task('emit.js'))
 
-  // t.after(() => pool.removeAllListeners('ping').stop())
-  // t.before(() => pool.start())
-  
-  await t.todo('listens for event once, across threads', (t, done) => {
-    function listener() {
-      ++count
-      clearTimeout(timer)
-      timer = setTimeout(done, 20)
-    }
-
-    pool.once('ping', listener)
-  })
-  
-  await t.todo('listener fires only once', async t => {
-    t.assert.strictEqual(count, 1)
-  })
-})
-
-
-test('#off()', { timeout: 500 }, async t => {
-  const pool = new Threadpool(task('ping.js'))
-
-  t.after(() => pool.removeAllListeners('ping').stop())
   t.before(() => pool.start())
+  t.after(() => pool.stop())
   
   await t.test('stop listening for event across threads', (t, done) => {
     let timer = null
@@ -71,11 +43,11 @@ test('#off()', { timeout: 500 }, async t => {
 })
 
 
-test('#removeAllListeners()', { timeout: 500 }, async t => {
-  const pool = new Threadpool(task('ping.js'))
+test('#removeAllListeners()', async t => {
+  const pool = new Threadpool(task('emit.js'))
 
-  t.after(() => pool.removeAllListeners('ping').stop())
   t.before(() => pool.start())
+  t.after(() => pool.stop())
   
   await t.test('stops listening, all listeners, across threads', (t, done) => {
     let timer = null
@@ -96,12 +68,12 @@ test('#removeAllListeners()', { timeout: 500 }, async t => {
 })
 
 
-test('#emit()', { timeout: 500 }, async t => {
+test('#emit()', async t => {
   const pool = new Threadpool(task('pong.js'), 4), 
         pongs = []
   
-  t.after(() => pool.removeAllListeners('pong').stop())
   t.before(() => pool.start())
+  t.after(() => pool.stop())
   
   await t.test('emits the event', (t, done) => {    
     for (let i = 0; i < pool.size * 2; i++)

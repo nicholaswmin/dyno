@@ -13,4 +13,4 @@ pool.on('pong', () => {
 
 pool.emit('ping')
 
-setTimeout(() => pool.stop(), 1 * 1000)
+setTimeout(() => pool.stop(), 2 * 1000)
