@@ -140,9 +140,9 @@ Listen for events emitted from the primary.
 
 Emit an event to the primary.
 
-## Graceful termination
+## Graceful exits
 
-Threads can listen for `SIGTERM` and perform [graceful exit][grace] cleanups,
+Threads can listen for `SIGTERM` and perform [graceful exits][grace] cleanups,
 like so:
 
 ```js
@@ -150,15 +150,11 @@ like so:
 
 import { primary } from '@nicholaswmin/threadpool'
 
-primary.on('ping', () => {
-  console.log('ping 🏓')
-
-  setTimeout(() => primary.emit('pong'), 100)
-})
+// some code ...
 
 process.once('SIGTERM', () => {
-  // shut down DB connection ...
-  // shut down server ...
+  // close something ...
+  // close something else ...
   
   process.exit(0)
 })
@@ -167,7 +163,7 @@ process.once('SIGTERM', () => {
 ## Gotchas 
 
 - Threads which [block the event loop][ee-block] or delay their termination 
-  are issued a [`SIGKILL`][signals], after a set timeout.
+  are issued a [`SIGKILL`][signals] signal, after a set timeout.
 - Runtime exceptions trigger a `stop()`; a shutdown of all running threads.
 - Based on [`fork()`][fork] so technically it's [*multi-processing*][child-p],
   with each "thread" being an isolated [V8][v8] instance. 
