@@ -207,17 +207,6 @@ const pool = new Threadpool('thread.js')
   not multithreading.   
   Each "thread" is an isolated [V8][v8] instance. 
 
-## Test 
-
-```bash 
-NODE_ENV=test node --run test
-```
-
-### Coverage 
-
-```bash
-NODE_ENV=test node --run test:coverage
-```
 
 ## Benchmark
 
@@ -250,6 +239,20 @@ Elapsed: 2 seconds
  
 > `--type=broadcast`: sends each `ping` to *every* thread  
 > `--type=emit`: sends each `ping` to a *single* thread
+
+
+## Test 
+
+```bash 
+NODE_ENV=test node --run test
+```
+
+### Coverage 
+
+```bash
+NODE_ENV=test node --run test:coverage
+```
+
 
 ## Authors
 
