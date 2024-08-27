@@ -89,7 +89,7 @@ Returns array of [exit codes][ecodes].
 
 ### Messaging
 
-> facilitates `primary-to-thread` [IPC][ipc]:
+> `primary-to-thread` [IPC][ipc]:
 
 #### `pool.on(name, listener)`
 
@@ -147,8 +147,8 @@ Thread's [Process ID][pid]
 
 
 ## Primary API
-  
-> Meant to be used in the thread file for `thread-to-primary` messaging.    
+
+> Meant to be used in the thread file, `thread-to-primary` [IPC][ipc]
 
 #### `primary.on(name, listener)`
 
