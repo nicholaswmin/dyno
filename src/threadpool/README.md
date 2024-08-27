@@ -235,7 +235,7 @@ logs:
 Elapsed: 2 seconds
 ```
 
-> using: 10-core 2022 Macbook Air M2, 24 GB, MacOS Sonoma
+> using: 2022 Macbook Air M2, 10-core, 24 GB, MacOS Sonoma
 
 ## Test 
 
