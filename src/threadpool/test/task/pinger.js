@@ -1,4 +1,4 @@
 // continously emits 'ping'
 import { primary } from '../../index.js'
 
-setInterval(() => primary.emit('ping'), 50)
+setInterval(() => primary.emit('ping'), 10) // < 20ms

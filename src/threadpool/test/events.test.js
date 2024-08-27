@@ -5,8 +5,9 @@ import { task } from './utils/utils.js'
 import { Threadpool } from '../index.js'
 
 
+
 test('#on()', async t => {
-  const pool = new Threadpool(task('pinger.js'))
+  const pool = new Threadpool(task('pinger.js'), 3)
   t.before(() => pool.start())
   t.after(() => pool.stop())
 
@@ -21,13 +22,33 @@ test('#on()', async t => {
 })
 
 
+test('#once()', async t => {
+  const pool = new Threadpool(task('pinger.js'), 3)
+
+  t.before(() => pool.start())
+  t.after(() => pool.stop())
+
+  await t.test('listens for event once, across threads', (t, done) => {
+    let timer  = null, 
+      calls    = 0,
+      listener = () => {
+        ++calls > 1 ? done('listener fired > 1 times') : null
+        clearTimeout(timer)
+        timer = setTimeout(done, 20)
+      }
+    
+    pool.once('ping', listener)
+  })
+})
+
+
 test('#off()', async t => {
-  const pool = new Threadpool(task('pinger.js'))
+  const pool = new Threadpool(task('pinger.js'), 3)
 
   t.before(() => pool.start())
   t.after(() => pool.stop())
   
-  await t.test('stop listening for event across threads', (t, done) => {
+  await t.test('stop listening for event, across threads', (t, done) => {
     let timer = null, listener = () => {
       clearTimeout(timer)
       timer = setTimeout(done, 20)
@@ -39,8 +60,9 @@ test('#off()', async t => {
 })
 
 
+
 test('#removeAllListeners()', async t => {
-  const pool = new Threadpool(task('pinger.js'))
+  const pool = new Threadpool(task('pinger.js'), 3)
 
   t.before(() => pool.start())
   t.after(() => pool.stop())
@@ -60,34 +82,34 @@ test('#removeAllListeners()', async t => {
 
 
 test('#emit()', async t => {
-  const pool = new Threadpool(task('pong.js'), 4), pongs = []
+  const pool = new Threadpool(task('pong.js'), 3), pongs = []
   
   t.before(() => pool.start())
   t.after(() => pool.stop())
   
   await t.test('emits the event', (t, done) => {    
     pool.on('pong', data => 
-      pongs.length < pool.size * 2 
+      pongs.length < pool.size * 4
         ? pongs.push(data)
         : done()
     )
     
-    for (let i = 0; i <= pool.size * 2; i++)
+    for (let i = 0; i <= pool.size * 4; i++)
       pool.emit('ping', { foo: 'bar' })
   })
   
   await t.test('to one thread', t => {
     t.assert.ok(pongs.length > 0, 'no pongs received')
-    t.assert.strictEqual(pongs.length, pool.size * 2)
+    t.assert.strictEqual(pongs.length, pool.size * 4)
   })
 
   await t.test('in round-robin', t => {
-    const pids = Object.keys(Object.groupBy(pongs, ({ pid }) => pid))
-    
-    t.assert.strictEqual(pids.length, pool.size)
+    const uniquePIDs = Object.groupBy(pongs, ({ pid }) => pid)
+
+    t.assert.strictEqual(Object.keys(uniquePIDs).length, pool.size)
   })
   
-  await t.test('passing data', t => {
+  await t.test('passes data', t => {
     pongs.forEach(pong => {
       t.assert.ok(Object.hasOwn(pong, 'foo'), 'cant find data prop. "foo" ')
       t.assert.strictEqual(pong.foo, 'bar')

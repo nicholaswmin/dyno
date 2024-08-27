@@ -1,4 +1,4 @@
-import { primary } from '../../../index.js'
+import { primary } from '../../index.js'
 
 primary.on('ping', () => {
   console.log('ping 🏓')

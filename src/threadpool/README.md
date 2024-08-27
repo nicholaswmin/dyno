@@ -23,12 +23,12 @@ const pool = new Threadpool('thread.js', 4)
 
 await pool.start()
 
-pool.on('pong', () => {
-  console.log('🏓 pong')
-  pool.emit('ping')
-})
-
-pool.emit('ping')
+pool
+  .on('pong', () => {
+    console.log('🏓 pong')
+    pool.emit('ping')
+  })
+  .emit('ping')
 ```
 
 and:
@@ -90,7 +90,8 @@ Listens for an emitted event, across all threads.
 
 #### `pool.once(eventName, listenerFn)`
 
-`@TODO`
+Listens for an emitted event once, across all threads.  
+As soon as the listener fires it is removed.
 
 #### `pool.off(eventName, listenerFn)`
 

@@ -113,10 +113,13 @@ class Threadpool extends EventEmitter {
   }
   
   once(eventName, listener) {
-    // @FIXME requires duduplication between threads, 
-    // otherwise event is not emitted once.
-    // this.threads.forEach(thread => thread.bus.once(eventName, listener))
-    emitWarning('pool.once() does not implement listening across threads yet.')
+    const once = (...args) => {
+      this.threads.forEach(thread => thread.bus.off(eventName, once))
+
+      return listener(...args)
+    }
+
+    this.threads.forEach(thread => thread.bus.once(eventName, once))
 
     super.on(eventName, listener)
 
@@ -125,8 +128,6 @@ class Threadpool extends EventEmitter {
   
   off(eventName, listener) {
     this.threads.forEach(thread => thread.bus.off(eventName, listener))
-    
-    super.off(eventName, listener)
     
     return this
   }
@@ -138,12 +139,6 @@ class Threadpool extends EventEmitter {
     super.removeAllListeners(eventName)
     
     return this
-  }
-  
-  ping(data = {}) {
-    const next = this.#getNextThread()
-
-    next.emit('ping', data)
   }
   
   #getNextThread() {
