@@ -219,13 +219,32 @@ NODE_ENV=test node --run test
 NODE_ENV=test node --run test:coverage
 ```
 
-### Running Example
+### Benchmark
 
-> Run the `ping`/`pong` example
+> Run a [`ping`/`pong` benchmark][benchmark]
 
 ```bash 
-node --run example
+node --run benchmark --size=6 --kb=5 --type=broadcast
 ```
+
+- across: `6` threads
+- sending: `5kb` of `data` in each ping 
+- using: [`broadcast()`](#pool.broadcast) 
+
+```text
+Ping/Pong Benchmark
+┬───────────────┬─────────┬──────────────┬────────────────┬─────────────────┐
+│ type          │ threads │ payload (KB) │ pings per sec. │ pongs per sec.  │
+┼───────────────┼─────────┼──────────────┼────────────────┼─────────────────┤
+│  broadcast()  │ 20      │ 1            │ 654            │ 13089           │
+┴───────────────┴─────────┴──────────────┴────────────────┴─────────────────┘
+```
+
+> can be either:  
+>
+> [`--type="broadcast"`](#`pool.broadcast(name, data)`)   
+> [`--type="emit"`](#`pool.emit(name, data)`)
+
 
 ## Authors
 
