@@ -6,42 +6,48 @@ import { Threadpool } from '../index.js'
 
 
 test('#emit()', async t => {
-  const pool = new Threadpool(task('pong.js'), 2), pongs = []
+  const pool = new Threadpool(task('pong.js'))
   
   t.before(() => pool.start())
   t.after(() => pool.stop())
   
-  await t.test('emits (pool size * "n") pings', (t, done) => {    
-    pool.on('pong', data => pongs.push(data) && 
-      pongs.length === pool.size * 2 ? done() : null)
-    
-    for (let i = 0; i < pool.size * 2; i++)
-      pool.emit('ping', { foo: 'bar' })
-  })
-  
-  await t.test('... getting back (pool size * "n") pongs', t => {    
-    t.assert.ok(pongs.length > 0, 'no pongs received')
-    t.assert.strictEqual(pongs.length, pool.size * 2)
-  })
+  await t.test('emitting "n" pings', async t => {    
+    let pongs = []
 
-  await t.test('... from every thread', t => {    
-    const pids = Object.keys(Object.groupBy(pongs, ({ pid }) => pid))
-
-    t.assert.strictEqual(pids.length, pool.size)
-  })
-  
-  await t.test('... distributed equally between threads', t => {    
-    const pongGroups = Object.values(Object.groupBy(pongs, ({ pid }) => pid))
-    
-    t.assert.strictEqual(pongGroups.length, pool.size)
-
-    pongGroups.forEach(group => t.assert.strictEqual(group.length, 2))
-  })
-  
-  await t.test('... and correctly passing their set data', t => {
-    pongs.forEach(pong => {
-      t.assert.ok(Object.hasOwn(pong, 'foo'), 'cant find data prop. "foo" ')
-      t.assert.strictEqual(pong.foo, 'bar')
+    t.before(async () => {
+      pongs = await new Promise(resolve => {
+        pool.on('pong', data => pongs.push(data) && 
+          pongs.length === pool.size * 2 ? resolve(pongs) : null)
+        
+        for (let i = 0; i < pool.size * 2; i++)
+          pool.emit('ping', { foo: 'bar' })
+      })
     })
-  })
+
+    await t.test('gets back "n" pongs', t => {    
+      t.assert.ok(pongs.length > 0, 'no pongs received')
+      t.assert.strictEqual(pongs.length, pool.size * 2)
+    })
+  
+    await t.test('from every thread', t => {    
+      const pids = Object.keys(Object.groupBy(pongs, ({ pid }) => pid))
+  
+      t.assert.strictEqual(pids.length, pool.size)
+    })
+    
+    await t.test('in an equal distribution', t => {    
+      const groups = Object.values(Object.groupBy(pongs, ({ pid }) => pid))
+      
+      t.assert.strictEqual(groups.length, pool.size)
+  
+      groups.forEach(group => t.assert.strictEqual(group.length, 2))
+    })
+    
+    await t.test('correctly passing their set data', t => {
+      pongs.forEach(pong => {
+        t.assert.ok(Object.hasOwn(pong, 'foo'), 'cant find data prop. "foo" ')
+        t.assert.strictEqual(pong.foo, 'bar')
+      })
+    })
+  })    
 })

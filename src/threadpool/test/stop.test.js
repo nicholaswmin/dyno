@@ -15,7 +15,7 @@ test('#stop()', async t => {
   await t.test('threads exit normally', async t => {    
     t.before(() => {
       cp.fork.mock.resetCalls()
-      pool = new Threadpool(task('ok.js'), 2)
+      pool = new Threadpool(task('ok.js'))
 
       return pool.start()
     })
@@ -38,7 +38,7 @@ test('#stop()', async t => {
   await t.test('threads cleanup in SIGTERM handler & exit: 0', async t => {    
     t.before(() => {
       cp.fork.mock.resetCalls()
-      pool = new Threadpool(task('exit-ok.js'), 2)
+      pool = new Threadpool(task('exit-ok.js'))
 
       return pool.start()
     })
@@ -60,7 +60,7 @@ test('#stop()', async t => {
   await t.test('threads cleanup in SIGTERM handler & exit: 1', async t => {    
     t.before(() => {
       cp.fork.mock.resetCalls()
-      pool = new Threadpool(task('exit-err.js'), 2)
+      pool = new Threadpool(task('exit-err.js'))
       
       return pool.start()
     })
@@ -82,7 +82,7 @@ test('#stop()', async t => {
   await t.test('threads cleanup in SIGTERM handler but never exit', async t => {    
     t.before(() => {
       cp.fork.mock.resetCalls()
-      pool = new Threadpool(task('exit-never.js'), 2)
+      pool = new Threadpool(task('exit-never.js'))
       
       return pool.start()
     })

@@ -16,7 +16,7 @@ test('#start()', async t => {
     t.before(() => {
       cp.fork.mock.resetCalls()
 
-      pool = new Threadpool(task('ok.js'), 2)
+      pool = new Threadpool(task('ok.js'))
       
       return pool.start()
     })
@@ -64,7 +64,7 @@ test('#start()', async t => {
     t.beforeEach(() => {
       cp.fork.mock.resetCalls()
 
-      pool = new Threadpool(task('spawn-err.js'), 2)
+      pool = new Threadpool(task('spawn-err.js'))
     })
     
     await t.test('start() promise rejects', async t => {
@@ -80,7 +80,7 @@ test('#start()', async t => {
   await t.test('threads with blocked event loop', async t => {
     t.before(() => {
       cp.fork.mock.resetCalls()
-      pool = new Threadpool(task('blocked-loop.js'), 2)
+      pool = new Threadpool(task('blocked-loop.js'))
     })
     
     await t.test('function call rejects', async t => {   
@@ -96,7 +96,7 @@ test('#start()', async t => {
   
   await t.test('threads throw runtime error', async t => {  
     await t.test('emits a "thread-error" event', (t, done) => {
-      t.before(() => pool = new Threadpool(task('run-err.js'), 2))
+      t.before(() => pool = new Threadpool(task('run-err.js')))
   
       pool.once('thread-error', err => {
         t.assert.ok(err instanceof Error, 'argument is not an Error instance')

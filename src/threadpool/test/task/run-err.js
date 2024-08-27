@@ -3,4 +3,4 @@ import { primary } from '../../index.js'
 
 setTimeout(() => {
   throw new Error('Simulated Runtime Error')
-}, 150)
+}, 100)
