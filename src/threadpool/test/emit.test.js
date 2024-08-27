@@ -1,51 +1,49 @@
 import test from 'node:test'
-import { EventEmitter } from 'node:events'
-
 import { task } from './utils/utils.js'
 import { Threadpool } from '../index.js'
 
 
-test('#emit()', async t => {
-  const pool = new Threadpool(task('pong.js'))
+test('#emit()', { timeout: 1000 }, async t => {
+  const pool = new Threadpool(task('pong.js'), 4)
+  const pingpong = (times = 1, pongs = []) => new Promise(resolve => {
+    pool.on('pong', arg => pongs.push(arg) === times ? resolve(pongs) : null)
+
+    for (let i = 0; i < times; i++) pool.emit('ping', { foo: 'bar' })
+  })
   
-  t.before(() => pool.start())
   t.after(() => pool.stop())
   
-  await t.test('emitting "n" pings', async t => {    
-    let pongs = []
+  await t.test('ping/pongs across 4 threads', async t => {    
+    const pongs = []
+    
+    await t.test('starts up', () => pool.start())
 
-    t.before(async () => {
-      pongs = await new Promise(resolve => {
-        pool.on('pong', data => pongs.push(data) && 
-          pongs.length === pool.size * 2 ? resolve(pongs) : null)
-        
-        for (let i = 0; i < pool.size * 2; i++)
-          pool.emit('ping', { foo: 'bar' })
-      })
-    })
+    await t.test('sends 1000 ping, gets 1000 pongs', async t => {
+      await pingpong(1000, pongs)
 
-    await t.test('gets back "n" pongs', t => {    
       t.assert.ok(pongs.length > 0, 'no pongs received')
-      t.assert.strictEqual(pongs.length, pool.size * 2)
+      t.assert.strictEqual(pongs.length, 1000)
     })
-  
+
+    await t.test('equally distributed', t => {    
+      t.plan(pool.size)
+
+      const groups = Object.values(Object.groupBy(pongs, ({ pid }) => pid))
+        
+      groups.forEach(g => t.assert.strictEqual(g.length, 1000 / pool.size))
+    })
+    
     await t.test('from every thread', t => {    
       const pids = Object.keys(Object.groupBy(pongs, ({ pid }) => pid))
   
       t.assert.strictEqual(pids.length, pool.size)
     })
     
-    await t.test('in an equal distribution', t => {    
-      const groups = Object.values(Object.groupBy(pongs, ({ pid }) => pid))
-      
-      t.assert.strictEqual(groups.length, pool.size)
-  
-      groups.forEach(group => t.assert.strictEqual(group.length, 2))
-    })
-    
-    await t.test('correctly passing their set data', t => {
+    await t.test('passes included data', t => {
+      t.plan(2000)
+
       pongs.forEach(pong => {
-        t.assert.ok(Object.hasOwn(pong, 'foo'), 'cant find data prop. "foo" ')
+        t.assert.strictEqual(typeof pong.foo, 'string')
         t.assert.strictEqual(pong.foo, 'bar')
       })
     })

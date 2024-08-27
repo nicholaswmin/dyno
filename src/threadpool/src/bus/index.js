@@ -31,20 +31,6 @@ class Bus extends EventEmitter {
   isBusMessage(args) {
     return args && Array.isArray(args) && args.includes('bus')
   }
-
-  emitWarning(text = '', type) {
-    isString(text, 'text')
-
-    if (typeof text !== 'string' || !text.length)
-      throw new RangeError('arg. "text" must be a string with length')
-
-    if (!!this.#emittedWarnings[text])
-      return
-    
-    emitWarning(`${this.name}: ${text}`, type)
-    
-    this.#emittedWarnings[text] = true
-  }
 }
 
 class PrimaryBus extends Bus {
@@ -71,13 +57,7 @@ class PrimaryBus extends Bus {
   }
   
   canListen() {
-    if (!this.cp.connected) {
-      this.emitWarning('cannot process.on(), process disconnected')
-
-      return false
-    }
-    
-    return true
+    return this.cp.connected
   }
   
   emit(...args) {
@@ -95,8 +75,6 @@ class PrimaryBus extends Bus {
       let readyTimer = setTimeout(() => {
         const errmsg = 'no "ready-ping" within timeout. Sending SIGKILL.'
 
-        this.emitWarning(errmsg, 'handshake')
-        
         const exit = err => {
           clearTimeout(sigkillTimer)
           this.cp.off('exit', onExitEvent)
@@ -133,7 +111,7 @@ class ThreadBus extends Bus {
     this.pid = process.pid
     this.error = false
     this.readyTimeoutTimer = setTimeout(() => {
-      this.emitWarning(`"ready-ping" timeout, exiting with: 1`, 'handshake')
+      emitWarning(`"ready-ping" timeout, exiting code: 1`, 'handshake')
       process.exit(1)
     }, isInteger(readyTimeout, 'readyTimeout'))
     
@@ -167,9 +145,6 @@ class ThreadBus extends Bus {
   }
 
   canListen() {
-    if (!process.connected)
-      this.emitWarning('cannot process.on(), process disconnected')
-    
     return process.connected
   }
 

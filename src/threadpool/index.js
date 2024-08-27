@@ -163,7 +163,7 @@ class Threadpool extends EventEmitter {
       const message = data.toString().trim()
 
       message.toLowerCase().includes('simulated') 
-        ? console.log('info: simulated test error thrown')
+        ? console.info('ignored simulated test error')
         : console.error(message)
     })
         
