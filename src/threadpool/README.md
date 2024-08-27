@@ -168,11 +168,10 @@ like so:
 
 import { primary } from '@nicholaswmin/threadpool'
 
-// some code ...
+// main code ...
 
 process.once('SIGTERM', () => {
-  // close something ...
-  // close something else ...
+  // cleanups
   
   process.exit(0)
 })
@@ -195,7 +194,7 @@ Threadpool.killTimeout  = 1000
 
 const pool = new Threadpool('thread.js')
 
-// some code ...
+// main code ...
 ```
 
 ## Gotchas 
