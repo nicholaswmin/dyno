@@ -115,7 +115,12 @@ Removes all listeners of a given event, across all threads.
 
 #### `pool.emit(name, data)`
 
-Emits an event to a single thread, chosen in [round-robin][rr].
+Emits an event to a *single* thread, chosen in [round-robin][rr].
+
+
+#### `pool.emit(name, data)`
+
+Emits an event to *every* thread, in [fan-out][fanout]
 
 
 ### Emitted Events
@@ -244,6 +249,7 @@ node --run example
 [pid]: https://en.wikipedia.org/wiki/Process_identifier
 [ee-block]: https://nodejs.org/en/learn/asynchronous-work/dont-block-the-event-loop
 [rr]: https://en.wikipedia.org/wiki/Round-robin_scheduling
+[fanout]: https://en.wikipedia.org/wiki/Fan-out_(software)#Message-oriented_middleware
 [grace]: https://en.wikipedia.org/wiki/Graceful_exit
 [child-p]: https://en.wikipedia.org/wiki/Child_process
 [v8]: https://v8.dev/
