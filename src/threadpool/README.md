@@ -105,7 +105,7 @@ Removes a listener of a given event, across all threads.
 
 #### `pool.removeAllListeners(eventName)`
 
-Removes all listener of a given event, across all threads.
+Removes all listeners of a given event, across all threads.
 
 #### `pool.emit(eventName, data)`
 
