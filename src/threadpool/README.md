@@ -240,10 +240,10 @@ Ping/Pong Benchmark
 ┴───────────────┴─────────┴──────────────┴────────────────┴─────────────────┘
 ```
 
-> can be either:  
+> `--type` can be either:  
 >
-> [`--type="broadcast"`](#`pool.broadcast(name, data)`)   
-> [`--type="emit"`](#`pool.emit(name, data)`)
+> [`--type=broadcast`](#poolbroadcastname-data)   
+> [`--type=emit`](#poolname-dataemit)
 
 
 ## Authors
@@ -276,5 +276,6 @@ Ping/Pong Benchmark
 [child-p]: https://en.wikipedia.org/wiki/Child_process
 [v8]: https://v8.dev/
 
+[benchmark]: ./.github/example
 [nicholaswmin]: https://github.com/nicholaswmin
 [license]: ./LICENSE

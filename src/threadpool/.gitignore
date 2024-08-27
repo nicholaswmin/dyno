@@ -7,10 +7,6 @@ yarn-error.log*
 lerna-debug.log*
 .pnpm-debug.log*
 
-# generated examples
-benchmark/
-/benchmark.js
-
 # draft prototyping 
 scratch/
 
