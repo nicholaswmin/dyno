@@ -232,7 +232,7 @@ where:
 - `--size` : `number` : thread count.
 - `--data` : `number` : bytes of `data` payload per `ping` event.
 - `--type` : `string` : dispatch type, can be either:
-  [`broadcast`](#pool.broadcast) or [`emit`](#pool.emit).
+  [`broadcast`](#poolbroadcastname-data) or [`emit`](#poolemitname-data).
 
 logs:
 
