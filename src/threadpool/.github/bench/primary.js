@@ -1,41 +1,28 @@
-import { join } from 'node:path'
-import { availableParallelism } from 'node:os'
-import { parseArgs, styleText } from 'node:util'
+import { display, type, data, size, path } from './config.js'
 import { Threadpool } from '../../index.js'
-
-const { values: { type, size, data }  } = parseArgs({ options: { 
-  type: { type: 'string', default: 'broadcast' },
-  size: { type: 'string', default: availableParallelism().toString() },
-  data: { type: 'string', default: '1' }
-}})
-
-if (!['broadcast', 'emit'].includes(type.trim()))
-  console.log(styleText('red', '--type can be: "broadcast" or "emit"'), '\n'),
-  process.exit(0)
-
-
-// Ping/Pong
-const pool = new Threadpool(join(import.meta.dirname, 'thread.js'), +size)
-await pool.start()
 
 console.log('starting up...')
 
-let pongs = 0, payload = 'a'.repeat(+data * 1000)
+// Main Ping/Pong code
+
+const pool = new Threadpool(path, size)
+await pool.start()
+
+let pongs = 0, payload = 'a'.repeat(data)
 
 pool.on('pong', () => setImmediate(() => {
   ++pongs, pool[type.trim()]('ping', { payload })
 })).emit('ping')
 
-setInterval(() => {
-  console.clear()
-  console.log('Ping/Pong Benchmark')
-  console.table([{ 
-    'type': `${type}()`,
-    'threads': pool.size, 
-    'ping payload (KB)': +data,
-    'pings per sec.': type === 'emit' ? pongs : Math.round(pongs / pool.size),
-    'pongs per sec.:': pongs 
-  }])
+// End Ping/Pong code
 
+setInterval(() => {
+  display({ type, size, data, pongs })
   pongs = 0
 }, 1 * 1000)
+
+process.once('SIGINT', () => {
+  pool.stop()
+  console.log('\n', 'Pool stopped. bye 👋', '\n')
+  setTimeout(() => process.exit(0))
+})

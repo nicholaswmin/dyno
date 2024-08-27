@@ -1,3 +1,3 @@
 import { primary } from '../../index.js'
 
-primary.on('ping', () => setImmediate(() => primary.emit('pong'), 10))
+primary.on('ping', () => setImmediate(() => primary.emit('pong')))
