@@ -142,9 +142,8 @@ Thread's [Process ID][pid]
 
 
 ## Primary API
-
-> The `primary` is an [EventEmitter][ee] for `thread-to-primary` messaging.      
-> Meant to be used in the thread file.
+  
+> Meant to be used in the thread file for `thread-to-primary` messaging.    
 
 #### `primary.on(name, listener)`
 
