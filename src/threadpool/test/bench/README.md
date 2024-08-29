@@ -2,9 +2,9 @@
 
 Messaging between `primary` & `threads`.
 
-- A `ping` is `pool.broadcast()` to all threads, in fan-out
-- The next `ping` is broadcast when all `pongs` from *all threads* are 
-  received back, therefore `1 ping = 4 pongs` assuming `4` threads.
+- A `ping` is `pool.broadcast()` to all threads, in fan-out.
+- Next `ping` is broadcast when *all* previous `pongs` from *all* threads are 
+  received, therefore `1 ping` = `4 pongs` assuming `4 threads`.
 - Each `ping` includes some data which is then re-sent back to the primary
   in each `pong`.
 
