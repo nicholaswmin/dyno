@@ -66,11 +66,11 @@ class PrimaryBus extends Bus {
         return resolve(false)
 
       const sent = this.cp.send(this.constructBusMessage(...args), err => {    
-        return err 
-          ? reject(err) 
-          : sent 
-            ? resolve(true) 
-            : reject(new Error('process.send(): IPC rate exceeded. Slow down.'))
+        if (err) return reject(err)
+      })
+      
+      process.nextTick(() => {
+        sent ? resolve(true) : reject(new Error('IPC rate exceeded.'))
       })
     })
   }

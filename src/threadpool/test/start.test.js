@@ -62,7 +62,7 @@ test('#start()', async t => {
   })
 
 
-  t.test('threads throw sync startup exception', async t => {
+  t.test('threads throw error on startup', async t => {
     t.beforeEach(() => {
       cp.fork.mock.resetCalls()
 
