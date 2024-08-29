@@ -208,7 +208,7 @@ const pool = new Threadpool('thread.js')
 node --run bench -- --size=4 --kibs=10
 ```
 
-> 4 threads, each `ping` sending 10 kb of event data
+> 4 threads, each `ping` sending 10 kilobytes of event data
 
 logs:
 
