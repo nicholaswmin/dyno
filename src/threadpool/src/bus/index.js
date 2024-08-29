@@ -61,10 +61,18 @@ class PrimaryBus extends Bus {
   }
   
   emit(...args) {
-    if (!this.canEmit())
-      return false
+    return new Promise((resolve, reject) => {
+      if (!this.canEmit())
+        return resolve(false)
 
-    this.cp.send(this.constructBusMessage(...args))
+      const sent = this.cp.send(this.constructBusMessage(...args), err => {    
+        return err 
+          ? reject(err) 
+          : sent 
+            ? resolve(true) 
+            : reject(new Error('process.send(): IPC rate exceeded. Slow down.'))
+      })
+    })
   }
   
   readyHandshake() {
@@ -97,10 +105,11 @@ class PrimaryBus extends Bus {
 
       this.on('ready-pong', err => {
         clearTimeout(readyTimer)
-        resolve()
+
+        return resolve()
       })
       
-      this.emit('ready-ping')
+      return this.emit('ready-ping').catch(reject)
     })
   }
 }

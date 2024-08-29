@@ -4,7 +4,7 @@ import { Threadpool } from '../index.js'
 
 const load = filename => join(import.meta.dirname, `./threadfiles/${filename}`)
 
-test('#broadcast()', { timeout: 1000 }, async t => {
+test('#broadcast() (size = 4 threads)', { timeout: 1000 }, async t => {
   const pool = new Threadpool(load('pong.js'), 4)
 
   const pingpong = (times = 1, pongs = []) => new Promise(resolve => {

@@ -18,8 +18,8 @@ class Thread extends EventEmitter {
   get signalCode() { return this.cp.signalCode      }
   get connected()  { return this.cp.connected       }
 
-  // @TODO check if we can ditch these
-  // These setters only exist for `Object.assign(this, cp)` below
+  // @REVIEW 
+  // These only exist because `Object.assign(this, cp)` throws w/o them
   set pid(pid)             {}
   set exitCode(code)       {}
   set signalCode(signal)   {}
@@ -73,16 +73,16 @@ class Thread extends EventEmitter {
   }
   
   emit(...args) {
-    this.bus.emit(...args)
     super.emit(...args)
 
-    return this
+    return this.bus.emit(...args)
   }
   
   on(...args) {
-    this.bus.on(...args)
     super.on(...args)
     
+    this.bus.on(...args)
+
     return this
   }
 

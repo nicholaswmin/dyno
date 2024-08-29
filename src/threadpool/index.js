@@ -78,33 +78,38 @@ class Threadpool extends EventEmitter {
   }
 
   async stop() {
-    if (this.#stopping)
-      return emitWarning('stop() ignored, shutdown in progress.')
+    const exits = thread => thread.exitCode,
+          alive = this.threads.filter(thread => thread.alive) 
+
+    if (this.#stopping) {
+      emitWarning('stop() ignored, shutdown in progress.')
+
+      return this.threads.map(exits)
+    }
 
     this.#stopping = true
 
-    const alive = this.threads.filter(thread => thread.alive), 
-          deaths = alive.map(thread => thread.kill())
+    const deaths = alive.map(thread => thread.kill())
     
-    const exits = await Promise.all(deaths)
+    await Promise.all(deaths)
 
     this.#stopping = false
 
-    return exits
+    return this.threads.map(exits)
   }
   
   emit(name, data) {
     const thread = this.#nextThread()
-    
-    thread.emit(name, data)
 
     super.emit(name, data)
     
-    return this
+    return thread.emit(name, data)
   }
   
-  broadcast(name, data) {
-    this.threads.forEach(thread => thread.emit(name, data))
+  broadcast(...args) {
+    return Promise.all(
+      this.threads.map(thread => thread.bus.emit(...args))
+    )
   }
   
   on(name, listener) {

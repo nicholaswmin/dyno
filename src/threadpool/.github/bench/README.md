@@ -1,7 +1,10 @@
-# benchmark
-
+# `pool.broadcast` benchmark
 
 Messaging between `primary` & `threads`.
+
+A `ping` is `pool.broadcast()` to all threads.  
+The next ping is broadcast when all `pongs` from all threads are 
+received back.
 
 Both `ping` and `pong` are scheduled using [`setImmediate`][setimmediate],  
 which allows the fastest possible, *non-blocking* `ping`/`pong` cycle.

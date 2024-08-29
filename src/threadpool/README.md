@@ -210,29 +210,29 @@ const pool = new Threadpool('thread.js')
 
 ## Benchmark
 
-> Run a [`ping`/`pong` benchmark][benchmark]
+> Run a [`ping`/`pong` benchmark][benchmark]    
+> Uses [`broadcast()`](#poolbroadcastname-data): sends `ping` every `n` `pong`s,   
+> where `n` is the number of threads.
 
 ```bash 
-node --run bench -- --size=8 --data=300 --type=broadcast
+node --run bench -- --size=4 --data=10
 ```
 
 where:
 
 - `--size` : `number` : thread count.
-- `--data` : `number` : bytes of `data` payload per `ping` event.
-- `--type` : `string` : dispatch type, [`broadcast`](#poolbroadcastname-data)
-or [`emit`](#poolemitname-data).
+- `--data` : `number` : kilobytes of `data` payload per `ping` event.
 
 logs:
 
 ```text
-┌────────────┬─────────┬─────────────────┬──────────────┬──────────────┐
-│ type       │ threads │ payload (bytes) │ pings/second │ pongs/second │
-├────────────┼─────────┼─────────────────┼──────────────┼──────────────┤
-│'broadcast' │ 8       │ 300             │ 6638         │ 54091        │
-┴────────────┴─────────┴─────────────────┴──────────────┴──────────────┘
+┌───────┬────────────┬────────────┬─────────────────────┬─────────────────────┐
+│ ticks │ pings/sec. │ pongs/sec. │ ping data (mb/sec.) │ pong data (mb/sec.) │
+├───────┼────────────┼────────────┼─────────────────────┼─────────────────────┤
+│ 5     │ 3968       │ 15871      │ 39.71               │ 158.71              │
+└───────┴────────────┴────────────┴─────────────────────┴─────────────────────┘
 
-Elapsed: 2 seconds
+ threads: 4 | payload (KB): 10 | Load avg. (1 min): 2 | Memory usage (mb): 10
 ```
 
 > using: 2022 Macbook Air M2, 10-core, 24 GB, MacOS Sonoma, node v23.0-pre
