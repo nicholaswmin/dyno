@@ -14,17 +14,16 @@ const load  = filename => join(import.meta.dirname, `./threadfiles/${filename}`)
 
 const fork = cp.fork.bind(cp)
 
-cp.fork = (...args) => {
-  const child = fork(...args), send = child.send.bind(child)
+cp.fork = function() {
+  const child = fork.apply(cp, arguments), send = child.send.bind(child)
 
   return Object.assign(child, {
-    send: function() {
-      return arguments[0].includes('cb-has-error') 
-        ? Array.from(arguments)
-            .find(arg => arg instanceof Function)(new Error('Simulated Error')) 
-        : arguments[0].includes('rate-limit') 
-          ? false 
-          : send.apply(child, arguments)
+    send: function(...args) {
+      return args[0].includes('cb-has-error') 
+          ? args.find(arg => arg instanceof Function)(Error('Simulated Error')) 
+          : args[0].includes('rate-limit') 
+            ? false 
+            : send.apply(child, arguments)
     }
   })
 }
