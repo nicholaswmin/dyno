@@ -12,8 +12,9 @@ const load  = filename => join(import.meta.dirname, `./threadfiles/${filename}`)
 // - `message` is 'rate-limit'  : return `false`
 // - `message` is none of above : work normally
 
-cp._fork = cp.fork.bind(cp), cp.fork = function() {
-  const child = fork.apply(cp, arguments), child._send = child.send.bind(child)
+cp._original_fork = cp.fork.bind(cp), cp.fork = function() {
+  const child = cp._original_fork.apply(cp, arguments)
+  child._original_send = child.send.bind(child)
 
   return Object.assign(child, {
     send: function(...args) {
@@ -21,7 +22,7 @@ cp._fork = cp.fork.bind(cp), cp.fork = function() {
           ? args.find(arg => arg instanceof Function)(Error('Simulated Error')) 
           : args[0].includes('rate-limit') 
             ? false 
-            : this._send.apply(child, arguments)
+            : this._original_send.apply(child, arguments)
     }
   })
 }
