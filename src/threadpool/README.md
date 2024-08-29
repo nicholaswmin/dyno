@@ -205,8 +205,8 @@ const pool = new Threadpool('thread.js')
 - Based on [`fork()`][fork] so technically it's [multi-processing][child-p],
   with each "thread" being an isolated [V8][v8] instance.
 - Beware of cyclic `pool.broadcasts` which issues simultaneous messages to
-  *all* threads; broadcasting the same `event` will create an exponentially
-  increasing sending rate.
+  *all* threads; broadcasting the same `event` will create an 
+  *exponentially-increasing* sending rate.
 
 
 
