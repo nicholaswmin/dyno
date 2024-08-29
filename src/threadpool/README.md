@@ -202,8 +202,7 @@ const pool = new Threadpool('thread.js')
 
 ## Benchmark
 
-> Run a [ping/pong benchmark][benchmark] on `4` threads sending 10 kb of data
-> in each `ping`
+> Run a [ping/pong benchmark][benchmark]
 
 ```bash 
 node --run bench -- --size=4 --data=10
@@ -225,10 +224,6 @@ logs:
 
  threads: 4 | payload (KB): 10 | Load avg. (1 min): 2 | Memory usage (mb): 10
 ```
-
-> Uses [`pool.broadcast()`](#poolbroadcastname-data) so each `ping` = `n` pongs, 
-> where `n` = number of threads
-
 
 
 ## Gotchas 
