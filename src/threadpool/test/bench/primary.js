@@ -36,7 +36,7 @@ setInterval(() => {
   }])
 
   console.log('\n', 
-    'threads:', size, '|', 'ticks:', ++ticks, '|', 'payload (KB):', kibs, '|', 
+    'threads:', size, '|', 'payload (KB):', kibs, '\n\n',
     'Load avg. (1 min):', Math.round(loadavg()[0]), '|',
     'Memory usage (mb):', Math.round(process.memoryUsage().heapUsed / 1000000)
   )
