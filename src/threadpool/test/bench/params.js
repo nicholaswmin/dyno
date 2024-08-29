@@ -3,11 +3,11 @@ import { availableParallelism } from 'node:os'
 import { parseArgs, styleText } from 'node:util'
 
 let path = join(import.meta.dirname, 'thread.js') 
-let { values: { type, size, data }  } = parseArgs({ options: { 
+let { values: { type, size, kibs }  } = parseArgs({ options: { 
   size: { type: 'string', default: availableParallelism().toString() },
-  data: { type: 'string', default: '1' }
+  kibs: { type: 'string', default: '1' }
 }})
 
-size = +size, data = +data
+size = +size, kibs = +kibs
 
-export { path, size, data }
+export { path, size, kibs }
