@@ -210,8 +210,8 @@ node --run bench -- --size=4 --data=10
 
 where:
 
-- `--size` : `number` : thread count.
-- `--data` : `number` : kilobytes of `data` payload per `ping` event.
+- `--size` : `Number` : thread count.
+- `--data` : `Number` : kilobytes of `data` payload per `ping` event.
 
 logs:
 
