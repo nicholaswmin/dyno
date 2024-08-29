@@ -169,8 +169,6 @@ calling `pool.stop()`, like so:
 ```js
 // primary.js
 
-// main code ...
-
 process.once('SIGTERM', async () => {
   try {
     await pool.stop()
@@ -190,8 +188,6 @@ issued a [`SIGKILL`][signals] signal, after a set timeout.
 The timeouts are in `ms` and can be set like so:
 
 ```js
-// primary.js
-
 import { Threadpool } from '@nicholaswmin/threadpool'
 
 Threadpool.readyTimeout = 1000
@@ -199,7 +195,7 @@ Threadpool.killTimeout  = 1000
 
 const pool = new Threadpool('thread.js')
 
-// main code ...
+// ... rest of code
 ```
 
 
