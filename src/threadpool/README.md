@@ -205,28 +205,6 @@ const pool = new Threadpool('thread.js')
 // main code ...
 ```
 
-## Benchmark
-
-> Run a [ping/pong benchmark][benchmark]:  
-
-```bash 
-node --run bench -- --size=4 --kibs=10
-```
-
-> 4 threads, each `ping` sending 10 kilobytes of event data
-
-logs:
-
-```text
-┌───────┬────────────┬────────────┬─────────────────────┬─────────────────────┐
-│ ticks │ pings/sec. │ pongs/sec. │ ping data (mb/sec.) │ pong data (mb/sec.) │
-├───────┼────────────┼────────────┼─────────────────────┼─────────────────────┤
-│ 5     │ 3968       │ 15871      │ 39.71               │ 158.71              │
-└───────┴────────────┴────────────┴─────────────────────┴─────────────────────┘
-
- threads: 4 | payload (kb): 10 | Load avg. (1 min): 2 | Memory usage (mb): 10
-```
-
 
 ## Gotchas 
 
@@ -247,6 +225,28 @@ NODE_ENV=test node --run test
 
 ```bash
 NODE_ENV=test node --run test:coverage
+```
+
+### Benchmark
+
+> Run a [ping/pong benchmark][benchmark]:  
+
+```bash 
+node --run bench -- --size=4 --kibs=10
+```
+
+> 4 threads, each `ping` sending 10 kilobytes of event data
+
+logs:
+
+```text
+┌───────┬────────────┬────────────┬─────────────────────┬─────────────────────┐
+│ ticks │ pings/sec. │ pongs/sec. │ ping data (mb/sec.) │ pong data (mb/sec.) │
+├───────┼────────────┼────────────┼─────────────────────┼─────────────────────┤
+│ 5     │ 3968       │ 15871      │ 39.71               │ 158.71              │
+└───────┴────────────┴────────────┴─────────────────────┴─────────────────────┘
+
+ threads: 4 | payload (kb): 10 | Load avg. (1 min): 2 | Memory usage (mb): 10
 ```
 
 
