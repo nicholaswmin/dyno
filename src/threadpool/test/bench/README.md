@@ -16,13 +16,13 @@ IPC via [`process.send`][procsend].
 > 4 threads, 5 kb of `ping` event `data`:
 
 ```bash
-node primary.js --size=4 --data=5
+node primary.js --size=4 --kibs=5
 ```
 
 ### Parameters:
 
 - `--size` : `Number` : thread count.
-- `--data` : `Number` : kilobytes of `data` payload per `ping` event.
+- `--kibs` : `Number` : kilobytes of `ping` event `data` payload.
 
 ## Authors
 

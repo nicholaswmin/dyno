@@ -6,31 +6,38 @@ import { Threadpool } from '../../index.js'
 
 console.log('starting up...')
 
-const pool = new Threadpool(path, size)
+let pool = new Threadpool(path, size), 
+    ticks = 0,
+    pings = 0, 
+    pongs = 0, 
+    payload = 'a'.repeat(data * 1000)
+
 await pool.start()
 
-let ticks = 1, pings = 0, pongs = 0, payload = 'a'.repeat(data * 1000)
-
-pool.on('pong', data => setImmediate(async () => {
+pool.on('pong', data => setImmediate(() => {
   return ++pongs % pool.size === 0 
-    ? pool.broadcast('ping', { 
-      payload, pings: ++pings 
-    })
-    : null
-})).broadcast('ping', { payload })
+    ? pool.broadcast('ping', { payload, pings: ++pings  })
+    : false
+}))
 
-// Stats display
+// Stats
 
 setInterval(() => {
+  if (ticks === 0)
+    pool.broadcast('ping', { payload })
+  
   console.clear()
+
   console.table([{
     'ticks': ++ticks,
-    'pings/sec.': Math.round(pings / ticks),
-    'pongs/sec.': Math.round(pongs / ticks),
-    'ping data (mb/sec.)': Math.round(Math.round(pings / ticks) * data) / 1000, 
-    'pong data (mb/sec.)': Math.round(Math.round(pongs / ticks) * data) / 1000
+    'pings/sec': Math.round(pings / ticks),
+    'pongs/sec': Math.round(pongs / ticks),
+    'ping (mb/sec)': Math.round(pings / ticks * data / 1000), 
+    'pong (mb/sec)': Math.round(pongs / ticks * data / 1000)
   }])
-  console.log('\n', 'threads:', size, '|', 'payload (KB):', data, '|', 
+
+  console.log('\n', 
+    'threads:', size, '|', 'ticks:', ++ticks, '|', 'payload (KB):', data, '|', 
     'Load avg. (1 min):', Math.round(loadavg()[0]), '|',
     'Memory usage (mb):', Math.round(process.memoryUsage().heapUsed / 1000000)
   )
@@ -38,5 +45,5 @@ setInterval(() => {
 
 // Graceful exit
 
-process.on('SIGINT', () => { pool.stop(), process.exit(0) })
-process.on('SIGTERM', () => { pool.stop(), process.exit(0) })
+;['SIGINT','SIGTERM'].forEach(e => 
+  process.on(e, () => pool.stop().then(process.exit.bind(process, 0))))

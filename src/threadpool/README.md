@@ -202,16 +202,13 @@ const pool = new Threadpool('thread.js')
 
 ## Benchmark
 
-> Run a [ping/pong benchmark][benchmark]:
+> Run a [ping/pong benchmark][benchmark]:  
 
 ```bash 
-node --run bench -- --size=4 --data=10
+node --run bench -- --size=4 --kibs=10
 ```
 
-where:
-
-- `--size` : `Number` : thread count.
-- `--data` : `Number` : kilobytes of `data` payload per `ping` event.
+> 4 threads, each `ping` sending 10 kb of event data
 
 logs:
 
@@ -222,7 +219,7 @@ logs:
 │ 5     │ 3968       │ 15871      │ 39.71               │ 158.71              │
 └───────┴────────────┴────────────┴─────────────────────┴─────────────────────┘
 
- threads: 4 | payload (KB): 10 | Load avg. (1 min): 2 | Memory usage (mb): 10
+ threads: 4 | payload (kb): 10 | Load avg. (1 min): 2 | Memory usage (mb): 10
 ```
 
 
