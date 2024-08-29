@@ -211,8 +211,6 @@ const pool = new Threadpool('thread.js')
 ## Benchmark
 
 > Run a [`ping`/`pong` benchmark][benchmark]    
-> Uses [`broadcast()`](#poolbroadcastname-data): sends `ping` every `n` `pong`s,   
-> where `n` is the number of threads.
 
 ```bash 
 node --run bench -- --size=4 --data=10
@@ -235,7 +233,8 @@ logs:
  threads: 4 | payload (KB): 10 | Load avg. (1 min): 2 | Memory usage (mb): 10
 ```
 
-> using: 2022 Macbook Air M2, 10-core, 24 GB, MacOS Sonoma, node v23.0-pre
+> Uses [`pool.broadcast()`](#poolbroadcastname-data).   
+> Sends 1 `ping` every `n` `pong`s, where `n` = number of threads.
 
 ## Test 
 
