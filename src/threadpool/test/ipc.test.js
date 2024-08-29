@@ -8,9 +8,9 @@ const load  = filename => join(import.meta.dirname, `./threadfiles/${filename}`)
 // Monkey-patch `child_process.fork()` to 
 // return a `ChildProcess` which implements `send(message, ...)` to:
 // 
-// - `message` is 'cb-has-err' : call its callback with an `err`
-// - `message` is 'rate-limit' : return `false`
-// - `message` is not of above : work normally
+// - `message` is 'cb-has-err'  : call its callback with an `err`
+// - `message` is 'rate-limit'  : return `false`
+// - `message` is none of above : work normally
 
 const fork = cp.fork.bind(cp)
 
