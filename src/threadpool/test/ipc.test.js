@@ -34,18 +34,9 @@ test('#IPC primary-to-thread error handling', async t => {
 
   t.before(() => pool.start())
   t.after(()  => pool.stop())
-  
 
-  await t.test('process.send() returns true', async t => {
-    await t.test('calling emit()', async t => {
-      await t.test('resolves', async t => {
-        await t.assert.doesNotReject(pool.emit.bind(pool, 'foo'))
-      })
-    })
-  })
 
-  
-  await t.test('process.send() callback has an error', async t => {
+  await t.test('process.send() callback called with error', async t => {
     await t.test('calling emit()', async t => {
       await t.test('rejects with callback error', async t => {
         await t.assert.rejects(pool.emit.bind(pool, 'cb-has-error'), {
