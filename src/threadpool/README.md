@@ -174,9 +174,6 @@ calling `pool.stop()`, like so:
 process.once('SIGTERM', async () => {
   try {
     await pool.stop()
-
-    // more cleanups if needed
-
     process.exit(0)
   } catch (err) {
     console.error(err)
