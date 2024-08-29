@@ -5,12 +5,12 @@ import { Threadpool } from '../index.js'
 
 const load  = filename => join(import.meta.dirname, `./threadfiles/${filename}`)
 
-// Monkey-patch `child_process.fork()` to return a 
-// `ChildProcess` which implements `ChildProcess.send` to:
+// Monkey-patch `child_process.fork()` to return a `ChildProcess` which 
+// implements `send()` to:
 // 
-// - message is 'cb-error'    : call callback with `Simulated Error`
-// - message is 'rate-limit'  : return `false`
-// - message is anything else : works normally
+// - message includes 'cb-has-err' : call its callback with an `err`
+// - message includes 'rate-limit' : return `false`
+// - message has none of the above : work normally
 
 const fork = cp.fork.bind(cp)
 
@@ -18,11 +18,14 @@ cp.fork = (...args) => {
   const child = fork(...args), send = child.send.bind(child)
 
   return Object.assign(child, {
-    send: (msg, cb) => msg.includes('cb-error') 
-      ? cb(new Error('Simulated')) 
-      : msg.includes('rate-limit') 
-        ? false 
-        : send(msg, cb)
+    send: function() {
+      return arguments[0].includes('cb-has-error') 
+        ? Array.from(arguments)
+            .find(arg => arg instanceof Function)(new Error('Simulated Error')) 
+        : arguments[0].includes('rate-limit') 
+          ? false 
+          : send.apply(child, arguments)
+    }
   })
 }
 
@@ -32,6 +35,7 @@ test('#IPC primary-to-thread error handling', async t => {
   t.before(() => pool.start())
   t.after(()  => pool.stop())
   
+
   await t.test('process.send() returns true', async t => {
     await t.test('calling emit()', async t => {
       await t.test('resolves', async t => {
@@ -44,8 +48,8 @@ test('#IPC primary-to-thread error handling', async t => {
   await t.test('process.send() callback has an error', async t => {
     await t.test('calling emit()', async t => {
       await t.test('rejects with callback error', async t => {
-        await t.assert.rejects(pool.emit.bind(pool, 'cb-error'), {
-          message: /Simulated/
+        await t.assert.rejects(pool.emit.bind(pool, 'cb-has-error'), {
+          message: /Simulated Error/
         })
       })
     })
