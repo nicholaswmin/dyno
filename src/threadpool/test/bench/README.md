@@ -3,7 +3,7 @@
 Messaging between `primary` & `threads`.
 
 - A `ping` is sent to all threads, in fan-out.
-- Next `ping` is sent when *all* `pongs` are received, so *1 ping = n pongs*, 
+- Next `ping` is sent when all `pongs` are received, so *`1` ping = `n` pongs*, 
   where `n` is the number of threads.
 
 The `ping` event `data` is resent to the primary in each `pong`.
