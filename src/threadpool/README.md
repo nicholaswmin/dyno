@@ -185,23 +185,6 @@ process.once('SIGTERM', async () => {
 })
 ```
 
-Threads can listen for `SIGTERM` and perform [graceful exit][grace] cleanups,
-like so:
-
-```js
-read.js 
-
-import { primary } from '@nicholaswmin/threadpool'
-
-// main code ...
-
-process.once('SIGTERM', () => {
-  // cleanups
-  
-  process.exit(0)
-})
-```
-
 ### Timeouts
 
 Threads which [block the event loop][ee-block] or delay their termination are 
