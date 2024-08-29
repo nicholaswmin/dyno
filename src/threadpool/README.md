@@ -204,9 +204,7 @@ const pool = new Threadpool('thread.js')
 - Runtime exceptions trigger a shutdown of all running threads.
 - Based on [`fork()`][fork] so technically it's [multi-processing][child-p],
   with each "thread" being an isolated [V8][v8] instance.
-- Beware of cyclic `pool.broadcasts` which issues simultaneous messages to
-  *all* threads; broadcasting the same `event` will create an 
-  *exponentially-increasing* sending rate.
+- Cyclic `pool.broadcast` create an  *exponentially-increasing* sending rate.
 
 
 
