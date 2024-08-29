@@ -233,8 +233,8 @@ logs:
  threads: 4 | payload (KB): 10 | Load avg. (1 min): 2 | Memory usage (mb): 10
 ```
 
-> Uses [`pool.broadcast()`](#poolbroadcastname-data).   
-> Sends 1 `ping` every `n` `pong`s, where `n` = number of threads.
+> Uses [`pool.broadcast()`](#poolbroadcastname-data). 
+> 1 `ping` = `n` pongs, where `n` = number of threads
 
 ## Test 
 
