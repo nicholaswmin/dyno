@@ -163,11 +163,33 @@ Emit an event to the primary.
 
 ## Graceful exits
 
+You should listen to `SIGTERM` and perform a [graceful exit][grace] by 
+calling `pool.stop()`, like so:
+
+```js
+// primary.js
+
+// main code ...
+
+process.once('SIGTERM', async () => {
+  try {
+    await pool.stop()
+
+    // more cleanups if needed
+
+    process.exit(0)
+  } catch (err) {
+    console.error(err)
+    process.exit(1)
+  }
+})
+```
+
 Threads can listen for `SIGTERM` and perform [graceful exit][grace] cleanups,
 like so:
 
 ```js
-// thread.js 
+read.js 
 
 import { primary } from '@nicholaswmin/threadpool'
 
