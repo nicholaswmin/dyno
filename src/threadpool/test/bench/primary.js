@@ -2,7 +2,7 @@ import { loadavg } from 'node:os'
 import { data, size, path } from './params.js'
 import { Threadpool } from '../../index.js'
 
-// Main code begin
+// Bechmark code
 
 console.log('starting up...')
 
@@ -19,8 +19,7 @@ pool.on('pong', data => setImmediate(async () => {
     : null
 })).broadcast('ping', { payload })
 
-
-// End of main code
+// Stats display
 
 setInterval(() => {
   console.clear()
@@ -36,6 +35,8 @@ setInterval(() => {
     'Memory usage (mb):', Math.round(process.memoryUsage().heapUsed / 1000000)
   )
 }, 1000)
+
+// Graceful exit
 
 process.on('SIGINT', () => { pool.stop(), process.exit(0) })
 process.on('SIGTERM', () => { pool.stop(), process.exit(0) })
