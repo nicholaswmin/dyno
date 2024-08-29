@@ -3,19 +3,17 @@
 Messaging between `primary` & `threads`.
 
 - A `ping` is sent to all threads, in fan-out.
-- Next `ping` is sent when *all* `pongs` from *all* threads are received,  
-  therefore `1 ping = 4 pongs`, assuming `4 threads`.
-- Each `ping` includes some event data which is then re-sent back to the 
-  primary with each `pong`.
+- Next `ping` is sent when *all* `pongs` are received, so *1 ping = 4 pongs*, 
+  4 threads.
 
-Both events are scheduled using [`setImmediate`][setimmediate], which allows 
-the fastest possible, *non-blocking* cycle.
+The `ping` event `data` is resent to the primary in each `pong`.
 
+Events are scheduled with [`setImmediate`][setimmediate].  
 IPC via [`process.send`][procsend].
 
 ## Run
 
-> 4 threads, sending 5 kb of data in each `ping`:
+> 4 threads, 5 kb of `ping` event `data`:
 
 ```bash
 node primary.js --size=4 --data=5
