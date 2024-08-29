@@ -4,7 +4,7 @@ Messaging between `primary` & `threads`.
 
 - A `ping` is sent to all threads, in fan-out.
 - Next `ping` is sent when *all* `pongs` from *all* threads are received,  
-  therefore `1 ping` = `4 pongs` assuming `4 threads`.
+  therefore `1 ping = 4 pongs`, assuming `4 threads`.
 - Each `ping` includes some event data which is then re-sent back to the 
   primary with each `pong`.
 
