@@ -282,6 +282,6 @@ NODE_ENV=test node --run test:coverage
 [child-p]: https://en.wikipedia.org/wiki/Child_process
 [v8]: https://v8.dev/
 
-[benchmark]: ./.github/bench
+[benchmark]: ./test/bench
 [nicholaswmin]: https://github.com/nicholaswmin
 [license]: ./LICENSE
