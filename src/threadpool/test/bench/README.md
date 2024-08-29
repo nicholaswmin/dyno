@@ -7,6 +7,9 @@ A `ping` is `pool.broadcast()` to all threads.
 The next `ping` is broadcast when all `pongs` from *all threads* are 
 received back, therefore `1 ping = 4 pongs`, if run on `4` threads.
 
+Each `ping` includes some data which is then re-sent back to the primary
+with each `pong`.
+
 Both events are scheduled using [`setImmediate`][setimmediate], which allows 
 the fastest possible, *non-blocking* `ping`/`pong` cycle.
 
