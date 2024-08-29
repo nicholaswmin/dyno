@@ -202,7 +202,7 @@ const pool = new Threadpool('thread.js')
 
 ## Benchmark
 
-> Run a [ping/pong benchmark][benchmark]
+> Run a [ping/pong benchmark][benchmark]:
 
 ```bash 
 node --run bench -- --size=4 --data=10
