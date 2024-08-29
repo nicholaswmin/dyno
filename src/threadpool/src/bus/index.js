@@ -69,9 +69,10 @@ class PrimaryBus extends Bus {
         if (err) return reject(err)
       })
       
-      process.nextTick(() => {
-        sent ? resolve(true) : reject(new Error('IPC rate exceeded.'))
-      })
+      process.nextTick(() => sent 
+        ? resolve(true) 
+        : reject(new Error('IPC rate exceeded.'))
+      )
     })
   }
   
