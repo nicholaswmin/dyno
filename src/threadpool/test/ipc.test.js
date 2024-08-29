@@ -3,7 +3,7 @@ import cp from 'node:child_process'
 import { join } from 'node:path'
 import { Threadpool } from '../index.js'
 
-const load = filename => join(import.meta.dirname, `./threadfiles/${filename}`)
+const load = filename => join(import.meta.dirname, `./child/${filename}`)
 
 // Monkey-patch `child_process.fork()` to return a `ChildProcess` 
 // implementing its `child.send(message, ...)` method as:

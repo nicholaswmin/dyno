@@ -2,7 +2,7 @@ import test from 'node:test'
 import { join } from 'node:path'
 import { Threadpool } from '../index.js'
 
-const load = filename => join(import.meta.dirname, `./threadfiles/${filename}`)
+const load = filename => join(import.meta.dirname, `./child/${filename}`)
 
 
 test('#emit()', { timeout: 1000 }, async t => {

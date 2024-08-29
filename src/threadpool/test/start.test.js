@@ -5,7 +5,7 @@ import { Threadpool } from '../index.js'
 
 const alive = cp => !cp.killed
 const dead  = cp =>  cp.killed
-const load  = filename => join(import.meta.dirname, `./threadfiles/${filename}`)
+const load  = filename => join(import.meta.dirname, `./child/${filename}`)
 
 
 test('#start()', async t => {
