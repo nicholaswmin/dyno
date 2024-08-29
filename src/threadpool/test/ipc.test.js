@@ -18,9 +18,9 @@ cp._original_fork = cp.fork.bind(cp), cp.fork = function() {
 
   return Object.assign(child, {
     send: function(...args) {
-      return args[0].includes('cb-has-error') 
+      return args.some(arg => !!arg.includes && arg.includes('cb-has-error'))
           ? args.find(arg => arg instanceof Function)(Error('Simulated Error')) 
-          : args[0].includes('rate-limit') 
+          : args.some(arg => !!arg.includes && arg.includes('rate-limit'))
             ? false 
             : this._original_send.apply(child, arguments)
     }
@@ -32,6 +32,15 @@ test('#IPC primary-to-thread error handling', async t => {
 
   t.before(() => pool.start())
   t.after(()  => pool.stop())
+  
+  
+  await t.test('process.send() returns true', async t => {
+    await t.test('calling emit()', async t => {
+      await t.test('resolves', async t => {
+        await t.assert.doesNotReject(() => pool.emit('foo', { foo: 'bar' }))
+      })
+    })
+  })
 
 
   await t.test('process.send() callback called with error', async t => {
