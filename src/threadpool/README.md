@@ -200,14 +200,6 @@ const pool = new Threadpool('thread.js')
 // main code ...
 ```
 
-## Gotchas 
-
-- Runtime exceptions trigger a shutdown of all running threads.
-- Based on [`fork()`][fork] so technically it's [multi-processing][child-p],
-  not multithreading.   
-  Each "thread" is an isolated [V8][v8] instance. 
-
-
 ## Benchmark
 
 > Run a [`ping`/`pong` benchmark][benchmark]    
@@ -233,8 +225,19 @@ logs:
  threads: 4 | payload (KB): 10 | Load avg. (1 min): 2 | Memory usage (mb): 10
 ```
 
-> Uses [`pool.broadcast()`](#poolbroadcastname-data). 
+> Uses [`pool.broadcast()`](#poolbroadcastname-data).   
 > 1 `ping` = `n` pongs, where `n` = number of threads
+
+
+
+## Gotchas 
+
+- Runtime exceptions trigger a shutdown of all running threads.
+- Based on [`fork()`][fork] so technically it's [multi-processing][child-p],
+  not multithreading.   
+  Each "thread" is an isolated [V8][v8] instance. 
+
+
 
 ## Test 
 
