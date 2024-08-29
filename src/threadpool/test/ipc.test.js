@@ -5,8 +5,8 @@ import { Threadpool } from '../index.js'
 
 const load  = filename => join(import.meta.dirname, `./threadfiles/${filename}`)
 
-// Monkey-patch `child_process.fork()` to 
-// return a `ChildProcess` which implements `send(message, ...)` to:
+// Monkey-patch `child_process.fork()` to return a `ChildProcess` 
+// implementing its `child.send(message, ...)` method as:
 // 
 // - `message` is 'cb-has-err'  : call its callback with an `err`
 // - `message` is 'rate-limit'  : return `false`
