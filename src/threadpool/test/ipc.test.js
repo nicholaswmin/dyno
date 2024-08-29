@@ -18,9 +18,9 @@ cp._original_fork = cp.fork.bind(cp), cp.fork = function() {
 
   return Object.assign(child, {
     send: function(...args) {
-      return args.some(arg => !!arg.includes && arg.includes('cb-has-error'))
+      return args.flat().includes('cb-has-error')
           ? args.find(arg => arg instanceof Function)(Error('Simulated Error')) 
-          : args.some(arg => !!arg.includes && arg.includes('rate-limit'))
+          : args.flat().includes('rate-limit')
             ? false 
             : this._original_send.apply(child, arguments)
     }
