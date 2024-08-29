@@ -4,12 +4,14 @@ Messaging between `primary` & `threads`.
 
 - A `ping` is sent to all threads, simulaneously, in fan-out.
 - To avoid an exponentially increasing send rate, each `ping` is sent when 
-  all `pongs` are received, so *`1` ping = `n` pongs*, where `n` is the
-  number of threads.
+  all `pongs` are received.  
+  
+*`1` ping = `n` pongs*, where `n` is the number of threads.
 
 The `ping` event `data` is resent to the primary in each `pong`.
 
 Events are scheduled with [`setImmediate`][setimmediate].  
+
 IPC via [`process.send`][procsend].
 
 ## Run
