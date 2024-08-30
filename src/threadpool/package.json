@@ -5,8 +5,7 @@
   "description": "tiny threadpool with ergonomic IPC",
   "main": "index.js",
   "scripts": {
-    "test": "node --test \"test/*.test.js\"",
-    "test:coverage": "node --test --experimental-test-coverage \"test/*.test.js\"",
+    "test": "node --test --experimental-test-coverage \"test/*.test.js\"",
     "bench": "node test/bench/primary.js"
   },
   "engines": {

@@ -61,6 +61,22 @@ test('#start()', async t => {
     })
   })
 
+  await t.test('pool is stopped', async t => {    
+    t.before(() => {
+      cp.fork.mock.resetCalls()
+      pool = new Threadpool(load('ok.js'))
+
+      return pool.start()
+    })
+
+    await t.test('rejects with error', async t => {   
+      await pool.stop()
+      
+      await t.assert.rejects(() => pool.start (), {
+        message: /stopped/
+      })
+    })
+  })
 
   t.test('threads throw error on startup', async t => {
     t.beforeEach(() => {
@@ -69,7 +85,7 @@ test('#start()', async t => {
       pool = new Threadpool(load('spawn-err.js'))
     })
     
-    await t.test('start() promise rejects', async t => {
+    await t.test('rejects with error', async t => {
       await t.assert.rejects(() => pool.start(), { message: /SIGKILL/ })
     })
     
@@ -85,7 +101,7 @@ test('#start()', async t => {
       pool = new Threadpool(load('blocked-loop.js'))
     })
     
-    await t.test('function call rejects', async t => {   
+    await t.test('rejects with error', async t => {   
       await t.assert.rejects(pool.start.bind(pool), {
         message: /SIGKILL/
       })

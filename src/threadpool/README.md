@@ -209,14 +209,10 @@ const pool = new Threadpool('thread.js')
 
 ## Test 
 
+> inc. coverage report
+
 ```bash 
 NODE_ENV=test node --run test
-```
-
-### Coverage 
-
-```bash
-NODE_ENV=test node --run test:coverage
 ```
 
 ### Benchmark
@@ -248,7 +244,7 @@ logs:
 
 ## License 
 
-[The MIT-0 License][license]
+[The MIT License][license]
 
 
 [test-badge]: https://github.com/nicholaswmin/threadpool/actions/workflows/test.yml/badge.svg

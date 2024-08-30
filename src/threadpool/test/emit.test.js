@@ -1,54 +1,141 @@
 import test from 'node:test'
+import cp from 'node:child_process'
 import { join } from 'node:path'
 import { Threadpool } from '../index.js'
 
+const fork = cp.fork
 const load = filename => join(import.meta.dirname, `./child/${filename}`)
+const dbouncer = t => (fn, ms) => t = clearTimeout(t) || setTimeout(fn, ms)
+const mockResultMethods = fns => ({ result }) => Object.assign(
+  result, Object.keys(fns).reduce((instance, fn) => ({ 
+    [fn]: fns[fn].bind(instance) 
+  }), result)
+)
 
+test('#emit()', async t => {
+  let pool = null
 
-test('#emit()', { timeout: 1000 }, async t => {
-  const pool = new Threadpool(load('pong.js'), 4)
-  
-  const pingpong = (times = 1, pongs = []) => new Promise(resolve => {
-    pool.on('pong', arg => pongs.push(arg) === times ? resolve(pongs) : null)
+  t.afterEach(() => pool.stop())
+  t.beforeEach(() => {
+    pool = new Threadpool(load('pong.js'), 2)
+    return pool.start()
+  })    
 
-    for (let i = 0; i < times; i++) pool.emit('ping', { foo: 'bar' })
+  await t.test('resolves true', async t => {
+    t.assert.strictEqual(await pool.emit('ping'), true)
   })
+
+  await t.test('sends event', async t => {
+    const result = await new Promise((resolve, reject) =>  
+      pool.once('pong', resolve).emit('ping').catch(reject))
+
+    t.assert.ok(result)
+  })
+
+  await t.test('sends event, only once', async t => {
+    const dbounce = t.mock.fn(dbouncer(t._timer))
     
+    await new Promise((resolve, reject) => {
+      pool.on('pong', () => dbounce(resolve, 50)).emit('ping').catch(reject)
+    })
+
+    t.assert.strictEqual(dbounce.mock.callCount(), 1, 'got back > 1 pong')
+  })
+  
+  await t.test('sends event uniformly across threads', async t => {
+    t.plan(pool.size)
+
+    const pids = await new Promise((resolve, reject) => {
+      const _pids = []
+      pool.on('pong', ({ pid }) => 
+        _pids.push({ pid }) === pool.size * 2 
+          ? resolve(_pids) 
+          : pool.emit('ping').catch(reject)
+      ).emit('ping').catch(reject)
+    })
+    
+     Object.values(Object.groupBy(pids, ({ pid }) => pid)).forEach(pongs => {
+       t.assert.strictEqual(pongs.length, 2)
+     })
+  })
+  
+  await t.test('sends event data', async t => {
+    const data = await new Promise((resolve, reject) => {
+      pool.once('pong', resolve)
+        .emit('ping', { foo: 123 }).catch(reject)
+    })
+    
+    t.assert.strictEqual(typeof data.foo, 'number')
+    t.assert.strictEqual(data.foo, 123)
+  })
+})
+
+
+
+test('#emit() non-started pool', async t => {
+  const pool = new Threadpool(load('pong.js'), 2)
+
+  await t.test('rejects with error', async t => {
+    await t.assert.rejects(pool.emit.bind(pool, 'foo'), {
+      message: /not started/
+    })
+  })
+})
+
+
+test('#emit() stopped pool', async t => {
+  const pool = new Threadpool(load('pong.js'), 2)
+
+  t.before(async () => {
+    await pool.start()
+    await pool.stop()
+  })  
+
+  await t.test('rejects with error', async t => {
+    await t.assert.rejects(pool.emit.bind(pool, 'foo'), {
+      message: /stopped/
+    })
+  })
+})
+
+
+test('#emit() IPC has error', async t => {
+  cp.fork = t.mock.fn(fork)
+  
+  const pool = new Threadpool(load('pong.js'), 2)
+
+  t.before(() => pool.start()) 
   t.after(() => pool.stop())
 
-  await t.test('ping/pongs across 4 threads', async t => {    
-    const pongs = []
-    
-    await t.test('starts up', () => pool.start())
+  await t.test('rejects with error', async t => {
+    cp.fork.mock.calls.map(mockResultMethods({
+      send: (...args) => args.find(arg => arg instanceof Function)(
+        new Error('Simulated Error')
+      )
+    }))
 
-    await t.test('sends 1000 ping, gets 1000 pongs', async t => {
-      await pingpong(1000, pongs)
-
-      t.assert.ok(pongs.length > 0, 'no pongs received')
-      t.assert.strictEqual(pongs.length, 1000)
+    await t.assert.rejects(pool.emit.bind(pool, 'foo'), {
+      message: /Simulated Error/
     })
+  })
+})
 
-    await t.test('equally distributed', t => {    
-      t.plan(pool.size)
 
-      const groups = Object.values(Object.groupBy(pongs, ({ pid }) => pid))
-        
-      groups.forEach(g => t.assert.strictEqual(g.length, 1000 / pool.size))
-    })
-    
-    await t.test('from every thread', t => {    
-      const pids = Object.keys(Object.groupBy(pongs, ({ pid }) => pid))
+test('#emit() IPC indicates rate limit', async t => {
+  cp.fork = t.mock.fn(fork)
   
-      t.assert.strictEqual(pids.length, pool.size)
-    })
-    
-    await t.test('passes included data', t => {
-      t.plan(2000)
+  const pool = new Threadpool(load('pong.js'), 2)
+  
+  t.afterEach(() => pool.stop())
+  t.before(() => pool.start())  
 
-      pongs.forEach(pong => {
-        t.assert.strictEqual(typeof pong.foo, 'string')
-        t.assert.strictEqual(pong.foo, 'bar')
-      })
+  await t.test('rejects with "rate exceeded" error', async t => {
+    cp.fork.mock.calls.map(mockResultMethods({
+      send: () => false
+    }))
+
+    await t.assert.rejects(pool.emit.bind(pool, 'foo'), {
+      message: /rate exceeded/
     })
-  })    
+  })
 })

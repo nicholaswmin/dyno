@@ -1,9 +1,4 @@
-// has a blocked event loop
-// 
-// the following is an (intentionally) extremely-inefficient recursive 
-// Fibonnaci Sequence function which blocks the Event Loop.
-// 
-// Anything `> fibonacci(50)` should block any CPU as of 2024
+// starts up with a blocked event loop
 function fibonacci(n) {
   return n < 1 ? 0
     : n <= 2 ? 1
@@ -11,9 +6,3 @@ function fibonacci(n) {
 }
 
 fibonacci(500)
-
-console.error('THIS SHOULD NEVER LOG')
-
-process.on('message', message => {  
-  message === 'exit' ? setImmediate(() => process.exit(0)) : 0
-})

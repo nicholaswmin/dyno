@@ -15,8 +15,17 @@ class Threadpool extends EventEmitter {
   #stopping  = false  
   #nextIndex = 0
 
+  
+  get #ready() {
+    return this.threads.every(t => t.alive)
+  }
+
   get #started() {
-    return this.threads.some(t => t.alive) && !this.#stopping
+    return !!this.threads.length
+  }
+  
+  get #stopped() {
+    return this.#started && !this.#ready
   }
 
   constructor(path = argv.at(-1), size = availableParallelism(),  env = {}) {
@@ -59,6 +68,9 @@ class Threadpool extends EventEmitter {
     if (this.#stopping)
       return emitWarning('start() ignored, startup in progress.')
 
+    if (this.#stopped)
+      throw new Error('cannot start() a stopped pool')
+
     this.#starting = true
 
     const forks = []
@@ -99,6 +111,12 @@ class Threadpool extends EventEmitter {
   }
   
   emit(name, data) {
+    if (this.#stopped)
+      return Promise.reject(new Error('Cannot emit. Pool stopped.'))
+    
+    if (!this.#started)
+      return Promise.reject(new Error('Cannot emit. Pool not started.'))
+
     const thread = this.#nextThread()
 
     super.emit(name, data)
@@ -107,9 +125,17 @@ class Threadpool extends EventEmitter {
   }
   
   broadcast(...args) {
-    return Promise.all(
-      this.threads.map(thread => thread.bus.emit(...args))
-    )
+    if (this.#stopped)
+      return Promise.reject(new Error('Cannot broadcast. Pool stopped.'))
+    
+    if (!this.#started)
+      return Promise.reject(new Error('Cannot broadcast. Pool not started.'))
+
+    const emits = this.threads.map(thread => thread.bus.emit(...args))
+
+    return emits.length 
+      ? Promise.all(emits) 
+      : Promise.reject(new Error('Cannot broadcast on a non-started pool'))
   }
   
   on(name, listener) {
@@ -177,14 +203,14 @@ class Threadpool extends EventEmitter {
     return thread
   }
 
-  #onThreadError(err) {
-    return this.#started 
+  #onThreadError(err) {   
+    return this.threads.some(t => t.alive) && !this.#stopping 
       ? this.stop()
         .then(() => {
-          this.emit('pool-error', err)
+          super.emit('pool-error', err)
         })
         .catch(nexterr => {
-          this.emit('pool-error', new Error(nexterr, { 
+          super.emit('pool-error', new Error(nexterr, { 
             cause: err 
           }))
           
