@@ -209,11 +209,11 @@ const pool = new Threadpool('thread.js')
 
 ## Test 
 
-> inc. coverage report
-
 ```bash 
 NODE_ENV=test node --run test
 ```
+
+> also outputs coverage at `test/lcov.info`
 
 ### Benchmark
 
