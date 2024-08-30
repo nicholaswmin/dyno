@@ -185,7 +185,7 @@ process.once('SIGTERM', async () => {
 Threads which [block the event loop][ee-block] or delay their termination are 
 issued a [`SIGKILL`][signals] signal, after a set timeout.
 
-The timeouts are in `ms` and can be set like so:
+timeouts are in `ms` and can be set like so:
 
 ```js
 import { Threadpool } from '@nicholaswmin/threadpool'
@@ -201,8 +201,8 @@ const pool = new Threadpool('thread.js')
 
 ## Gotchas 
 
-- Runtime exceptions trigger a shutdown of all running threads.
-- Cyclic `pool.broadcast` create an  *exponentially-increasing* sending rate.
+- Runtime exceptions trigger a shutdown/stop.
+- Cyclic `pool.broadcast`s can create an  *exponentially-increasing* send rate.
 - Based on [`fork()`][fork] so technically it's [multi-processing][child-p],
   each "thread" being an isolated [V8][v8] instance.
 

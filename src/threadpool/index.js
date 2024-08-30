@@ -14,7 +14,6 @@ class Threadpool extends EventEmitter {
   #starting  = false
   #stopping  = false  
   #nextIndex = 0
-
   
   get #ready() {
     return this.threads.every(t => t.alive)
@@ -204,7 +203,7 @@ class Threadpool extends EventEmitter {
   }
 
   #onThreadError(err) {   
-    return this.threads.some(t => t.alive) && !this.#stopping 
+    return !this.#stopping 
       ? this.stop()
         .then(() => {
           super.emit('pool-error', err)
