@@ -2,6 +2,7 @@ import cp from 'node:child_process'
 import { availableParallelism } from 'node:os'
 import { EventEmitter } from 'node:events'
 import { emitWarning, argv } from 'node:process'
+import { randomUUID } from 'node:crypto'
 
 import { Thread } from './src/thread/index.js'
 import { PrimaryBus, ThreadBus } from './src/bus/index.js'
@@ -27,10 +28,18 @@ class Threadpool extends EventEmitter {
     return this.#started && !this.#ready
   }
 
-  constructor(path = argv.at(-1), size = availableParallelism(),  env = {}) {
+  constructor(
+    path = argv.at(-1), 
+    size = +process.env.WEB_CONCURRENCY || availableParallelism(),  
+    env = {}) {
     super()
 
     Object.defineProperties(this, {
+      id: {
+        value: randomUUID(),
+        writable : false, enumerable : false, configurable : false
+      },
+
       readyTimeout: {
         value: isInteger(Threadpool.readyTimeout, 'readyTimeout'),
         writable : false, enumerable : false, configurable : false
@@ -77,8 +86,8 @@ class Threadpool extends EventEmitter {
     for (let i = 0; i < this.size; i++) {
       forks.push(await this.#forkThread(this.path, {
         stdio: ['ipc', 'pipe', 'pipe'],
-        env: { ...process.env, ...this.env, index: i }
-      }))
+        env: { ...process.env, ...this.env }
+      }, i))
     }
 
     this.threads = Object.freeze(forks)
@@ -95,7 +104,7 @@ class Threadpool extends EventEmitter {
     if (this.#stopping) {
       emitWarning('stop() ignored, shutdown in progress.')
 
-      return this.threads.map(exits)
+      return []
     }
 
     this.#stopping = true
@@ -130,10 +139,8 @@ class Threadpool extends EventEmitter {
     if (!this.#started)
       return Promise.reject(new Error('Cannot broadcast. Pool not started.'))
 
-    const emits = this.threads.map(thread => thread.bus.emit(...args))
-
-    return emits.length 
-      ? Promise.all(emits) 
+    return this.threads.length 
+      ? Promise.all(this.threads.map(thread => thread.bus.emit(...args))) 
       : Promise.reject(new Error('Cannot broadcast on a non-started pool'))
   }
   
@@ -179,9 +186,18 @@ class Threadpool extends EventEmitter {
     return this.threads[++this.#nextIndex % this.threads.length]
   }
   
-  async #forkThread (path, args) {
+  async #forkThread (path, args, index) {
     const thread = new Thread(
-      cp.fork(path, args), {
+      cp.fork(path, {
+        ...args,
+        env: {
+          ...args.env,
+          IS_THREAD: 1,
+          PARENT_ID: this.id ,
+          INDEX: index
+        }
+      }), {
+      parentId: this.id,
       readyTimeout: this.readyTimeout,
       killTimeout: this.killTimeout
     })
@@ -219,11 +235,11 @@ class Threadpool extends EventEmitter {
   }
 }
 
-const primary = process.env.index 
+const primary = Object.hasOwn(process.env, 'IS_THREAD')
   ? new ThreadBus({ 
-    killTimeout: Threadpool.killTimeout, 
-    readyTimeout: Threadpool.readyTimeout 
-  }) 
+      killTimeout: Threadpool.killTimeout, 
+      readyTimeout: Threadpool.readyTimeout 
+    }) 
   : false
 
 export { Threadpool, primary }

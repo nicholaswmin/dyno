@@ -38,28 +38,44 @@ test('#start()', async t => {
     })
   })
   
-  
-  test('thread env. vars', async t => {
-    const pool = new Threadpool(load('env.js'), 2, { FOO: 'BAR', BAZ: 'QUUX' })
-    const envs = await pool.start()
-      .then(() => new Promise(resolve => pool.on('pong', resolve).emit('ping')))
-      .finally(pool.stop.bind(pool))
-  
-    
-    await t.test('passes env. vars', async t => {
-      t.assert.ok(envs.FOO, 'missing env. variable "FOO"')
-      t.assert.strictEqual(envs.FOO, 'BAR')
+  await t.test('sets threads .env variables', async t => {
+    let env = null
+
+    t.before(async () => {
+      pool = new Threadpool(load('env.js'), 2, { FOO: 'BAR', BAZ: '1' })
       
-      t.assert.ok(envs.BAZ, 'missing env. variable "BAZ"')
-      t.assert.strictEqual(envs.BAZ, 'QUUX')
+      await pool.start()
+
+      env = await new Promise(resolve => 
+        pool.once('pong', resolve).emit('ping'))
     })
-  
     
-    await t.test('passes a spawn index', t => {
-      t.assert.ok(Object.hasOwn(envs, 'index'), 'missing env. variable "index"')
-      t.assert.strictEqual(typeof +envs.index, 'number')
+    await t.test('user-configured .env vars', async t => { 
+      t.assert.ok(!!env.FOO, 'missing env. variable "FOO"')
+      t.assert.strictEqual(env.FOO, 'BAR')
+      
+      t.assert.ok(!!env.BAZ, 'missing env. variable "BAZ"')
+      t.assert.strictEqual(+env.BAZ, 1)
+    })
+    
+    await t.test('system set env. vars', async t => {
+      await t.test('IS_THREAD', async t => { 
+        t.assert.ok(Object.hasOwn(env, 'IS_THREAD'), 'missing env.IS_THREAD')
+        t.assert.strictEqual(!!env.IS_THREAD, true)
+        t.assert.strictEqual(!!process.env.IS_THREAD, false)
+      })
+
+      await t.test('PARENT_ID', async t => { 
+        t.assert.ok(Object.hasOwn(env, 'PARENT_ID'), 'missing env.PARENT_ID')
+        t.assert.strictEqual(env.PARENT_ID, pool.id, 'pool.id != env.PARENT_ID')
+      })
+      
+      await t.test('INDEX', async t => { 
+        t.assert.ok(Object.hasOwn(env, 'INDEX'), 'missing env.INDEX')
+      })
     })
   })
+
 
   await t.test('pool is stopped', async t => {    
     t.before(() => {

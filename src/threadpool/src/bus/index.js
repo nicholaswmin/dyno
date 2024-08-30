@@ -1,6 +1,4 @@
 import { EventEmitter } from 'node:events'
-import { emitWarning } from 'node:process'
-
 import { isChildProcess, isInteger, isString } from '../validate/index.js'
 
 class Bus extends EventEmitter {
@@ -23,29 +21,27 @@ class Bus extends EventEmitter {
 
     return !this.stopped
   }
-  
-  constructBusMessage(...args) {
-    return Object.values({ ...args, from: 'bus', pid: process.pid })
-  }
-  
-  isBusMessage(args) {
-    return args && Array.isArray(args) && args.includes('bus')
-  }
 }
 
 class PrimaryBus extends Bus {
-  constructor(cp, { readyTimeout, killTimeout }) {
+  constructor(cp, { id, readyTimeout, killTimeout }) {
     super('primary')
+
+    this.cp = isChildProcess(cp, 'cp')
+    this.ready = false
+
+    this.id = isString(id, 'id')
+    this.pid  = isString(this.cp.pid.toString(), 'cp.pid')
+
     this.readyTimeout = isInteger(readyTimeout, 'readyTimeout')
     this.killTimeout = isInteger(killTimeout, 'killTimeout')
-    this.ready = false
-    this.cp = isChildProcess(cp, 'cp')
-    
+
+
     this.on('ready-ping', args => this.ready = true)
 
     if (this.canListen())
       this.cp.on('message', args => {
-        if (!this.isBusMessage(args))
+        if (!args.includes('emit'))
           return
 
         super.emit(args.at(0), { ...args.at(1), pid: args.at(-1) })
@@ -64,8 +60,13 @@ class PrimaryBus extends Bus {
     return new Promise((resolve, reject) => {
       if (!this.canEmit())
         return resolve(false)
-
-      const sent = this.cp.send(this.constructBusMessage(...args), err => {    
+      
+      const sent = this.cp.send(Object.values({ 
+        ...args, 
+        from: 'emit', 
+        parentId: this.id, 
+        pid: this.pid
+      }), err => {    
         if (err) return reject(err)
       })
       
@@ -82,7 +83,10 @@ class PrimaryBus extends Bus {
 
     return new Promise((resolve, reject) => {
       let readyTimer = setTimeout(() => {
-        const errmsg = 'no "ready-ping" within timeout. Sending SIGKILL.'
+        const errmsg = [ 
+          `primary: thread ${this.cp.pid}:`, 
+          `"ready-pong" not received in: ${this.readyTimeout} ms timeout.`,
+        ].join(' ')
 
         const exit = err => {
           clearTimeout(sigkillTimer)
@@ -118,32 +122,42 @@ class PrimaryBus extends Bus {
 class ThreadBus extends Bus {
   constructor({ readyTimeout }) {
     super('thread')
-    this.pid = process.pid
+    this.pid = isString(process.pid.toString(), 'process.pid')
+    this.parentId = isString(process.env.PARENT_ID.toString(), 'env.PARENT_ID')
     this.error = false
+    
     this.readyTimeoutTimer = setTimeout(() => {
-      emitWarning(`"ready-ping" timeout, exiting code: 1`, 'handshake')
+      console.error([ 
+        `thread: ${this.pid}:`, 
+        `"ready-ping" not received in: ${readyTimeout} ms timeout.`,
+        'Exiting with code: 1.'
+      ].join(','))
+
       process.exit(1)
     }, isInteger(readyTimeout, 'readyTimeout'))
     
     process.on('message', args => {
-      if (!this.isBusMessage(args))
-        return
-
       if (!this.canListen())
         return
 
-      if (this.error)
+      if (!args.includes('emit'))
         return
-        
-      if (Array.isArray(args) && args.at(0) === 'ready-ping') {
+
+      const forPid = args.at(-1), fromParentId = args.at(-2)
+      
+      if (forPid !== this.pid || fromParentId !== this.parentId) 
+        return
+
+      if (args.includes('ready-ping')) {
         clearTimeout(this.readyTimeoutTimer)
-        this.emit('ready-pong', {})        
+        this.emit('ready-pong', {})     
       }
 
       super.emit(...args) 
     })
     
     process.on('uncaughtException', error => {
+      console.error(error)
       this.error = error.toString()
       throw error
     })
@@ -155,14 +169,29 @@ class ThreadBus extends Bus {
   }
 
   canListen() {
-    return process.connected
+    return process.connected && !this.error
   }
 
   emit(...args) {
-    if (!this.canEmit()) 
-      return false
-    
-    return process.send(this.constructBusMessage(...args))
+    return new Promise((resolve, reject) => {
+      if (!this.canEmit())
+        return resolve(false)
+      
+      const sent = process.send(Object.values({ 
+        ...args, from: 'emit', pid: this.pid
+      }), err => {    
+        if (err) return reject(err)
+      })
+      
+      return process.nextTick(() => sent 
+        ? resolve(true) 
+        : (() => {
+          this.error = new Error('IPC rate exceeded.')
+          
+          return reject(error)
+        })()
+      )
+    })
   }
 }
 

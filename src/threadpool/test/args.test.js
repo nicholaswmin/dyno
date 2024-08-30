@@ -63,6 +63,23 @@ test('#constructor()', async t => {
         t.assert.throws(() => new Threadpool(null, 0), { name: 'RangeError' })
       })
     })
+    
+    await t.test('setting process.env.WEB_CONCURRENCY', async t => {
+      t.before(() => process.env.WEB_CONCURRENCY = 7)
+      t.after(() => delete process.env.WEB_CONCURRENCY)
+
+      await t.test('overrides default pool.size value', t => {
+        const pool = new Threadpool()
+
+        t.assert.strictEqual(pool.size, 7)
+      })
+      
+      await t.test('does not override explicit pool.size', t => {
+        const pool = new Threadpool(null, 3, { foo: 'bar' })
+
+        t.assert.strictEqual(pool.size, 3)
+      })
+    })
   })
   
   

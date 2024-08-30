@@ -37,6 +37,27 @@ test('#stop()', async t => {
   })
   
   
+  await t.test('double stop() while previous is pending', async t => {    
+    t.before(() => {
+      cp.fork.mock.resetCalls()
+
+      pool = new Threadpool(load('exit-ok.js'))
+      
+      return pool.start()
+    })
+
+    await t.test('both resolve', async t => {   
+      await t.assert.doesNotReject(() => Promise.all([ 
+        pool.stop(), pool.stop() 
+      ]))
+    })
+
+    await t.test('all threads exit', t => {          
+      t.assert.strictEqual(cp.instances().filter(dead).length, pool.size)
+      t.assert.strictEqual(cp.instances().filter(alive).length, 0)
+    })
+  })
+  
   await t.test('threads SIGTERM handler exits: 0', async t => {    
     t.before(() => {
       cp.fork.mock.resetCalls()

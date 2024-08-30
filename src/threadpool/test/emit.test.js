@@ -1,6 +1,7 @@
 import test from 'node:test'
 import cp from 'node:child_process'
 import { join } from 'node:path'
+import { randomUUID } from 'node:crypto'
 import { Threadpool } from '../index.js'
 
 const fork = cp.fork
@@ -13,13 +14,10 @@ const mockResultMethods = fns => ({ result }) => Object.assign(
 )
 
 test('#emit()', async t => {
-  let pool = null
+  const pool = new Threadpool(load('pong.js'))
 
-  t.afterEach(() => pool.stop())
-  t.beforeEach(() => {
-    pool = new Threadpool(load('pong.js'), 2)
-    return pool.start()
-  })    
+  t.after(() => pool.stop())
+  t.before(() => pool.start())    
 
   await t.test('resolves true', async t => {
     t.assert.strictEqual(await pool.emit('ping'), true)
@@ -33,10 +31,14 @@ test('#emit()', async t => {
   })
 
   await t.test('sends event, only once', async t => {
-    const dbounce = t.mock.fn(dbouncer(t._timer))
+    const dbounce = t.mock.fn(dbouncer(t._timer)), 
+          _pingid = randomUUID()
     
     await new Promise((resolve, reject) => {
-      pool.on('pong', () => dbounce(resolve, 50)).emit('ping').catch(reject)
+      pool.on('pong', ({ id }) => {
+        if (id === _pingid) 
+          dbounce(resolve, 50)
+      }).emit('ping', { id: _pingid }).catch(reject)
     })
 
     t.assert.strictEqual(dbounce.mock.callCount(), 1, 'got back > 1 pong')
@@ -46,16 +48,18 @@ test('#emit()', async t => {
     t.plan(pool.size)
 
     const pids = await new Promise((resolve, reject) => {
-      const _pids = []
-      pool.on('pong', ({ pid }) => 
-        _pids.push({ pid }) === pool.size * 2 
-          ? resolve(_pids) 
-          : pool.emit('ping').catch(reject)
-      ).emit('ping').catch(reject)
+      const _pids = [], _pingid = randomUUID()
+
+      pool.on('pong', ({ pid, id }) => {
+        if (id === _pingid)
+          return _pids.push({ pid }) % pool.size === 0
+            ? resolve(_pids)
+            : pool.emit('ping', { id: _pingid }).catch(reject)
+      }).emit('ping', { id: _pingid }).catch(reject)
     })
     
      Object.values(Object.groupBy(pids, ({ pid }) => pid)).forEach(pongs => {
-       t.assert.strictEqual(pongs.length, 2)
+       t.assert.strictEqual(pongs.length, 1)
      })
   })
   

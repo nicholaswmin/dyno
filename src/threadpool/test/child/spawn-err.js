@@ -2,5 +2,5 @@
 
 import { primary } from '../../index.js'
 
-if (+process.env.index === 0)
+if (+process.env.INDEX === 0)
   throw new Error('Simulated Spawn Error')

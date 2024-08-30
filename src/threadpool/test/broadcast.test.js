@@ -1,6 +1,7 @@
 import test from 'node:test'
 import cp from 'node:child_process'
 import { join } from 'node:path'
+import { randomUUID } from 'node:crypto'
 import { Threadpool } from '../index.js'
 
 const fork = cp.fork
@@ -13,15 +14,12 @@ const mockResultMethods = fns => ({ result }) => Object.assign(
 )
 
 test('#broadcast()', async t => {
-  let pool = null
+  const pool = new Threadpool(load('pong.js'))
 
-  t.afterEach(() => pool.stop())
-  t.beforeEach(() => {
-    pool = new Threadpool(load('pong.js'), 2)
-    return pool.start()
-  })    
+  t.before(() => pool.start())    
+  t.after(() => pool.stop())
 
-  await t.test('resolves array of IPC send results', async t => {
+  await t.test('resolves IPC send result list', async t => {
     const results = await pool.broadcast('ping')
 
     t.assert.ok(Array.isArray(results), 'resolved results is not an Array')
@@ -38,8 +36,13 @@ test('#broadcast()', async t => {
     const dbounce = t.mock.fn(dbouncer(t._timer))
     
     await new Promise((resolve, reject) => {
-      pool.on('pong', () => dbounce(resolve, 50))
-        .broadcast('ping').catch(reject)
+      const _pingid = randomUUID()
+
+      pool.on('pong', ({ id }) => {
+        if (id === _pingid) 
+          dbounce(resolve, 50)
+      })
+      .broadcast('ping', { id: _pingid }).catch(reject)
     })
 
     t.assert.strictEqual(dbounce.mock.callCount(), pool.size,
@@ -48,21 +51,18 @@ test('#broadcast()', async t => {
   
   await t.test('event sent uniformly across threads', async t => {
     t.plan(pool.size)
-
+    
     const pids = await new Promise((resolve, reject) => {
-      let _pids = []
+      const _pids = [], _pingid = randomUUID()
 
-      pool.on('pong', ({ pid, startup_ping }) => 
-        startup_ping === false
-          ? _pids.push({ pid }) % (pool.size * 2) === 0
-            ? resolve(_pids)
-          : null
-        : pool.broadcast('ping', { startup_ping: false }).catch(reject)
-      ).broadcast('ping', { startup_ping: true }).catch(reject)
+      pool.on('pong', ({ pid, id }) => {
+        if (id === _pingid && _pids.push({ pid }) % pool.size * 2 === 0)
+          resolve(_pids)
+      }).broadcast('ping', { id: _pingid }).catch(reject)
     })
 
     Object.values(Object.groupBy(pids, ({ pid }) => pid)).forEach(pongs => {
-      t.assert.strictEqual(pongs.length, 2)
+      t.assert.strictEqual(pongs.length, 1)
     })
   })
   
@@ -77,8 +77,38 @@ test('#broadcast()', async t => {
   })
 })
 
+test('#broadcast() parallel instances', async t => {  
+  const pools = [
+    new Threadpool(load('pong.js'), 2),
+    new Threadpool(load('pong.js'), 5),
+    new Threadpool(load('pong.js'))
+  ]
+  
+  t.before(() => Promise.all(pools.map(pool => pool.start())))  
+  t.after(() => Promise.all(pools.map(pool => pool.stop())))  
+
+  await t.test('each pool gets its own pongs, only', async t => {
+    const pongs = await Promise.all(pools.map((pool, i) => {
+      return new Promise((resolve, reject) => {
+        const dbounce = t.mock.fn(dbouncer(t._timer))
+
+        pool.on('pong', () => dbounce(() => 
+          resolve({ got: dbounce.mock.callCount(), exp: pool.size }), 50))
+        .broadcast('ping').catch(reject)
+
+      })
+    }))
+    
+    t.plan(pools.length)
+
+    pongs.forEach(({ got, exp }, i) => {
+      t.assert.strictEqual(got, exp, `${i}, expected: ${exp}, got: ${got}`)
+    })
+  })
+})
+
 test('#broadcast() non-started pool', async t => {
-  const pool = new Threadpool(load('pong.js'), 2)
+  const pool = new Threadpool(load('pong.js'))
 
   await t.test('rejects with error', async t => {
     await t.assert.rejects(pool.broadcast.bind(pool, 'foo'), {
@@ -88,7 +118,7 @@ test('#broadcast() non-started pool', async t => {
 })
 
 test('#broadcast() stopped pool', async t => {
-  const pool = new Threadpool(load('pong.js'), 2)
+  const pool = new Threadpool(load('pong.js'))
 
   t.before(async () => {
     await pool.start()
@@ -105,7 +135,7 @@ test('#broadcast() stopped pool', async t => {
 test('#broadcast() IPC has error', async t => {
   cp.fork = t.mock.fn(fork)
 
-  const pool = new Threadpool(load('pong.js'), 2)
+  const pool = new Threadpool(load('pong.js'))
 
   t.before(() => pool.start()) 
   t.after(() => pool.stop())
@@ -127,7 +157,7 @@ test('#broadcast() IPC has error', async t => {
 test('#broadcast() IPC indicates rate limit', async t => {
   cp.fork = t.mock.fn(fork)
 
-  const pool = new Threadpool(load('pong.js'), 2)
+  const pool = new Threadpool(load('pong.js'))
   
   t.after(() => pool.stop())
   t.before(() => pool.start())  

@@ -25,7 +25,7 @@ class Thread extends EventEmitter {
   set signalCode(signal)   {}
   set connected(connected) {}
   
-  constructor(cp, { readyTimeout, killTimeout }) {
+  constructor(cp, { parentId, readyTimeout, killTimeout }) {
     super()
 
     Object.defineProperties(this, {
@@ -35,7 +35,7 @@ class Thread extends EventEmitter {
       },
 
       bus: {
-        value: new PrimaryBus(cp, { readyTimeout, killTimeout }),
+        value: new PrimaryBus(cp, { id: parentId, readyTimeout, killTimeout }),
         writable : false, enumerable : false, configurable : false
       },
 
