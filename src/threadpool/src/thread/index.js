@@ -128,7 +128,7 @@ class Thread extends EventEmitter {
         ? this.cp.signalCode === 'SIGKILL' ? 1 : 0 : null
   }
   
-  #addErrorListeners(ee) {
+  #addErrorListeners(cp) {
     const onError = err => 
       this.off('exit', onExit).emit('err', err)
 
@@ -139,10 +139,14 @@ class Thread extends EventEmitter {
         this.off('error', onError).emit('err', err)
     }
 
-    if (ee.stderr)
-      ee.stderr.on('data', data => this.#stderr += data.toString().trim())
+    if (cp.stderr)
+      cp.stderr.on('data', data => this.#stderr += data.toString().trim())
 
-    ee.once('exit', onExit.bind(this)).once('error', onError.bind(this))
+    cp.once('exit', onExit.bind(this)).once('error', err => {
+      return this.kill().then(onError.bind(this, err)).catch(killErr => {
+        return onError(new Error(killErr, { cause: err }))
+      })
+    })
   }
 }
 

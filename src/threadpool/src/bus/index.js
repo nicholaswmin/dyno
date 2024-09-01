@@ -122,6 +122,7 @@ class PrimaryBus extends Bus {
 class ThreadBus extends Bus {
   constructor({ readyTimeout }) {
     super('thread')
+
     this.pid = isString(process.pid.toString(), 'process.pid')
     this.parentId = isString(process.env.PARENT_ID.toString(), 'env.PARENT_ID')
     this.error = false
@@ -157,10 +158,14 @@ class ThreadBus extends Bus {
     })
     
     process.on('uncaughtException', error => {
-      console.error(error)
       this.error = error.toString()
+
+      console.error(error)
+
       throw error
-    })
+    })  
+  
+    process.send('spawned')  
   }
   
   stop() {

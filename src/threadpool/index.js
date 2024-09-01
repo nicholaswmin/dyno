@@ -1,14 +1,15 @@
-import cp from 'node:child_process'
 import { availableParallelism } from 'node:os'
 import { EventEmitter } from 'node:events'
 import { emitWarning, argv } from 'node:process'
 import { randomUUID } from 'node:crypto'
 
+import { fork } from './src/fork/index.js'
 import { Thread } from './src/thread/index.js'
 import { PrimaryBus, ThreadBus } from './src/bus/index.js'
 import { isObject, isInteger, isString } from './src/validate/index.js'
 
 class Threadpool extends EventEmitter {
+  static spawnTimeout = 250
   static readyTimeout = 250
   static killTimeout  = 250
 
@@ -37,6 +38,11 @@ class Threadpool extends EventEmitter {
     Object.defineProperties(this, {
       id: {
         value: randomUUID(),
+        writable : false, enumerable : false, configurable : false
+      },
+      
+      spawnTimeout: {
+        value: isInteger(Threadpool.spawnTimeout, 'spawnTimeout'),
         writable : false, enumerable : false, configurable : false
       },
 
@@ -84,9 +90,8 @@ class Threadpool extends EventEmitter {
     const forks = []
 
     for (let i = 0; i < this.size; i++) {
-      forks.push(await this.#forkThread(this.path, {
-        stdio: ['ipc', 'pipe', 'pipe'],
-        env: { ...process.env, ...this.env }
+      forks.push(await this.#createThread(this.path, {
+        ...process.env, ...this.env
       }, i))
     }
 
@@ -186,17 +191,17 @@ class Threadpool extends EventEmitter {
     return this.threads[++this.#nextIndex % this.threads.length]
   }
   
-  async #forkThread (path, args, index) {
-    const thread = new Thread(
-      cp.fork(path, {
-        ...args,
-        env: {
-          ...args.env,
-          IS_THREAD: 1,
-          PARENT_ID: this.id ,
-          INDEX: index
-        }
-      }), {
+  async #createThread (path, env, index) {
+    const childProcess = await fork(path, {
+      ...env,
+      IS_THREAD: 1,
+      PARENT_ID: this.id,
+      INDEX: index
+    }, {
+      spawnTimeout: this.spawnTimeout
+    }) 
+
+    const thread = new Thread(childProcess, {
       parentId: this.id,
       readyTimeout: this.readyTimeout,
       killTimeout: this.killTimeout
@@ -240,6 +245,6 @@ const primary = Object.hasOwn(process.env, 'IS_THREAD')
       killTimeout: Threadpool.killTimeout, 
       readyTimeout: Threadpool.readyTimeout 
     }) 
-  : false
+  : null
 
 export { Threadpool, primary }

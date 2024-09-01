@@ -1,3 +1,5 @@
+import { primary } from '../../index.js'
+
 // starts up with a blocked event loop
 function fibonacci(n) {
   return n < 1 ? 0
