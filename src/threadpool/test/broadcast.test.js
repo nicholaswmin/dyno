@@ -5,7 +5,7 @@ import { randomUUID } from 'node:crypto'
 import { Threadpool } from '../index.js'
 
 const fork = cp.fork
-const load = filename => join(import.meta.dirname, `./child/${filename}`)
+const load = file => join(import.meta.dirname, `./child-modules/${file}`)
 const dbouncer = t => (fn, ms) => t = clearTimeout(t) || setTimeout(fn, ms)
 const mockResultMethods = fns => ({ result }) => Object.assign(
   result, Object.keys(fns).reduce((instance, fn) => ({ 
@@ -88,16 +88,20 @@ test('#broadcast() parallel instances', async t => {
   t.after(() => Promise.all(pools.map(pool => pool.stop())))  
 
   await t.test('each pool gets its own pongs, only', async t => {
-    const pongs = await Promise.all(pools.map((pool, i) => {
-      return new Promise((resolve, reject) => {
+    const pongs = await Promise.all(pools.map((pool, i) => 
+      new Promise((resolve, reject) => {
         const dbounce = t.mock.fn(dbouncer(t._timer))
-
-        pool.on('pong', () => dbounce(() => 
-          resolve({ got: dbounce.mock.callCount(), exp: pool.size }), 50))
-        .broadcast('ping').catch(reject)
-
+  
+        pool.on('pong', () => dbounce(() => resolve({ 
+            got: dbounce.mock.callCount(), 
+            exp: pool.size 
+          }), 50)
+        )
+        .broadcast('ping')
+        .catch(reject)
+  
       })
-    }))
+    ))
     
     t.plan(pools.length)
 

@@ -4,7 +4,7 @@ import { join } from 'node:path'
 import { Threadpool } from '../index.js'
 
 const alive = cp => !cp.killed
-const load  = filename => join(import.meta.dirname, `./child/${filename}`)
+const load  = file => join(import.meta.dirname, `./child-modules/${file}`)
 
 test('threads throw runtime error', async t => {
   cp.fork      = t.mock.fn(cp.fork)

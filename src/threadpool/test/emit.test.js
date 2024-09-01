@@ -5,7 +5,7 @@ import { randomUUID } from 'node:crypto'
 import { Threadpool } from '../index.js'
 
 const fork = cp.fork
-const load = filename => join(import.meta.dirname, `./child/${filename}`)
+const load = file => join(import.meta.dirname, `./child-modules/${file}`)
 const dbouncer = t => (fn, ms) => t = clearTimeout(t) || setTimeout(fn, ms)
 const mockResultMethods = fns => ({ result }) => Object.assign(
   result, Object.keys(fns).reduce((instance, fn) => ({ 

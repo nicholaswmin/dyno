@@ -2,9 +2,7 @@ import test from 'node:test'
 import { join } from 'node:path'
 import { Threadpool } from '../index.js'
 
-const alive = cp => !cp.killed
-const dead  = cp =>  cp.killed
-const load  = filename => join(import.meta.dirname, `./child/${filename}`)
+const load  = file => join(import.meta.dirname, `./child-modules/${file}`)
 
 test('#on()', async t => {
   const pool = new Threadpool(load('pinger.js'))
