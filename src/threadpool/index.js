@@ -30,7 +30,7 @@ class Threadpool extends EventEmitter {
 
   constructor(
     path = argv.at(-1), 
-    size = +process.env.WEB_CONCURRENCY || availableParallelism(),  
+    size = +process.env.POOL_CONCURRENCY || availableParallelism(),  
     env = {}) {
     super()
 

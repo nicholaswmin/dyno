@@ -64,9 +64,9 @@ test('#constructor()', async t => {
       })
     })
     
-    await t.test('setting process.env.WEB_CONCURRENCY', async t => {
-      t.before(() => process.env.WEB_CONCURRENCY = 7)
-      t.after(() => delete process.env.WEB_CONCURRENCY)
+    await t.test('setting process.env.POOL_CONCURRENCY', async t => {
+      t.before(() => process.env.POOL_CONCURRENCY = 7)
+      t.after(() => delete process.env.POOL_CONCURRENCY)
 
       await t.test('overrides default pool.size value', t => {
         const pool = new Threadpool()
