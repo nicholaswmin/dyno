@@ -151,7 +151,7 @@ Thread's [Process ID][pid]
 
 ## Primary API
 
-> Meant to be used in the thread file, `thread-to-primary` [IPC][ipc]
+> For `thread-to-primary` [IPC][ipc], for usage in the thread code file
 
 #### `primary.on(name, listener)`
 
