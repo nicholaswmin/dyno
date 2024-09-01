@@ -20,12 +20,12 @@ class Threadpool extends EventEmitter {
     return this.threads.every(t => t.alive)
   }
 
-  get #started() {
+  get started() {
     return !!this.threads.length
   }
   
-  get #stopped() {
-    return this.#started && !this.#ready
+  get stopped() {
+    return this.started && !this.#ready
   }
 
   constructor(
@@ -76,7 +76,7 @@ class Threadpool extends EventEmitter {
     if (this.#stopping)
       return emitWarning('start() ignored, startup in progress.')
 
-    if (this.#stopped)
+    if (this.stopped)
       throw new Error('cannot start() a stopped pool')
 
     this.#starting = true
@@ -119,10 +119,10 @@ class Threadpool extends EventEmitter {
   }
   
   emit(name, data) {
-    if (this.#stopped)
+    if (this.stopped)
       return Promise.reject(new Error('Cannot emit. Pool stopped.'))
     
-    if (!this.#started)
+    if (!this.started)
       return Promise.reject(new Error('Cannot emit. Pool not started.'))
 
     const thread = this.#nextThread()
@@ -133,10 +133,10 @@ class Threadpool extends EventEmitter {
   }
   
   broadcast(...args) {
-    if (this.#stopped)
+    if (this.stopped)
       return Promise.reject(new Error('Cannot broadcast. Pool stopped.'))
     
-    if (!this.#started)
+    if (!this.started)
       return Promise.reject(new Error('Cannot broadcast. Pool not started.'))
 
     return this.threads.length 
@@ -202,7 +202,7 @@ class Threadpool extends EventEmitter {
       killTimeout: this.killTimeout
     })
 
-    thread.once('thread-error', this.#onThreadError.bind(this))
+    thread.on('err', this.#onThreadError.bind(this))
 
     thread.stdout.on('data', data => console.log(data.toString()))    
     thread.stderr.on('data', data => {

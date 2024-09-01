@@ -65,27 +65,37 @@ test('threads throw runtime error', async t => {
   })
 })
 
-test('child_process emits "error" event', async t => {
+test('ChildProcess emits "error" event after spawning', async t => {
   const pool = new Threadpool(load('ok.js'))
 
   cp.fork = t.mock.fn(cp.fork)
   cp.instances = () => cp.fork.mock.calls.map(call => call.result)
-  t.afterEach(() => pool.stop())
 
-  // @TODO
-  // - change `t.todo(..` to `await t.test(...`
-  // - fix test failing on `ChildProcess` emitting 'error' event, 
-  //   seems like 'error' is crashing the process
-  t.todo('re-emitted as "thread-error" w/o crashing', async t => {
-    t.before(() => pool.start())
+  t.before(() => pool.start())
 
-    const err = await new Promise((resolve, reject) => {
-      pool.once('thread-error', resolve)
+  await t.test('re-emits it as "pool-error" w/o crashing process', async t => {
+    const err = await new Promise(resolve => {
+      pool.once('pool-error', resolve)
       cp.instances().at(0).emit('error', new Error('Simulated CP Error'))
     })
 
-    t.assert.ok(err.message.includes('Simulated CP Error'), 
-      `error: "${err.message}", expected "Simulated CP Error"`
-    )
+    await t.test('event includes an Error instance', t => {
+      t.assert.ok(err, 'error is falsy or undefined')
+      t.assert.ok(err instanceof Error, 'error is not an Error instance')
+    })
+    
+    await t.test('error message includes ChildProcess error', async t => {
+      t.assert.ok(err.message.includes('Simulated CP Error'), 
+        `error: "${err.message}", expected "Simulated CP Error"`
+      )
+    })
+    
+    await t.test('stops the pool', t => {
+      t.assert.strictEqual(pool.stopped, true)
+    })
+    
+    await t.test('all threads exit', t => {     
+      t.assert.strictEqual(cp.instances().filter(alive).length, 0)
+    })
   })
 })
