@@ -213,7 +213,7 @@ const pool = new Threadpool('thread.js')
 NODE_ENV=test node --run test
 ```
 
-> also outputs coverage at `test/lcov.info`
+> test coverage saved as: `test/lcov.info`
 
 
 ### Benchmark
