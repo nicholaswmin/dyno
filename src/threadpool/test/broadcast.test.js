@@ -36,13 +36,13 @@ test('#broadcast()', async t => {
     const dbounce = t.mock.fn(dbouncer(t._timer))
     
     await new Promise((resolve, reject) => {
-      const _pingid = randomUUID()
+      const _id = randomUUID()
 
       pool.on('pong', ({ id }) => {
-        if (id === _pingid) 
+        if (id === _id) 
           dbounce(resolve, 50)
       })
-      .broadcast('ping', { id: _pingid }).catch(reject)
+      .broadcast('ping', { id: _id }).catch(reject)
     })
 
     t.assert.strictEqual(dbounce.mock.callCount(), pool.size,
@@ -53,12 +53,15 @@ test('#broadcast()', async t => {
     t.plan(pool.size)
     
     const pids = await new Promise((resolve, reject) => {
-      const _pids = [], _pingid = randomUUID()
+      const pids = [], pingID = randomUUID()
 
-      pool.on('pong', ({ pid, id }) => {
-        if (id === _pingid && _pids.push({ pid }) % pool.size * 2 === 0)
-          resolve(_pids)
-      }).broadcast('ping', { id: _pingid }).catch(reject)
+      pool.on('pong', ({ pid, pongID }) => {
+        if (pongID !== pingID) 
+          return
+
+        if (pids.push({ pid }) % pool.size * 2 === 0)
+          resolve(pids)
+      }).broadcast('ping', { pongID: pingID }).catch(reject)
     })
 
     Object.values(Object.groupBy(pids, ({ pid }) => pid)).forEach(pongs => {
@@ -68,8 +71,7 @@ test('#broadcast()', async t => {
   
   await t.test('sends event data', async t => {
     const data = await new Promise((resolve, reject) => {
-      pool.once('pong', resolve)
-        .broadcast('ping', { foo: 123 }).catch(reject)
+      pool.once('pong', resolve).broadcast('ping', { foo: 123 }).catch(reject)
     })
     
     t.assert.strictEqual(typeof data.foo, 'number')

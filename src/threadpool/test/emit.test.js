@@ -31,14 +31,13 @@ test('#emit()', async t => {
   })
 
   await t.test('sends event, only once', async t => {
-    const dbounce = t.mock.fn(dbouncer(t._timer)), 
-          _pingid = randomUUID()
+    const dbounce = t.mock.fn(dbouncer(t._timer)), pingID = randomUUID()
     
     await new Promise((resolve, reject) => {
-      pool.on('pong', ({ id }) => {
-        if (id === _pingid) 
-          dbounce(resolve, 50)
-      }).emit('ping', { id: _pingid }).catch(reject)
+      pool.on('pong', ({ pongID }) => pongID === pingID 
+        ? dbounce(resolve, 50) 
+        : null
+      ).emit('ping', { pongID: pingID }).catch(reject)
     })
 
     t.assert.strictEqual(dbounce.mock.callCount(), 1, 'got back > 1 pong')
@@ -48,25 +47,25 @@ test('#emit()', async t => {
     t.plan(pool.size)
 
     const pids = await new Promise((resolve, reject) => {
-      const _pids = [], _pingid = randomUUID()
+      const pids = [], pingID = randomUUID()
 
-      pool.on('pong', ({ pid, id }) => {
-        if (id === _pingid)
-          return _pids.push({ pid }) % pool.size === 0
-            ? resolve(_pids)
-            : pool.emit('ping', { id: _pingid }).catch(reject)
-      }).emit('ping', { id: _pingid }).catch(reject)
+      pool.on('pong', ({ pid, pongID }) => {
+        if (pongID !== pingID) return
+        
+        return pids.push({ pid }) % pool.size === 0
+          ? resolve(pids)
+          : pool.emit('ping', { pongID: pingID }).catch(reject)
+      }).emit('ping', { pongID: pingID }).catch(reject)
     })
     
-     Object.values(Object.groupBy(pids, ({ pid }) => pid)).forEach(pongs => {
-       t.assert.strictEqual(pongs.length, 1)
-     })
+    const pongsPerPID = Object.values(Object.groupBy(pids, ({ pid }) => pid))
+  
+    pongsPerPID.forEach(group => t.assert.strictEqual(group.length, 1))
   })
   
   await t.test('sends event data', async t => {
     const data = await new Promise((resolve, reject) => {
-      pool.once('pong', resolve)
-        .emit('ping', { foo: 123 }).catch(reject)
+      pool.once('pong', resolve).emit('ping', { foo: 123 }).catch(reject)
     })
     
     t.assert.strictEqual(typeof data.foo, 'number')
