@@ -1,7 +1,7 @@
 import { validatePositiveInteger } from './validators.js'
-import histogram from '../histogram/index.js'
+import { metric } from '../metrics/index.js'
 
-class Scheduler {
+class CycleScheduler {
   constructor({ cyclesPerSecond }) {
     this.on = true
     this.timer = null
@@ -40,7 +40,7 @@ class Scheduler {
         thread: thread,
         handler: function measureCompleted({ name }) {
           if (['cycle:completed'].includes(name))
-            histogram('completed').record(1)
+            metric('completed').record(1)
         }
       }
 
@@ -81,7 +81,7 @@ class Scheduler {
   
       thread && thread.connected && this.on
         ? thread.send({ name: 'cycle:start' }) 
-          ? histogram('issued').record(1)
+          ? metric('issued').record(1)
           : (() => {
             throw new Error('IPC oversaturated. Set "cyclesPerSecond" lower')
           })
@@ -114,4 +114,4 @@ class Scheduler {
   }
 }
 
-export default Scheduler
+export default CycleScheduler

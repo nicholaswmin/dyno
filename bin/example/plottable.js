@@ -5,11 +5,11 @@ import console from '@nicholaswmin/console-plot'
 
 await dyno(async function cycle() { 
 
-  await performance.timerify(function sleepRandom1(ms) {
+  await performance.timerify(function sleepOne(ms) {
     return new Promise(r => setTimeout(r, Math.random() * ms))
   })(Math.random() * 20)
   
-  await performance.timerify(function sleepRandom2(ms) {
+  await performance.timerify(function sleepTwo(ms) {
     return new Promise(r => setTimeout(r, Math.random() * ms))
   })(Math.random() * 20)
   
@@ -17,9 +17,9 @@ await dyno(async function cycle() {
 
   parameters: { cyclesPerSecond: 15, durationMs: 20 * 1000 },
 
-  onTick: list => {  
+  onTick: metrics => {  
     console.clear()
-    console.plot(list().threads().pick('snapshots').of('mean').group(), {
+    console.plot(metrics().threads().pick('snapshots').of('mean').group(), {
       title: 'Plot',
       subtitle: 'mean durations (ms)'
     })

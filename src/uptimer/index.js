@@ -1,4 +1,4 @@
-import histogram from '../histogram/index.js'
+import { metric } from '../metrics/index.js'
 
 class Uptimer {
   constructor() {
@@ -13,11 +13,11 @@ class Uptimer {
   
   stop() {
     clearInterval(this.timer)
-    histogram().stop()
+    metric().stop()
   }
   
   #tick() {
-    return this.on ? histogram('uptime').record(1) : false
+    return this.on ? metric('uptime').record(1) : false
   }
 }
 
