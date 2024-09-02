@@ -5,7 +5,7 @@
   "description": "tiny threadpool with ergonomic IPC",
   "main": "index.js",
   "scripts": {
-    "test": "POOL_CONCURRENCY=3 node --test --experimental-test-coverage --test-reporter=spec --test-reporter=lcov --test-reporter-destination=stdout --test-reporter-destination=test/lcov.info \"test/*.test.js\"",
+    "test": "POOL_CONCURRENCY=3 node --test --experimental-test-coverage --test-reporter=spec --test-reporter=lcov --test-reporter-destination=stdout --test-reporter-destination=test/lcov.info \"test/**/*.test.js\"",
     "bench": "node test/bench/primary.js"
   },
   "engines": {

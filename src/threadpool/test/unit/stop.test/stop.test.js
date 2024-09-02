@@ -1,12 +1,12 @@
 import test from 'node:test'
 import cp from 'node:child_process'
 import { join } from 'node:path'
-import { Threadpool } from '../index.js'
+import { Threadpool } from '../../../index.js'
 
 
 const dead  = cp => !alive(cp)
 const alive = cp => cp.exitCode === null & cp.signalCode === null
-const load  = file => join(import.meta.dirname, `./child-modules/${file}`)
+const load  = file => join(import.meta.dirname, `../../child-modules/${file}`)
 
 
 test('#stop()', async t => {
@@ -37,6 +37,7 @@ test('#stop()', async t => {
     })
   })
 })
+
 
 test('#stop() error cases', async t => {
   let pool     = null 

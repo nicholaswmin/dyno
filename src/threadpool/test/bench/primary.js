@@ -44,5 +44,6 @@ setInterval(() => {
 
 // Graceful exit
 
-;['SIGINT','SIGTERM'].forEach(e => 
-  process.on(e, () => pool.stop().then(process.exit.bind(process, 0))))
+process.on('beforeExit', async () => {
+  await pool.stop()
+})

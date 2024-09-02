@@ -1,5 +1,5 @@
 import test from 'node:test'
-import { Threadpool } from '../index.js'
+import { Threadpool } from '../../../index.js'
 
 
 test('#constructor()', async t => {
