@@ -1,17 +1,23 @@
+// `child_process.fork()` but normalized so it: 
+// 
+// - Checks if created `ChildProcess` is valid, if not, kills it and rejects.
+// - Expects the `ChildProcess` file to send a `process.send('spawned')` message
+//   to the parent immediately upon loading.
+
 import cp from 'node:child_process'
 
-const createMissingSpawnedError = () => new Error(
-  'Missing "spawned" event. Did you import primary bus?'
-)
+const createMissingSpawnedError = () => new Error('Missing "spawned" evt')
 
 const kill = child => {
   if (child.exitCode === null && child.signalCode === null)
     child.kill()
-  
+
   return child
 }
 
-const fork = (path, env, { spawnTimeout }) => {
+const discard = child => offAll(child)
+
+export default (path, env, { spawnTimeout }) => {
   return new Promise((resolve, reject) => {
     let child, stderr = '', error = null
 
@@ -64,5 +70,3 @@ const fork = (path, env, { spawnTimeout }) => {
     child.stderr.on('data', onstderr)
   })
 }
-
-export { fork }

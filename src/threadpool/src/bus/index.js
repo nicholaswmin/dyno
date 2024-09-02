@@ -27,17 +27,12 @@ class PrimaryBus extends Bus {
   constructor(cp, { id, readyTimeout, killTimeout }) {
     super('primary')
 
-    this.cp = isChildProcess(cp, 'cp')
-    this.ready = false
-
-    this.id = isString(id, 'id')
-    this.pid  = isString(this.cp.pid.toString(), 'cp.pid')
+    this.cp  = isChildProcess(cp, 'cp')
+    this.id  = isString(id, 'id')
+    this.pid = isString(this.cp.pid.toString(), 'cp.pid')
 
     this.readyTimeout = isInteger(readyTimeout, 'readyTimeout')
-    this.killTimeout = isInteger(killTimeout, 'killTimeout')
-
-
-    this.on('ready-ping', args => this.ready = true)
+    this.killTimeout  = isInteger(killTimeout, 'killTimeout')
 
     if (this.canListen())
       this.cp.on('message', args => {
@@ -82,7 +77,7 @@ class PrimaryBus extends Bus {
       return resolve()
 
     return new Promise((resolve, reject) => {
-      let readyTimer = setTimeout(() => {
+      const readyTimer = setTimeout(() => {
         const errmsg = [ 
           `primary: thread ${this.cp.pid}:`, 
           `"ready-pong" not received in: ${this.readyTimeout} ms timeout.`,
@@ -108,7 +103,7 @@ class PrimaryBus extends Bus {
           reject(new Error(`${errmsg} SIGKILL cleanup signal failed.`))
       }, this.readyTimeout)
 
-      this.on('ready-pong', err => {
+      this.once('ready-pong', err => {
         clearTimeout(readyTimer)
 
         return resolve()

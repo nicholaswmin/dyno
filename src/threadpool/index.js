@@ -3,7 +3,7 @@ import { EventEmitter } from 'node:events'
 import { emitWarning, argv } from 'node:process'
 import { randomUUID } from 'node:crypto'
 
-import { fork } from './src/fork/index.js'
+import fork from './src/fork/index.js'
 import { Thread } from './src/thread/index.js'
 import { PrimaryBus, ThreadBus } from './src/bus/index.js'
 import { isObject, isInteger, isString } from './src/validate/index.js'
@@ -40,7 +40,7 @@ class Threadpool extends EventEmitter {
         value: randomUUID(),
         writable : false, enumerable : false, configurable : false
       },
-      
+
       spawnTimeout: {
         value: isInteger(Threadpool.spawnTimeout, 'spawnTimeout'),
         writable : false, enumerable : false, configurable : false
@@ -103,6 +103,8 @@ class Threadpool extends EventEmitter {
   }
 
   async stop() {
+    this.threads.map(thread => thread.removeAllListeners())
+
     const exits = thread => thread.exitCode,
           alive = this.threads.filter(thread => thread.alive) 
 

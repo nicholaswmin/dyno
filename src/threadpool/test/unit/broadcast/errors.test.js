@@ -6,8 +6,8 @@ const fork = cp.fork
 
 test('#broadcast() parallel instances', async t => {  
   const pools = [
-    new Threadpool(load('pong.js'), 2),
-    new Threadpool(load('pong.js'), 5),
+    new Threadpool(load('pong.js')),
+    new Threadpool(load('pong.js')),
     new Threadpool(load('pong.js'))
   ]
   

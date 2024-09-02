@@ -1,6 +1,6 @@
 import { loadavg } from 'node:os'
 import { path, size, kibs } from './params.js'
-import { Threadpool } from '../../index.js'
+import { Threadpool } from '../../../index.js'
 
 // Bechmark code
 

@@ -85,6 +85,10 @@ class Thread extends EventEmitter {
 
     return this
   }
+  
+  removeAllListeners(...args) {
+    this.bus.removeAllListeners(...args)
+  }
 
   #attemptForceKill() {
     return new Promise((resolve, reject) => {

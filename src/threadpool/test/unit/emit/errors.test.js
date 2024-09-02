@@ -8,7 +8,7 @@ const fork = cp.fork
 
 
 test('#emit() non-started pool', async t => {
-  const pool = new Threadpool(load('pong.js'), 2)
+  const pool = new Threadpool(load('pong.js'))
 
   await t.test('rejects with error', async t => {
     await t.assert.rejects(pool.emit.bind(pool, 'foo'), {
@@ -19,7 +19,7 @@ test('#emit() non-started pool', async t => {
 
 
 test('#emit() stopped pool', async t => {
-  const pool = new Threadpool(load('pong.js'), 2)
+  const pool = new Threadpool(load('pong.js'))
 
   t.before(async () => {
     await pool.start()
@@ -37,7 +37,7 @@ test('#emit() stopped pool', async t => {
 test('#emit() IPC has error', async t => {
   cp.fork = t.mock.fn(fork)
   
-  const pool = new Threadpool(load('pong.js'), 2)
+  const pool = new Threadpool(load('pong.js'))
 
   t.before(() => pool.start()) 
   t.after(() => pool.stop())
@@ -59,7 +59,7 @@ test('#emit() IPC has error', async t => {
 test('#emit() IPC indicates rate limit', async t => {
   cp.fork = t.mock.fn(fork)
   
-  const pool = new Threadpool(load('pong.js'), 2)
+  const pool = new Threadpool(load('pong.js'))
   
   t.afterEach(() => pool.stop())
   t.before(() => pool.start())  

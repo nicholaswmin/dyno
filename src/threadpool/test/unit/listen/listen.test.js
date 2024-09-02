@@ -19,6 +19,7 @@ test('#on()', async t => {
   })
 })
 
+
 test('#once()', async t => {
   const pool = new Threadpool(load('pinger.js'))
 
@@ -38,6 +39,7 @@ test('#once()', async t => {
   })
 })
 
+
 test('#off()', async t => {
   const pool = new Threadpool(load('pinger.js'))
 
@@ -54,6 +56,7 @@ test('#off()', async t => {
     pool.on('ping', listener)
   })
 })
+
 
 test('#removeAllListeners()', async t => {
   const pool = new Threadpool(load('pinger.js'))

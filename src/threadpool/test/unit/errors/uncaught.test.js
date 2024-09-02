@@ -13,7 +13,7 @@ test('threads throw runtime error', async t => {
   let err  = null
 
   t.beforeEach(() => {
-    pool = new Threadpool(load('run-err.js'), 2)
+    pool = new Threadpool(load('run-err.js'))
     cp.fork.mock.resetCalls()
   })
   

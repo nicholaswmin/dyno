@@ -218,10 +218,11 @@ NODE_ENV=test node --run test
 
 ### Benchmark
 
-> Run a [ping/pong benchmark][benchmark]:  
+> Run a [ping/pong benchmark][benchmark]   
+> Measures [IPC][ipc] capacity 
 
 ```bash 
-node --run bench -- --size=4 --kibs=10
+node --run benchmark -- --size=4 --kibs=10
 ```
 
 > 4 threads, each `ping` sending 10 kilobytes of event data
@@ -269,6 +270,6 @@ logs:
 [child-p]: https://en.wikipedia.org/wiki/Child_process
 [v8]: https://v8.dev/
 
-[benchmark]: ./test/bench
+[benchmark]: ./test/utils/benchmrk
 [nicholaswmin]: https://github.com/nicholaswmin
 [license]: ./LICENSE
