@@ -1,9 +1,11 @@
 import test from 'node:test'
 
-import { cp, load, mockResultMethods } from '../../utils/index.js'
+import { cp, load, mockInstanceMethods } from '../../utils/index.js'
 import { Threadpool } from '../../../index.js'
 
+
 const fork = cp.fork
+
 
 test('#emit() non-started pool', async t => {
   const pool = new Threadpool(load('pong.js'), 2)
@@ -41,7 +43,7 @@ test('#emit() IPC has error', async t => {
   t.after(() => pool.stop())
 
   await t.test('rejects with error', async t => {
-    cp.fork.mock.calls.map(mockResultMethods({
+    cp.fork.mock.calls.map(mockInstanceMethods({
       send: (...args) => args.find(arg => arg instanceof Function)(
         new Error('Simulated Error')
       )
@@ -63,7 +65,7 @@ test('#emit() IPC indicates rate limit', async t => {
   t.before(() => pool.start())  
 
   await t.test('rejects with "rate exceeded" error', async t => {
-    cp.fork.mock.calls.map(mockResultMethods({
+    cp.fork.mock.calls.map(mockInstanceMethods({
       send: () => false
     }))
 

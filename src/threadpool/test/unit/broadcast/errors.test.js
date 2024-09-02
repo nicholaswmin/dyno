@@ -1,5 +1,5 @@
 import test from 'node:test'
-import { cp, load, mockResultMethods, dbouncer } from '../../utils/index.js'
+import { cp, load, mockInstanceMethods, dbouncer } from '../../utils/index.js'
 import { Threadpool } from '../../../index.js'
 
 const fork = cp.fork
@@ -72,7 +72,7 @@ test('#broadcast() IPC has error', async t => {
   t.after(() => pool.stop())
 
   await t.test('rejects with callback error', async t => {
-    cp.fork.mock.calls.map(mockResultMethods({
+    cp.fork.mock.calls.map(mockInstanceMethods({
       send: (...args) => args.find(arg => arg instanceof Function)(
         new Error('Simulated Error')
       )
@@ -94,7 +94,7 @@ test('#broadcast() IPC indicates rate limit', async t => {
   t.before(() => pool.start())  
 
   await t.test('rejects with "rate exceeded" error', async t => {
-    cp.fork.mock.calls.map(mockResultMethods({
+    cp.fork.mock.calls.map(mockInstanceMethods({
       send: () => false
     }))
 
