@@ -1,11 +1,9 @@
 import test from 'node:test'
-import cp from 'node:child_process'
-import { join } from 'node:path'
+
+import { cp, load } from '../../utils/index.js'
 import { Threadpool } from '../../../index.js'
 
 const alive = cp => cp.exitCode === null && cp.signalCode === null
-const load  = file => join(import.meta.dirname, `../../child-modules/${file}`)
-
 
 test('#start() error cases', async t => {
   let pool

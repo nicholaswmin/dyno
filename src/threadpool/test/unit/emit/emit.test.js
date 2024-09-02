@@ -1,12 +1,7 @@
 import test from 'node:test'
-import { join } from 'node:path'
-import { randomUUID } from 'node:crypto'
+
+import { load, dbouncer, randomUUID } from '../../utils/index.js'
 import { Threadpool } from '../../../index.js'
-
-
-const load = file => join(import.meta.dirname, `../../child-modules/${file}`)
-const dbouncer = t => (fn, ms) => t = clearTimeout(t) || setTimeout(fn, ms)
-
 
 test('#emit()', async t => {
   const pool = new Threadpool(load('pong.js'))

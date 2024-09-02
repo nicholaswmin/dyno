@@ -1,17 +1,8 @@
 import test from 'node:test'
-import cp from 'node:child_process'
-import { join } from 'node:path'
+import { cp, load, mockResultMethods, dbouncer } from '../../utils/index.js'
 import { Threadpool } from '../../../index.js'
 
 const fork = cp.fork
-const load = file => join(import.meta.dirname, `../../child-modules/${file}`)
-const dbouncer = t => (fn, ms) => t = clearTimeout(t) || setTimeout(fn, ms)
-const mockResultMethods = fns => ({ result }) => Object.assign(
-  result, Object.keys(fns).reduce((instance, fn) => ({ 
-    [fn]: fns[fn].bind(instance) 
-  }), result)
-)
-
 
 test('#broadcast() parallel instances', async t => {  
   const pools = [

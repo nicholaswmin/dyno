@@ -1,11 +1,7 @@
 import test from 'node:test'
-import cp from 'node:child_process'
-import { join } from 'node:path'
-import { randomUUID } from 'node:crypto'
-import { Threadpool } from '../../../index.js'
 
-const load = file => join(import.meta.dirname, `../../child-modules/${file}`)
-const dbouncer = t => (fn, ms) => t = clearTimeout(t) || setTimeout(fn, ms)
+import { load, dbouncer, randomUUID } from '../../utils/index.js'
+import { Threadpool } from '../../../index.js'
 
 test('#broadcast()', async t => {
   const pool = new Threadpool(load('pong.js'))
@@ -17,8 +13,10 @@ test('#broadcast()', async t => {
     const results = await pool.broadcast('ping')
 
     t.assert.ok(Array.isArray(results), 'resolved results is not an Array')
-    results.forEach((result, i) => 
-      t.assert.strictEqual(result, true, `result: ${i} is not true`))
+
+    results.forEach((result, i) => {
+      t.assert.strictEqual(result, true, `result: ${i} is not true`)
+    })
   })
 
   await t.test('sends event', async t => {
@@ -30,13 +28,13 @@ test('#broadcast()', async t => {
     const dbounce = t.mock.fn(dbouncer(t._timer))
     
     await new Promise((resolve, reject) => {
-      const _id = randomUUID()
+      const pingID = randomUUID()
 
-      pool.on('pong', ({ id }) => {
-        if (id === _id) 
+      pool.on('pong', ({ pongID }) => {
+        if (pongID === pingID) 
           dbounce(resolve, 50)
       })
-      .broadcast('ping', { id: _id }).catch(reject)
+      .broadcast('ping', { pongID: pingID }).catch(reject)
     })
 
     t.assert.strictEqual(dbounce.mock.callCount(), pool.size,
